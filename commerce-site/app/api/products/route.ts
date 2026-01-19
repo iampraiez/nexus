@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const ip = request.headers.get("x-forwarded-for") || "unknown";
     try {
       //
-      await checkRateLimit(ip, "search", 50000, 600);
+      await checkRateLimit(ip, "search", 100000, 600);
     } catch (error) {
       return NextResponse.json(
         { message: "Too many search requests. Please try again later." },

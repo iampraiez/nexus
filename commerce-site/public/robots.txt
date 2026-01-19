@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Allow all major search engines to crawl the site
+# Disallow access to admin areas
+Disallow: /admin/
+Disallow: /api/
+
+# Allow crawling of product pages and categories
+Allow: /products/
+Allow: /categories/
+
+# Disallow crawling of user-specific pages
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /profile
+Disallow: /auth/
+Disallow: /wishlist
+
+# Allow search engines to crawl search results (but with care)
+Allow: /search
+
+# Sitemap
+Sitemap: https://shop-site-thingy.vercel.app/sitemap.xml
+
+# Crawl delay (optional - helps reduce server load)
+Crawl-delay: 1

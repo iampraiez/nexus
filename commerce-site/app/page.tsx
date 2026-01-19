@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, Suspense, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  Suspense,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { useRouter } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
@@ -60,26 +67,27 @@ function HomeContent() {
 
   // Use ref to track if we're currently fetching to prevent duplicate requests
   const isFetchingRef = useRef(false);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
+  const fetchProducts = useCallback(
+    async (page: number = 1) => {
       // Prevent duplicate fetches
       if (isFetchingRef.current) return;
-      
+
       isFetchingRef.current = true;
       setIsLoading(true);
       setError("");
-      
+
       try {
         const params = new URLSearchParams();
-        params.append("page", "1");
+        params.append("page", page.toString());
         params.append("limit", "12");
         if (searchQuery) params.append("search", searchQuery);
         if (selectedCategory !== "All")
           params.append("category", selectedCategory);
 
         const response = await fetch(`/api/products?${params}`);
-        
+
         if (!response.ok) {
           if (response.status === 429) {
             setError("Too many requests. Please wait a moment and try again.");
@@ -90,7 +98,7 @@ function HomeContent() {
         }
 
         const data: PaginationData = await response.json();
-        
+
         // Safe defaults
         setProducts(data?.products || []);
         setCurrentPage(data?.pagination?.page || 1);
@@ -102,10 +110,33 @@ function HomeContent() {
         setIsLoading(false);
         isFetchingRef.current = false;
       }
-    };
+    },
+    [searchQuery, selectedCategory],
+  );
 
-    fetchProducts();
-  }, [searchQuery, selectedCategory]); // Only depend on actual search/category changes
+  // Debounced search effect
+  useEffect(() => {
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Set new timer for debounced search
+    debounceTimerRef.current = setTimeout(
+      () => {
+        fetchProducts(1);
+        setCurrentPage(1);
+      },
+      searchQuery ? 500 : 0,
+    ); // No delay for category changes, 500ms delay for search
+
+    // Cleanup function
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchQuery, selectedCategory, fetchProducts]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -113,47 +144,10 @@ function HomeContent() {
   };
 
   const handlePageChange = async (page: number) => {
-    if (isFetchingRef.current || page < 1 || page > totalPages) return;
-    
-    isFetchingRef.current = true;
-    setIsLoading(true);
-    setError("");
-    
-    try {
-      const params = new URLSearchParams();
-      params.append("page", page.toString());
-      params.append("limit", "12");
-      if (searchQuery) params.append("search", searchQuery);
-      if (selectedCategory !== "All")
-        params.append("category", selectedCategory);
-
-      const response = await fetch(`/api/products?${params}`);
-      
-      if (!response.ok) {
-        if (response.status === 429) {
-          setError("Too many requests. Please wait a moment and try again.");
-        } else {
-          setError("Failed to load products. Please try again.");
-        }
-        return;
-      }
-
-      const data: PaginationData = await response.json();
-      
-      // Safe defaults
-      setProducts(data?.products || []);
-      setCurrentPage(data?.pagination?.page || page);
-      setTotalPages(data?.pagination?.pages || 1);
-      
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      setError("An error occurred while loading products.");
-    } finally {
-      setIsLoading(false);
-      isFetchingRef.current = false;
-    }
+    if (page < 1 || page > totalPages) return;
+    await fetchProducts(page);
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (

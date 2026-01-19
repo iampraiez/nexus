@@ -18,15 +18,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Shop - Modern Ecommerce Store",
   description: "Shop premium products with a modern, seamless experience",
-  generator: "v0.app",
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
+        url: "/icon.svg",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/icon-dark-32x32.png",
+        url: "/icon.svg",
         media: "(prefers-color-scheme: dark)",
       },
       {
