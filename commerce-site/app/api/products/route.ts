@@ -5,9 +5,9 @@ import { checkRateLimit } from "@/lib/rate-limit";
 export async function GET(request: NextRequest) {
   try {
     const ip = request.headers.get("x-forwarded-for") || "unknown";
-    // Looser limit for search: 60 requests per minute
     try {
-      await checkRateLimit(ip, "search", 10000, 10);
+      //
+      await checkRateLimit(ip, "search", 50000, 600);
     } catch (error) {
       return NextResponse.json(
         { message: "Too many search requests. Please try again later." },

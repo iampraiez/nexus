@@ -5,9 +5,7 @@ import { getDB } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-12-27.acpi.3"
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 import { checkRateLimit } from "@/lib/rate-limit";
 
