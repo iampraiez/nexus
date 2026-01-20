@@ -4,23 +4,26 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, ChevronRight } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Card, CardContent } from "@/components/ui/card";
+import { Package, ChevronRight, Calendar, CreditCard, ShoppingBag } from "lucide-react";
 
 interface Order {
   _id: string;
   total: number;
+  subtotal?: number;
+  taxAmount?: number;
   status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
   createdAt: string;
   items: any[];
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800",
-  paid: "bg-blue-100 text-blue-800",
-  shipped: "bg-purple-100 text-purple-800",
-  delivered: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
+  pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
+  paid: "bg-blue-100 text-blue-800 border-blue-300",
+  shipped: "bg-purple-100 text-purple-800 border-purple-300",
+  delivered: "bg-green-100 text-green-800 border-green-300",
+  cancelled: "bg-red-100 text-red-800 border-red-300",
 };
 
 export default function OrdersPage() {
@@ -49,17 +52,22 @@ export default function OrdersPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-primary">My Orders</h1>
-          <p className="text-muted-foreground mt-2">
-            View and track your orders
+      <header className="border-b border-border bg-card">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-3 bg-primary/10 rounded-lg">
+              <Package className="w-6 h-6 text-primary" />
+            </div>
+            <h1 className="text-4xl font-bold text-primary">My Orders</h1>
+          </div>
+          <p className="text-muted-foreground ml-[60px]">
+            View and track your order history
           </p>
         </div>
       </header>
 
       {/* Orders List */}
-      <main className="max-w-7xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-8">
         {error && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 mb-6">
             {error}
@@ -67,13 +75,18 @@ export default function OrdersPage() {
         )}
 
         {isLoading ? (
-          <p className="text-muted-foreground">Loading your orders...</p>
+          <div className="flex justify-center py-12">
+            <LoadingSpinner />
+          </div>
         ) : orders.length === 0 ? (
-          <Card>
+          <Card className="max-w-md mx-auto">
             <CardContent className="pt-12 text-center pb-12">
-              <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg text-muted-foreground mb-6">
-                No orders yet
+              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <ShoppingBag className="w-10 h-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">No orders yet</h3>
+              <p className="text-muted-foreground mb-6">
+                Start shopping to see your orders here
               </p>
               <Button
                 asChild
@@ -84,69 +97,81 @@ export default function OrdersPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
-            {orders.map((order) => (
-              <Link key={order._id} href={`/orders/${order._id}`}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <p className="text-sm text-muted-foreground">
-                          Order ID
-                        </p>
-                        <p className="font-mono font-semibold mb-3">
-                          {order._id.substring(0, 16)}...
-                        </p>
+          <div className="grid gap-4">
+            {orders.map((order) => {
+              const itemCount = Array.isArray(order.items) && order.items.length > 0
+                ? order.items.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0)
+                : 0;
 
-                        <div className="flex items-center gap-4">
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              Total
-                            </p>
-                            <p className="text-xl font-bold text-accent">
-                              ${order.total.toFixed(2)}
-                            </p>
+              return (
+                <Link key={order._id} href={`/orders/${order._id}`}>
+                  <Card className="hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary/20">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+                        {/* Left: Order Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="p-2 bg-muted rounded-lg">
+                              <Package className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Order</p>
+                              <p className="font-mono text-sm font-semibold">
+                                #{order._id.slice(-8).toUpperCase()}
+                              </p>
+                            </div>
                           </div>
 
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              Items
-                            </p>
-                            <p className="text-lg font-semibold">
-                              {Array.isArray(order.items) && order.items.length > 0
-                                ? order.items.reduce(
-                                    (sum: number, item: any) => sum + (item.quantity || 0),
-                                    0,
-                                  )
-                                : 0}
-                            </p>
-                          </div>
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <CreditCard className="w-4 h-4 text-muted-foreground" />
+                                <p className="text-xs text-muted-foreground">Total</p>
+                              </div>
+                              <p className="text-2xl font-bold text-accent">
+                                ${order.total.toFixed(2)}
+                              </p>
+                            </div>
 
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              Date
-                            </p>
-                            <p className="text-lg font-semibold">
-                              {new Date(order.createdAt).toLocaleDateString()}
-                            </p>
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <ShoppingBag className="w-4 h-4 text-muted-foreground" />
+                                <p className="text-xs text-muted-foreground">Items</p>
+                              </div>
+                              <p className="text-xl font-semibold">{itemCount}</p>
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <Calendar className="w-4 h-4 text-muted-foreground" />
+                                <p className="text-xs text-muted-foreground">Date</p>
+                              </div>
+                              <p className="text-sm font-semibold">
+                                {new Date(order.createdAt).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric"
+                                })}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="flex flex-col items-end gap-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-semibold ${STATUS_COLORS[order.status]}`}
-                        >
-                          {order.status.charAt(0).toUpperCase() +
-                            order.status.slice(1)}
-                        </span>
-                        <ChevronRight className="w-6 h-6 text-muted-foreground" />
+                        {/* Right: Status & Arrow */}
+                        <div className="flex items-center gap-4 lg:flex-col lg:items-end justify-between lg:justify-center">
+                          <span
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold border whitespace-nowrap ${STATUS_COLORS[order.status]}`}
+                          >
+                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                          </span>
+                          <ChevronRight className="w-6 h-6 text-muted-foreground flex-shrink-0" />
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>

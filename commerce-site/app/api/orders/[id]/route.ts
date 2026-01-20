@@ -30,6 +30,21 @@ export async function GET(
     const db = await getDB();
     const ordersCollection = db.collection("orders");
 
+    // Auto-delivery logic for single order
+    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
+    
+    await ordersCollection.updateOne(
+      {
+        _id: new ObjectId(id),
+        userId: new ObjectId(session.user.id),
+        status: "paid",
+        createdAt: { $lt: thirtySecondsAgo }
+      },
+      {
+        $set: { status: "delivered", updatedAt: new Date() }
+      }
+    );
+
     const order = await ordersCollection.findOne({
       _id: new ObjectId(id),
       userId: new ObjectId(session.user.id)

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ArrowLeft, Eye, AlertCircle } from "lucide-react";
 import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
 
@@ -107,10 +108,8 @@ export default function RecentlyViewedPage() {
         )}
 
         {productsLoading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              Loading recently viewed products...
-            </p>
+          <div className="flex justify-center py-12">
+            <LoadingSpinner />
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">

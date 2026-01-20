@@ -190,7 +190,6 @@ function HomeContent() {
       {isLoading ? (
         <div className="text-center py-12 flex flex-col items-center">
           <LoadingSpinner />
-          <p className="text-muted-foreground mt-4">Loading products...</p>
         </div>
       ) : products.length === 0 ? (
         <div className="text-center py-12">

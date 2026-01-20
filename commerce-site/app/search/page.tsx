@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ArrowLeft, Search } from "lucide-react";
 import Loading from "./loading"; // Import the Loading component
 
@@ -149,9 +150,9 @@ function SearchContent() {
             <p className="text-muted-foreground">No search query provided</p>
           </div>
         ) : isLoading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading results...</p>
-          </div>
+            <div className="flex justify-center py-12">
+              <LoadingSpinner />
+            </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12">
             <Search className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />

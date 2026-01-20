@@ -18,6 +18,20 @@ export async function GET(request: NextRequest) {
     const db = await getDB();
     const ordersCollection = db.collection("orders");
 
+    // Auto-delivery logic: Update "paid" orders older than 30 seconds to "delivered"
+    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
+    
+    await ordersCollection.updateMany(
+      {
+        userId: new ObjectId(session.user.id),
+        status: "paid",
+        createdAt: { $lt: thirtySecondsAgo }
+      },
+      {
+        $set: { status: "delivered", updatedAt: new Date() }
+      }
+    );
+
     const orders = await ordersCollection
       .find({ userId: new ObjectId(session.user.id) })
       .sort({ createdAt: -1 })

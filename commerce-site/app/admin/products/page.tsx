@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Edit, Trash2, Plus, ChevronLeft } from "lucide-react";
 
@@ -87,7 +88,9 @@ export default function AdminProductsPage() {
         )}
 
         {isLoading ? (
-          <p className="text-muted-foreground">Loading products...</p>
+          <div className="flex justify-center py-12">
+            <LoadingSpinner />
+          </div>
         ) : products.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">

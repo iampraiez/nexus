@@ -6,7 +6,7 @@ import { ObjectId } from "mongodb";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -18,11 +18,14 @@ export async function POST(
       );
     }
 
+    // Await params in Next.js 15+
+    const { id } = await params;
+
     const db = await getDB();
     const ordersCollection = db.collection("orders");
 
     const order = await ordersCollection.findOne({
-      _id: new ObjectId(params.id),
+      _id: new ObjectId(id),
       userId: new ObjectId(session.user.id)
     });
 
@@ -43,7 +46,7 @@ export async function POST(
 
     // Update order status to cancelled
     const result = await ordersCollection.findOneAndUpdate(
-      { _id: new ObjectId(params.id) },
+      { _id: new ObjectId(id) },
       {
         $set: {
           status: "cancelled",
@@ -53,7 +56,7 @@ export async function POST(
       { returnDocument: "after" }
     );
 
-    return NextResponse.json(result.value, { status: 200 });
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Error cancelling order:", error);
     return NextResponse.json(

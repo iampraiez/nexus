@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ProductForm } from "@/components/product-form";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface Product {
   _id: string;
@@ -40,7 +41,7 @@ export default function EditProductPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <LoadingSpinner />
       </div>
     );
   }

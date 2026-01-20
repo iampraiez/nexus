@@ -23,10 +23,15 @@ export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [taxRate, setTaxRate] = useState(0);
+  const [showProcessing, setShowProcessing] = useState(false);
 
   useEffect(() => {
     const cartItems = getCart();
     setItems(cartItems);
+    // Generate random tax rate between 1.5% and 3.7%
+    const randomTax = (Math.random() * (3.7 - 1.5) + 1.5) / 100;
+    setTaxRate(randomTax);
     setIsLoading(false);
   }, []);
 
@@ -48,37 +53,46 @@ export default function CartPage() {
     }
   };
 
-  const total = items.reduce(
+  const subtotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
+  const taxAmount = subtotal * taxRate;
+  const total = subtotal + taxAmount;
 
   const handleCheckout = async () => {
     setIsCheckingOut(true);
+    setShowProcessing(true);
+    
     try {
+      // Simulate a brief processing time for better UX
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ 
+          items,
+          subtotal,
+          taxAmount,
+          total 
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        setShowProcessing(false);
         alert(data.message || "Checkout failed");
         return;
       }
 
-      // Redirect to Stripe checkout
-      const stripe = await import("@stripe/stripe-js").then(
-        (m) => m.loadStripe,
-      );
-      const stripeInstance = await stripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-      );
-      await stripeInstance?.redirectToCheckout({ sessionId: data.sessionId });
+      // Clear cart and redirect to success
+      clearCart();
+      router.push(`/checkout/success?orderId=${data.orderId}`);
     } catch (error) {
       console.error("Checkout error:", error);
+      setShowProcessing(false);
       alert("An error occurred during checkout");
     } finally {
       setIsCheckingOut(false);
@@ -89,6 +103,21 @@ export default function CartPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Processing overlay
+  if (showProcessing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-12 pb-12 text-center">
+            <LoadingSpinner className="mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Processing Your Order</h3>
+            <p className="text-muted-foreground">Please wait...</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -212,7 +241,11 @@ export default function CartPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-medium">${total.toFixed(2)}</span>
+                      <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Tax ({(taxRate * 100).toFixed(2)}%)</span>
+                      <span className="font-medium">${taxAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Shipping</span>

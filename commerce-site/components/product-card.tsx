@@ -1,7 +1,12 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import Image from "next/image";
 
 interface ProductCardProps {
@@ -21,8 +26,92 @@ export function ProductCard({
   description,
   stock,
 }: ProductCardProps) {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isCheckingWishlist, setIsCheckingWishlist] = useState(false);
+
+  // Check if product is in wishlist on mount
+  useEffect(() => {
+    if (!session?.user) return;
+
+    const checkWishlist = async () => {
+      setIsCheckingWishlist(true);
+      try {
+        const response = await fetch("/api/wishlist");
+        if (!response.ok) return;
+        
+        const data = await response.json();
+        const isIn = data.productIds?.some(
+          (productId: any) => (productId.$oid || productId.toString?.() || productId) === id,
+        );
+        setIsInWishlist(!!isIn);
+      } catch (error) {
+        console.error("Error checking wishlist:", error);
+      } finally {
+        setIsCheckingWishlist(false);
+      }
+    };
+
+    checkWishlist();
+  }, [session?.user, id]);
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation
+    e.stopPropagation(); // Stop event bubbling
+
+    if (!session?.user) {
+      router.push("/auth/login");
+      return;
+    }
+
+    // Optimistic update
+    const previousState = isInWishlist;
+    setIsInWishlist(!previousState);
+
+    try {
+      if (previousState) {
+        // Remove from wishlist
+        const response = await fetch(`/api/wishlist?productId=${id}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) throw new Error("Failed to remove");
+      } else {
+        // Add to wishlist
+        const response = await fetch("/api/wishlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: id }),
+        });
+        if (!response.ok) throw new Error("Failed to add");
+      }
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+      // Revert on error
+      setIsInWishlist(previousState);
+    }
+  };
+
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow relative">
+      {/* Wishlist Button - Top Right */}
+      {session?.user && (
+        <button
+          onClick={handleToggleWishlist}
+          disabled={isCheckingWishlist}
+          className="absolute top-3 right-3 z-10 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-all shadow-md disabled:opacity-50"
+          aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className={`w-5 h-5 transition-colors ${
+              isInWishlist
+                ? "fill-accent text-accent"
+                : "text-foreground hover:text-accent"
+            }`}
+          />
+        </button>
+      )}
+
       <Link href={`/products/${id}`}>
         <div className="aspect-video overflow-hidden bg-muted relative">
           <Image

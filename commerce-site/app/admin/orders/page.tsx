@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -69,7 +70,9 @@ export default function AdminOrdersPage() {
         )}
 
         {isLoading ? (
-          <p className="text-muted-foreground">Loading orders...</p>
+          <div className="flex justify-center py-12">
+            <LoadingSpinner />
+          </div>
         ) : orders.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center pb-6">
