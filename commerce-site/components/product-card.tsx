@@ -96,7 +96,7 @@ export function ProductCard({
 
   if (viewMode === "list") {
     return (
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow relative flex flex-row h-48 group">
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow relative flex flex-col sm:flex-row h-auto sm:h-48 group">
         {/* Wishlist Button - Top Right */}
         {session?.user && (
           <button
@@ -115,7 +115,7 @@ export function ProductCard({
           </button>
         )}
 
-        <Link href={`/products/${id}`} className="w-48 shrink-0 relative bg-muted">
+        <Link href={`/products/${id}`} className="w-full sm:w-48 aspect-video sm:aspect-square shrink-0 relative bg-muted">
           <Image
             src={image || "/placeholder.svg"}
             alt={name}
@@ -125,27 +125,27 @@ export function ProductCard({
           />
         </Link>
 
-        <div className="flex flex-col flex-1 p-6 justify-between">
+        <div className="flex flex-col flex-1 p-4 sm:p-6 justify-between">
           <div>
-            <div className="flex justify-between items-start">
-              <Link href={`/products/${id}`}>
-                <h3 className="font-semibold text-xl hover:text-accent transition-colors truncate mb-2">
+            <div className="flex justify-between items-start gap-4">
+              <Link href={`/products/${id}`} className="flex-1 min-w-0">
+                <h3 className="font-semibold text-lg sm:text-xl hover:text-accent transition-colors truncate mb-1 sm:mb-2">
                   {name}
                 </h3>
               </Link>
-              <p className="text-xl font-bold text-accent">
+              <p className="text-lg sm:text-xl font-bold text-accent shrink-0">
                 ${price.toFixed(2)}
               </p>
             </div>
             
             {description && (
-              <p className="text-muted-foreground line-clamp-2 text-sm max-w-2xl">
+              <p className="text-muted-foreground line-clamp-2 text-xs sm:text-sm max-w-2xl">
                 {description}
               </p>
             )}
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-4 sm:mt-0">
             <Button
               asChild
               size="sm"
