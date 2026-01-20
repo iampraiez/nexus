@@ -1,12 +1,11 @@
 # Full-Stack Ecommerce Application - Setup Guide
 
-This is a complete full-stack ecommerce application built with Next.js, MongoDB, Stripe, and NextAuth.
+This is a complete full-stack ecommerce application built with Next.js, MongoDB, and NextAuth.
 
 ## Prerequisites
 
 - Node.js 18+ 
 - MongoDB database (local or cloud)
-- Stripe account (test keys)
 - NextAuth secret key
 
 ## Environment Variables
@@ -20,11 +19,6 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ecommerce?retryW
 # NextAuth
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key-here
-
-# Stripe
-STRIPE_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_... (optional, set up webhook later)
 ```
 
 ## Installation & Setup
@@ -70,7 +64,7 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, set up webhook later)
 - Browse products with search and filtering
 - View product details
 - Add items to shopping cart (persisted in localStorage)
-- Checkout with Stripe
+- Demo checkout with simulated payments
 - View order history
 - Track order status
 - Customer profile
@@ -116,7 +110,6 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, set up webhook later)
   - image (string)
 - total (number)
 - status (string: "pending" | "paid" | "shipped" | "delivered" | "cancelled")
-- stripeSessionId (string)
 - createdAt (date)
 - updatedAt (date)
 
@@ -160,18 +153,7 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, set up webhook later)
 - `GET /api/admin/dashboard` - Get dashboard analytics
 
 ### Webhooks
-- `POST /api/webhooks/stripe` - Stripe webhook handler
 
-## Stripe Webhook Setup (Production)
-
-1. Go to https://dashboard.stripe.com/webhooks
-2. Click "Add endpoint"
-3. Enter your webhook URL: `https://yourdomain.com/api/webhooks/stripe`
-4. Select events:
-   - `checkout.session.completed`
-   - `charge.refunded`
-   - `payment_intent.payment_failed`
-5. Copy the signing secret to `STRIPE_WEBHOOK_SECRET`
 
 ## Project Structure
 
@@ -225,16 +207,13 @@ STRIPE_WEBHOOK_SECRET=whsec_... (optional, set up webhook later)
 - Check `NEXTAUTH_URL` matches your domain
 - Clear cookies and try again
 
-**Stripe Errors:**
-- Verify Stripe keys are correct
-- Test with Stripe's test card: `4242 4242 4242 4242`
-- Check webhook signing secret for webhook events
+
 
 ## Additional Notes
 
 - Cart is stored in browser localStorage for unauthenticated users
-- Payment processing is handled by Stripe
-- Order status updates happen via webhooks
+- Payment processing is simulated (Demo Mode)
+- Order status updates happen automatically (e.g., auto-delivery)
 - All admin routes require authentication and admin role
 - Protected routes use middleware and server-side session checks
 
@@ -244,4 +223,3 @@ For issues or questions, refer to the documentation for:
 - [Next.js](https://nextjs.org/docs)
 - [NextAuth](https://next-auth.js.org)
 - [MongoDB](https://docs.mongodb.com)
-- [Stripe](https://stripe.com/docs)

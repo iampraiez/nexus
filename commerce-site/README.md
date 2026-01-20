@@ -1,13 +1,13 @@
 # Commerce Brain
 
-A full-stack e-commerce application built with Next.js, featuring user authentication, product management, shopping cart, secure checkout with Stripe, and an admin dashboard.
+A full-stack e-commerce application built with Next.js, featuring user authentication, product management, shopping cart, demo checkout, and an admin dashboard.
 
 ## 🚀 Features
 
 - **User Authentication**: Secure login/registration with NextAuth
 - **Product Management**: Browse, search, and view detailed product information
 - **Shopping Cart**: Add/remove items, persistent cart storage
-- **Secure Checkout**: Integrated Stripe payment processing
+- **Demo Checkout**: Integrated simulated payment processing with random success/failure and delivery fees
 - **Order Management**: Track orders and order history
 - **Admin Dashboard**: Manage products, orders, and users
 - **Responsive Design**: Mobile-first design with Tailwind CSS
@@ -21,14 +21,13 @@ A full-stack e-commerce application built with Next.js, featuring user authentic
 - **Backend**: Next.js API routes
 - **Database**: MongoDB with Mongoose
 - **Authentication**: NextAuth.js
-- **Payments**: Stripe
+- **Payments**: Demo Mode (Simulated)
 - **State Management**: React hooks, Context API
 
 ## 📋 Prerequisites
 
 - Node.js 18+
 - MongoDB database (local or cloud like MongoDB Atlas)
-- Stripe account for payment processing
 - npm or pnpm package manager
 
 ## 🔧 Installation
@@ -55,11 +54,6 @@ A full-stack e-commerce application built with Next.js, featuring user authentic
    # NextAuth
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=your-secret-key-here
-
-   # Stripe
-   STRIPE_SECRET_KEY=sk_test_...
-   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
-   STRIPE_WEBHOOK_SECRET=whsec_... (optional, for webhooks)
    ```
 
 4. **Initialize the database:**
@@ -119,11 +113,11 @@ The app uses NextAuth.js with multiple providers. Currently configured for crede
 
 ## 💳 Payment Integration
 
-Stripe is integrated for secure payment processing. The checkout flow includes:
-- Cart review
-- Shipping information
-- Payment processing
-- Order confirmation
+The application uses a **Demo Mode** for checkout to simulate a real-world experience without requiring actual payment processing. Features include:
+- Random delivery fee calculation ($5 - $30)
+- Simulated payment processing with a 75% success rate
+- Automatic order status updates (e.g., auto-delivery after 30 seconds)
+- Order confirmation and history tracking
 
 ## 📊 Admin Features
 
@@ -149,4 +143,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with [Next.js](https://nextjs.org/)
 - UI components from [Radix UI](https://www.radix-ui.com/)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Payments powered by [Stripe](https://stripe.com/)
