@@ -1,0 +1,58 @@
+{
+  "name": "nexus-avail",
+  "version": "1.1.2",
+  "author": "iampraiez",
+  "license": "MIT",
+  "private": false,
+  "description": "Production-ready TypeScript SDK for Nexus analytics platform",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iampraiez/commerce_brain.git",
+    "directory": "nexus-sdk-build/nexus-sdk"
+  },
+  "homepage": "https://github.com/iampraiez/commerce_brain/tree/main/nexus-sdk-build/nexus-sdk#readme",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js",
+      "types": "./dist/types/index.d.ts",
+      "browser": "./dist/esm/browser.js",
+      "node": "./dist/esm/node.js",
+      "default": "./dist/esm/browser.js"
+    }
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "fs/promises": false,
+    "crypto": false
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs",
+    "build:esm": "tsc --module esnext --outDir dist/esm",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist/types",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "analytics",
+    "tracking",
+    "events",
+    "nexus",
+    "sdk"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

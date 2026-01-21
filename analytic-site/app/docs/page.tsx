@@ -147,16 +147,15 @@ export default function PublicDocsPage() {
                   1
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
-                  Create a Project
+                  Install the SDK
                 </h3>
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6 space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Sign up for free and create your first project. You&apos;ll
-                  get an API key instantly:
+                  Install the production-ready SDK via npm or pnpm:
                 </p>
                 <div className="bg-secondary rounded-lg p-3 font-mono text-xs text-primary overflow-x-auto">
-                  pk_live_xxxxxxxxxxxxxxxxxxxx
+                  npm install nexus-avail
                 </div>
               </div>
             </div>
@@ -173,12 +172,13 @@ export default function PublicDocsPage() {
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6">
                 <CopyableCode
-                  code={`import { Analytics } from '@nexus/analytics-sdk';
+                  code={`import { Nexus } from 'nexus-avail';
 
 // Initialize once at app startup
-const analytics = new Analytics({
+Nexus.init({
   apiKey: 'pk_live_your_api_key',
-  apiUrl: 'https://api.nexus-analytics.com/events'
+  projectId: 'your_project_id',
+  environment: 'production'
 });`}
                   language="typescript"
                 />
@@ -197,22 +197,26 @@ const analytics = new Analytics({
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6">
                 <CopyableCode
-                  code={`// Track user actions
-analytics.track('user_signup', {
-  plan: 'pro',
+                  code={`// Track user actions with type-safe schemas
+Nexus.track('user_signup', {
+  email: 'user@example.com',
   source: 'landing_page'
 });
 
-// Identify users (optional but recommended)
-analytics.identify('user_12345', {
-  email: 'user@example.com',
-  plan: 'pro',
-  signup_date: '2026-01-20'
+// Track product interactions
+Nexus.track('product_viewed', {
+  productId: 'prod_123',
+  productName: 'Awesome Headphones',
+  category: 'Electronics'
 });
 
-// Track page views
-analytics.pageView('pricing_page', {
-  referrer: 'home'
+// Track orders
+Nexus.track('order_created', {
+  orderId: 'order_987',
+  userId: 'user_123',
+  amount: 99.99,
+  currency: 'USD',
+  items: [{ productId: 'prod_123', qty: 1 }]
 });`}
                   language="typescript"
                 />
@@ -239,6 +243,50 @@ analytics.pageView('pricing_page', {
             </div>
           </div>
 
+          {/* Environment Support */}
+          <div className="space-y-6">
+            <h2 className="text-3xl font-semibold text-foreground">
+              Cross-Platform Support
+            </h2>
+            <p className="text-base text-muted-foreground leading-relaxed">
+              The Nexus SDK is designed to work seamlessly in any environment.
+              It automatically detects where it&apos;s running and adjusts its
+              behavior for maximum performance and reliability.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+              <div className="p-6 rounded-lg border border-border/50 bg-card/30 backdrop-blur">
+                <div className="flex items-start gap-4">
+                  <Globe className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-2">
+                      Browser Environment
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Uses IndexedDB for robust offline persistence and
+                      SubtleCrypto for secure request signing. Perfect for
+                      React, Next.js, and Vue apps.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 rounded-lg border border-border/50 bg-card/30 backdrop-blur">
+                <div className="flex items-start gap-4">
+                  <Code className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-2">
+                      Node.js Environment
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Uses the filesystem for event caching and the native
+                      crypto module. Ideal for server-side tracking in API
+                      routes or backend services.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Core Concepts */}
           <div className="space-y-6">
             <h2 className="text-3xl font-semibold text-foreground">
@@ -248,47 +296,50 @@ analytics.pageView('pricing_page', {
             <div className="space-y-4">
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <h3 className="font-semibold text-foreground mb-2 text-lg">
-                  Events
+                  Type-Safe Events
                 </h3>
                 <p className="text-muted-foreground text-sm mb-4">
-                  Events are actions your users take. They can be anything:
-                  button clicks, form submissions, page views, or custom
-                  business events.
-                </p>
-                <CopyableCode
-                  code={`analytics.track('purchase', { amount: 99.99, currency: 'USD' })`}
-                  language="typescript"
-                />
-              </div>
-
-              <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h3 className="font-semibold text-foreground mb-2 text-lg">
-                  User Identification
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Link events to specific users with the `identify` method. This
-                  allows you to build user profiles, track user journeys, and
-                  create cohorts.
-                </p>
-                <CopyableCode
-                  code={`analytics.identify('user_id', { email: 'user@example.com' })`}
-                  language="typescript"
-                />
-              </div>
-
-              <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h3 className="font-semibold text-foreground mb-2 text-lg">
-                  Properties
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Every event can have properties—contextual data that describes
-                  what happened. Use properties to segment and analyze your
+                  Nexus uses TypeScript to ensure your event data is always
+                  correct. No more missing fields or typos in your analytics
                   data.
                 </p>
                 <CopyableCode
-                  code={`analytics.track('course_completed', { course_id: '101', duration_minutes: 45 })`}
+                  code={`Nexus.track('payment_failed', { 
+  orderId: 'order_123', 
+  error: 'Insufficient funds' 
+})`}
                   language="typescript"
                 />
+              </div>
+
+              <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
+                <h3 className="font-semibold text-foreground mb-2 text-lg">
+                  Automatic Batching
+                </h3>
+                <p className="text-muted-foreground text-sm mb-4">
+                  To optimize performance, events are automatically batched and
+                  sent every 2 seconds or when the batch size reaches 10.
+                </p>
+                <CopyableCode
+                  code={`// Events are queued and sent efficiently
+Nexus.track('product_viewed', { productId: '1' });
+Nexus.track('product_viewed', { productId: '2' });`}
+                  language="typescript"
+                />
+              </div>
+
+              <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
+                <h3 className="font-semibold text-foreground mb-2 text-lg">
+                  Offline Persistence
+                </h3>
+                <p className="text-muted-foreground text-sm mb-4">
+                  If the user goes offline, events are saved locally and
+                  automatically synced when the connection is restored.
+                </p>
+                <div className="bg-secondary/30 rounded-lg p-4 text-sm text-muted-foreground italic">
+                  &ldquo;Never lose a single event due to network
+                  instability.&rdquo;
+                </div>
               </div>
             </div>
           </div>
@@ -302,17 +353,19 @@ analytics.pageView('pricing_page', {
             <div className="space-y-4">
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
-                  track(eventName, properties?)
+                  Nexus.init(config)
                 </h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Records an event. This is the primary method for tracking user
-                  actions.
+                  Initializes the SDK. Must be called before tracking any
+                  events.
                 </p>
                 <CopyableCode
-                  code={`analytics.track('video_watched', {
-  video_id: 'v123',
-  duration_seconds: 300,
-  completed: true
+                  code={`Nexus.init({
+  apiKey: 'your_key',
+  projectId: 'your_id',
+  environment: 'production',
+  batchSize: 10,
+  flushInterval: 2000
 });`}
                   language="typescript"
                 />
@@ -320,18 +373,14 @@ analytics.pageView('pricing_page', {
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
-                  identify(userId, traits?)
+                  Nexus.track(eventType, data)
                 </h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Associate events with a specific user and set their traits.
-                  Traits are persistent user attributes.
+                  Records an event with type-safe data validation.
                 </p>
                 <CopyableCode
-                  code={`analytics.identify('user_456', {
-  email: 'john@example.com',
-  name: 'John Doe',
-  plan: 'premium',
-  signup_date: '2025-06-15'
+                  code={`Nexus.track('user_login', {
+  email: 'john@example.com'
 });`}
                   language="typescript"
                 />
@@ -339,44 +388,40 @@ analytics.pageView('pricing_page', {
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
-                  pageView(pageName, properties?)
+                  Nexus.flush()
                 </h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Automatically tracks page views with URL and referrer
-                  information.
+                  Immediately sends all queued events. Returns a promise that
+                  resolves when sending is complete.
                 </p>
                 <CopyableCode
-                  code={`analytics.pageView('pricing', {
-  utm_source: 'google',
-  utm_campaign: 'summer_sale'
-});`}
+                  code={`await Nexus.flush();`}
                   language="typescript"
                 />
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
-                  flush()
+                  Nexus.getSessionId()
                 </h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Immediately sends all queued events. Useful before page
-                  unloads.
+                  Returns the current unique session identifier.
                 </p>
                 <CopyableCode
-                  code={`analytics.flush()`}
+                  code={`const sessionId = Nexus.getSessionId();`}
                   language="typescript"
                 />
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
-                  reset()
+                  Nexus.destroy()
                 </h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Clears the current user context. Use this on logout.
+                  Flushes pending events and cleans up resources.
                 </p>
                 <CopyableCode
-                  code={`analytics.reset()`}
+                  code={`await Nexus.destroy();`}
                   language="typescript"
                 />
               </div>
@@ -398,8 +443,8 @@ analytics.pageView('pricing_page', {
                   </h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Keep event names consistent with your team&apos;s naming
-                  convention (e.g., snake_case). This makes analysis easier.
+                  Stick to the predefined event types for maximum compatibility
+                  with Nexus dashboards.
                 </p>
               </div>
 
@@ -407,12 +452,12 @@ analytics.pageView('pricing_page', {
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <h4 className="font-semibold text-foreground">
-                    Identify Users Early
+                    Initialize Once
                   </h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Call `identify()` as soon as you know who the user is,
-                  typically after login or signup.
+                  Call `Nexus.init()` once at the root of your application
+                  (e.g., in `App.tsx` or `layout.tsx`).
                 </p>
               </div>
 
@@ -450,8 +495,8 @@ analytics.pageView('pricing_page', {
                   </h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Call `flush()` before page unloads to ensure all events are
-                  sent.
+                  Call `Nexus.destroy()` in your cleanup logic to ensure all
+                  pending events are sent.
                 </p>
               </div>
 
@@ -459,12 +504,12 @@ analytics.pageView('pricing_page', {
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <h4 className="font-semibold text-foreground">
-                    Test Your Events
+                    Use TypeScript
                   </h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Use the dashboard to verify that events are being tracked
-                  correctly before going live.
+                  Take advantage of the SDK&apos;s full TypeScript support for
+                  autocompletion and error checking.
                 </p>
               </div>
             </div>
@@ -576,6 +621,16 @@ analytics.pageView('pricing_page', {
                       Create Account
                     </Button>
                   </Link>
+                  <a
+                    href="https://github.com/iampraiez/commerce_brain"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button size="sm" variant="outline" className="gap-2">
+                      <Github className="w-4 h-4" />
+                      GitHub Repo
+                    </Button>
+                  </a>
                 </div>
               </div>
             </div>
@@ -589,7 +644,15 @@ analytics.pageView('pricing_page', {
           <div>
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} Nexus • Modern Analytics, Built
-              Simple
+              Simple by{" "}
+              <a
+                href="https://github.com/iampraiez"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                iampraiez
+              </a>
             </p>
           </div>
           <div className="flex gap-6 items-center">
