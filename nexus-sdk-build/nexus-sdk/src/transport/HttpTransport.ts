@@ -4,7 +4,7 @@
 
 import type { ITransport, SerializedEvent, ILogger } from "../types";
 
-const DEFAULT_ENDPOINT = "https://api.nexus-analytics.com/events";
+const DEFAULT_ENDPOINT = "https://nexus-anal.vercel.app/api/events/ingest";
 const MAX_RETRIES = 3;
 
 interface RetryConfig {
