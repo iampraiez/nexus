@@ -99,6 +99,8 @@ export interface SerializedEvent {
   type: EventType;
   data: Record<string, unknown>;
   timestamp: number;
+  sdkVersion: string;
+  latency?: number; // Time taken to process event (in milliseconds)
 }
 
 /**

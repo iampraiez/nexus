@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { getDatabase } from '@/lib/db';
 import { getSessionCompany } from '@/lib/auth';
 import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
+import { ObjectId } from 'mongodb';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,36 +11,74 @@ export async function GET(request: NextRequest) {
       return createErrorResponse('Not authenticated', 401);
     }
 
+    const { searchParams } = new URL(request.url);
+    const range = searchParams.get('range') || '7d';
+    const projectId = searchParams.get('projectId');
+    const environment = searchParams.get('environment');
+
     const db = await getDatabase();
     
-    // Get all projects for the company
+    // Get all projects for the company to verify ownership
     const projects = await db
       .collection('projects')
       .find({ companyId: company._id })
       .toArray();
     
-    const projectIds = projects.map(p => p._id);
+    const allProjectIds = projects.map(p => p._id);
+    let filterProjectIds = allProjectIds;
 
-    // 1. Total Events
-    const totalEvents = await db.collection('events').countDocuments({
-      projectId: { $in: projectIds }
-    });
+    if (projectId && projectId !== 'all') {
+      const selectedProjectId = new ObjectId(projectId);
+      if (allProjectIds.some(id => id.equals(selectedProjectId))) {
+        filterProjectIds = [selectedProjectId];
+      } else {
+        return createErrorResponse('Project not found or access denied', 404);
+      }
+    }
 
-    // 2. Events Over Time (Last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const matchStage: any = {
+      projectId: { $in: filterProjectIds }
+    };
 
+    if (environment && environment !== 'all') {
+      matchStage.environment = environment;
+    }
+
+    const now = new Date();
+    let startDate = new Date();
+    let days = 7;
+
+    if (range === '24h') {
+      startDate.setHours(now.getHours() - 24);
+      days = 1;
+    } else if (range === '30d') {
+      startDate.setDate(now.getDate() - 30);
+      days = 30;
+    } else if (range === 'all') {
+      startDate = new Date(0); // Beginning of time
+      days = 365; // Default for avg calculation if all
+    } else {
+      startDate.setDate(now.getDate() - 7);
+      days = 7;
+    }
+
+    if (range !== 'all') {
+      matchStage.timestamp = { $gte: startDate };
+    }
+
+    // 1. Total Events in range
+    const totalEvents = await db.collection('events').countDocuments(matchStage);
+
+    // 2. Events Over Time
     const eventsOverTime = await db.collection('events').aggregate([
-      {
-        $match: {
-          projectId: { $in: projectIds },
-          timestamp: { $gte: sevenDaysAgo }
-        }
-      },
+      { $match: matchStage },
       {
         $group: {
           _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$timestamp" }
+            $dateToString: { 
+              format: range === '24h' ? "%Y-%m-%d %H:00" : "%Y-%m-%d", 
+              date: "$timestamp" 
+            }
           },
           count: { $sum: 1 },
           pageViews: {
@@ -52,9 +91,7 @@ export async function GET(request: NextRequest) {
 
     // 3. Top Events
     const topEvents = await db.collection('events').aggregate([
-      {
-        $match: { projectId: { $in: projectIds } }
-      },
+      { $match: matchStage },
       {
         $group: {
           _id: "$eventName",
@@ -62,14 +99,12 @@ export async function GET(request: NextRequest) {
         }
       },
       { $sort: { value: -1 } },
-      { $limit: 5 }
+      { $limit: 10 }
     ]).toArray();
 
     // 4. Events by Environment
     const eventsByEnvironment = await db.collection('events').aggregate([
-      {
-        $match: { projectId: { $in: projectIds } }
-      },
+      { $match: matchStage },
       {
         $group: {
           _id: "$environment",
@@ -79,20 +114,18 @@ export async function GET(request: NextRequest) {
     ]).toArray();
 
     // 5. Unique Event Types
-    const uniqueEventTypes = await db.collection('events').distinct('eventName', {
-      projectId: { $in: projectIds }
-    });
+    const uniqueEventTypes = await db.collection('events').distinct('eventName', matchStage);
 
-    // 6. Errors (Mocked for now as we don't have a specific error field, but we can look for 'error' in eventName)
+    // 6. Errors
     const errorEvents = await db.collection('events').countDocuments({
-      projectId: { $in: projectIds },
+      ...matchStage,
       eventName: { $regex: /error/i }
     });
 
     return createSuccessResponse({
       metrics: {
         totalEvents,
-        avgEventsPerDay: Math.round(totalEvents / 7),
+        avgEventsPerDay: Math.round(totalEvents / days),
         uniqueEventTypes: uniqueEventTypes.length,
         errorCount: errorEvents,
         errorRate: totalEvents > 0 ? (errorEvents / totalEvents) * 100 : 0

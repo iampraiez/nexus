@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   BarChart3,
   Loader2,
+  Info,
 } from "lucide-react";
 
 interface NavItem {
@@ -57,7 +58,7 @@ const navigationItems: NavItem[] = [
   },
   { href: "/dashboard/alerts", label: "Alerts", icon: Bell },
   { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
-  { href: "/dashboard/docs", label: "Documentation", icon: FileText },
+  { href: "/dashboard/about", label: "About Nexus", icon: Info },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 

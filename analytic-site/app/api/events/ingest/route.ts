@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
         timestamp: event.timestamp ? new Date(event.timestamp) : new Date(),
         environment: event.environment || 'production',
         sdkVersion: event.sdkVersion || 'unknown',
+        latency: typeof event.latency === 'number' ? event.latency : null,
         userAgent: event.userAgent,
         country: event.country,
       };

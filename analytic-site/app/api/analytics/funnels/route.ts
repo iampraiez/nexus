@@ -3,6 +3,8 @@ import { getDatabase } from '@/lib/db';
 import { getSessionCompany } from '@/lib/auth';
 import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
 
+import { ObjectId } from 'mongodb';
+
 export async function GET(request: NextRequest) {
   try {
     const company = await getSessionCompany();
@@ -10,15 +12,57 @@ export async function GET(request: NextRequest) {
       return createErrorResponse('Not authenticated', 401);
     }
 
+    const { searchParams } = new URL(request.url);
+    const range = searchParams.get('range') || '30d';
+    const projectId = searchParams.get('projectId');
+    const environment = searchParams.get('environment');
+
     const db = await getDatabase();
     
-    // Get all projects for the company
+    // Get all projects for the company to verify ownership
     const projects = await db
       .collection('projects')
       .find({ companyId: company._id })
       .toArray();
     
-    const projectIds = projects.map(p => p._id);
+    const allProjectIds = projects.map(p => p._id);
+    let filterProjectIds = allProjectIds;
+
+    if (projectId && projectId !== 'all') {
+      const selectedProjectId = new ObjectId(projectId);
+      if (allProjectIds.some(id => id.equals(selectedProjectId))) {
+        filterProjectIds = [selectedProjectId];
+      } else {
+        return createErrorResponse('Project not found or access denied', 404);
+      }
+    }
+
+    const matchStage: any = {
+      projectId: { $in: filterProjectIds }
+    };
+
+    if (environment && environment !== 'all') {
+      matchStage.environment = environment;
+    }
+
+    const now = new Date();
+    let startDate = new Date();
+
+    if (range === '24h') {
+      startDate.setHours(now.getHours() - 24);
+    } else if (range === '7d') {
+      startDate.setDate(now.getDate() - 7);
+    } else if (range === '30d') {
+      startDate.setDate(now.getDate() - 30);
+    } else if (range === 'all') {
+      startDate = new Date(0);
+    } else {
+      startDate.setDate(now.getDate() - 30);
+    }
+
+    if (range !== 'all') {
+      matchStage.timestamp = { $gte: startDate };
+    }
 
     // Define funnel steps
     const steps = [
@@ -35,7 +79,7 @@ export async function GET(request: NextRequest) {
       
       // Count unique users who performed this event
       const usersCount = await db.collection('events').distinct('userId', {
-        projectId: { $in: projectIds },
+        ...matchStage,
         eventName: step.event,
         userId: { $ne: null }
       });

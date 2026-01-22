@@ -15,6 +15,7 @@ import { EventQueue } from "./EventQueue";
 import { SecurityManager } from "./Security";
 import { Logger } from "./Logger";
 import { HttpTransport } from "../transport/HttpTransport";
+import { SDK_VERSION } from "../version";
 
 const OFFLINE_EVENTS_KEY = "nexus_offline_events";
 
@@ -79,6 +80,8 @@ export class EventTracker {
     data: Omit<EventSchemas[T], "timestamp" | "sessionId">
   ): void {
     try {
+      const startTime = performance.now();
+      
       const event: SerializedEvent = {
         type: eventType,
         data: {
@@ -87,6 +90,8 @@ export class EventTracker {
           timestamp: Date.now(),
         },
         timestamp: Date.now(),
+        sdkVersion: SDK_VERSION,
+        latency: Math.round(performance.now() - startTime)
       };
 
       this.logger.debug("Tracking event", { type: eventType });
