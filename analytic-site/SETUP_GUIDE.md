@@ -188,7 +188,7 @@ All colors are optimized for dark mode only.
 To integrate the Nexus SDK in your application:
 
 ```javascript
-import { Analytics } from '@nexus/analytics-sdk';
+import { Analytics } from 'nexus-avail';
 
 const analytics = new Analytics({
   apiKey: 'your-api-key',

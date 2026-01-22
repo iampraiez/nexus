@@ -58,23 +58,23 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <div>
-        <h1 className="text-4xl font-bold text-foreground mb-2">Dashboard</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Dashboard</h1>
+        <p className="text-sm md:text-base text-muted-foreground">
           Welcome back. Here&apos;s your analytics overview.
         </p>
       </div>
-
+ 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {stats.map((stat) => {
           const Icon = stat.label === "Total Events" ? Activity : 
                        stat.label === "Active Users" ? Users :
                        stat.label === "Conversion Rate" ? TrendingUp : BarChart3;
           const ChangeIcon = stat.positive ? ArrowUpRight : ArrowDownRight;
           const changeColor = stat.positive ? "text-green-600" : "text-red-600";
-
+ 
           return (
             <Link key={stat.label} href={
               stat.label === "Total Events" ? "/dashboard/analytics/events" :
@@ -82,7 +82,7 @@ export default function DashboardPage() {
               stat.label === "Conversion Rate" ? "/dashboard/analytics/funnels" :
               "/dashboard/projects"
             }>
-              <Card className="p-6 hover:bg-secondary/50 transition-colors cursor-pointer border border-border bg-card">
+              <Card className="p-5 md:p-6 hover:bg-secondary/50 transition-colors cursor-pointer border border-border bg-card">
                 <div className="flex items-start justify-between mb-4">
                   <div className="p-2 rounded-lg bg-primary/10">
                     <Icon className="w-5 h-5 text-primary" />
@@ -94,10 +94,10 @@ export default function DashboardPage() {
                     {stat.change}
                   </div>
                 </div>
-                <p className="text-muted-foreground text-sm mb-1">
+                <p className="text-muted-foreground text-xs md:text-sm mb-1">
                   {stat.label}
                 </p>
-                <p className="text-3xl font-bold text-foreground">
+                <p className="text-2xl md:text-3xl font-bold text-foreground">
                   {stat.value}
                 </p>
               </Card>
@@ -105,9 +105,14 @@ export default function DashboardPage() {
           );
         })}
       </div>
-
+ 
       {/* SDK Install Card */}
-      <SdkInstallCard />
+      <Card className="p-6 border border-border bg-card">
+        <h2 className="text-lg font-semibold text-foreground mb-4">
+          Quick Install
+        </h2>
+        <SdkInstallCard />
+      </Card>
 
       {/* Quick Links */}
       <Card className="p-6 border border-border bg-card">

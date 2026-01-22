@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Copy, Check, ChevronDown } from "lucide-react";
 
-const SDK_NAME = "@nexus/analytics-sdk";
+const SDK_NAME = "nexus-avail";
 const PACKAGE_MANAGERS = ["npm", "pnpm", "yarn", "bun"] as const;
 
 type PackageManager = (typeof PACKAGE_MANAGERS)[number];

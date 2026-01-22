@@ -52,7 +52,7 @@ export default function PublicDocsPage() {
             <h1 className="text-5xl md:text-6xl font-light text-foreground leading-relaxed flex items-center gap-3">
               <Activity className="w-10 h-10 text-primary flex-shrink-0" />
               Nexus{" "}
-              <span className="text-primary font-semibold">Analytics SDK</span>
+              <span className="text-primary font-semibold">Analytics</span>
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl">
               A powerful, production-ready event tracking SDK for understanding
@@ -152,7 +152,8 @@ export default function PublicDocsPage() {
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6 space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Before you can start tracking events, you need to create a project and generate an API key in your Nexus dashboard.
+                  Before you can start tracking events, you need to create a
+                  project and generate an API key in your Nexus dashboard.
                 </p>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2 text-sm text-foreground">
@@ -165,7 +166,10 @@ export default function PublicDocsPage() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-foreground">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
-                    <span>Go to <strong>Settings &gt; API Keys</strong> to find your credentials</span>
+                    <span>
+                      Go to <strong>Settings &gt; API Keys</strong> to find your
+                      credentials
+                    </span>
                   </div>
                 </div>
                 <Link href="/auth/register">

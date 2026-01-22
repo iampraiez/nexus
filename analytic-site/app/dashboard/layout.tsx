@@ -112,20 +112,24 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen bg-background relative overflow-hidden">
       <MinimalBackground />
-      {/* Mobile Top Bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b border-border flex items-center justify-between px-4 z-50">
+      {/* Mobile Top Bar - Floating & Transparent */}
+      <div className="lg:hidden fixed top-4 left-1/2 -translate-x-1/2 w-[92%] h-14 bg-background/40 backdrop-blur-md border border-border/30 rounded-2xl flex items-center justify-between px-6 z-50 shadow-lg transition-all duration-300">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Activity className="w-5 h-5 text-primary" />
-          <span className="font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <span className="font-bold text-lg bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
             Nexus
           </span>
         </Link>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 hover:bg-secondary rounded-lg transition-colors"
+          className="p-2 hover:bg-secondary/50 rounded-xl transition-colors"
           aria-label="Toggle menu"
         >
-          {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {sidebarOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
         </button>
       </div>
 
@@ -210,7 +214,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto ml-0 lg:ml-64 relative z-10 pt-16 lg:pt-0">
+      <div className="flex-1 overflow-auto ml-0 lg:ml-64 relative z-10 pt-24 lg:pt-0">
         <div className="p-4 md:p-8">{children}</div>
       </div>
 
