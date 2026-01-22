@@ -112,17 +112,26 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen bg-background relative overflow-hidden">
       <MinimalBackground />
-      {/* Mobile menu button */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-4 left-4 z-50 lg:hidden p-2 hover:bg-secondary rounded-lg"
-      >
-        {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
+      {/* Mobile Top Bar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-card border-b border-border flex items-center justify-between px-4 z-50">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Activity className="w-5 h-5 text-primary" />
+          <span className="font-bold text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Nexus
+          </span>
+        </Link>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 hover:bg-secondary rounded-lg transition-colors"
+          aria-label="Toggle menu"
+        >
+          {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 w-64 border-r border-border bg-card transform transition-transform lg:translate-x-0 z-40 ${
+        className={`fixed inset-y-0 left-0 w-64 border-r border-border bg-card transform transition-transform lg:translate-x-0 z-[60] ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -201,14 +210,14 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto ml-0 lg:ml-64 relative z-10">
-        <div className="p-8">{children}</div>
+      <div className="flex-1 overflow-auto ml-0 lg:ml-64 relative z-10 pt-16 lg:pt-0">
+        <div className="p-4 md:p-8">{children}</div>
       </div>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-[55] lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

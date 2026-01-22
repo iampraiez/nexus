@@ -4,59 +4,51 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Filter, ArrowDown } from 'lucide-react';
 
-const funnelSteps = [
-  {
-    step: 1,
-    name: 'Page Visit',
-    users: 10000,
-    dropoff: 0,
-    dropoffPercent: 0,
-    avgTime: '-',
-  },
-  {
-    step: 2,
-    name: 'Sign Up',
-    users: 3200,
-    dropoff: 6800,
-    dropoffPercent: 68,
-    avgTime: '2m 45s',
-  },
-  {
-    step: 3,
-    name: 'Email Verification',
-    users: 2856,
-    dropoff: 344,
-    dropoffPercent: 10.8,
-    avgTime: '1m 12s',
-  },
-  {
-    step: 4,
-    name: 'Onboarding',
-    users: 2284,
-    dropoff: 572,
-    dropoffPercent: 20,
-    avgTime: '5m 34s',
-  },
-  {
-    step: 5,
-    name: 'First Project',
-    users: 1713,
-    dropoff: 571,
-    dropoffPercent: 25,
-    avgTime: '3m 18s',
-  },
-  {
-    step: 6,
-    name: 'First Event Track',
-    users: 1456,
-    dropoff: 257,
-    dropoffPercent: 15,
-    avgTime: '8m 22s',
-  },
-];
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function FunnelsPage() {
-  const totalConversion = ((1456 / 10000) * 100).toFixed(1);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/analytics/funnels');
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+        } else {
+          setError(result.error || 'Failed to fetch data');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching data');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
+        <p className="font-medium">Error</p>
+        <p className="text-sm">{error}</p>
+      </div>
+    );
+  }
+
+  const { funnelName, totalUsers, overallConversion, steps } = data;
 
   return (
     <div className="space-y-8">
@@ -84,17 +76,17 @@ export default function FunnelsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <p className="text-muted-foreground text-sm mb-1">Funnel Name</p>
-            <p className="text-2xl font-bold text-foreground">Signup to First Event</p>
+            <p className="text-2xl font-bold text-foreground">{funnelName}</p>
           </div>
           <div>
             <p className="text-muted-foreground text-sm mb-1">Overall Conversion</p>
-            <p className="text-2xl font-bold text-foreground">{totalConversion}%</p>
-            <p className="text-xs text-red-600 mt-1">↓ 2.3% from last period</p>
+            <p className="text-2xl font-bold text-foreground">{overallConversion.toFixed(1)}%</p>
+            <p className="text-xs text-muted-foreground mt-1">Across all projects</p>
           </div>
           <div>
             <p className="text-muted-foreground text-sm mb-1">Total Users</p>
-            <p className="text-2xl font-bold text-foreground">10,000</p>
-            <p className="text-xs text-green-600 mt-1">↑ 8.2% from last period</p>
+            <p className="text-2xl font-bold text-foreground">{totalUsers.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground mt-1">Unique users in funnel</p>
           </div>
         </div>
       </Card>
@@ -103,8 +95,8 @@ export default function FunnelsPage() {
       <Card className="p-6 border border-border bg-card">
         <h2 className="text-xl font-semibold text-foreground mb-8">Funnel Flow</h2>
         <div className="space-y-4">
-          {funnelSteps.map((item, index) => {
-            const width = (item.users / 10000) * 100;
+          {steps.map((item: any, index: number) => {
+            const width = totalUsers > 0 ? (item.users / totalUsers) * 100 : 0;
             return (
               <div key={item.step} className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -131,7 +123,7 @@ export default function FunnelsPage() {
                   </div>
                 </div>
 
-                {index < funnelSteps.length - 1 && (
+                {index < steps.length - 1 && (
                   <div className="flex items-center gap-2 px-4 py-2 bg-destructive/10 border border-destructive/20 rounded">
                     <ArrowDown className="w-4 h-4 text-destructive" />
                     <span className="text-sm text-destructive">
@@ -173,9 +165,9 @@ export default function FunnelsPage() {
               </tr>
             </thead>
             <tbody>
-              {funnelSteps.map((step, index) => {
-                const prevUsers = index === 0 ? 10000 : funnelSteps[index - 1].users;
-                const stepConversion = ((step.users / prevUsers) * 100).toFixed(1);
+              {steps.map((step: any, index: number) => {
+                const prevUsers = index === 0 ? totalUsers : steps[index - 1].users;
+                const stepConversion = prevUsers > 0 ? ((step.users / prevUsers) * 100).toFixed(1) : 0;
                 return (
                   <tr
                     key={step.step}

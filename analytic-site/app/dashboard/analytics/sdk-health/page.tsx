@@ -16,31 +16,51 @@ import {
 } from 'recharts';
 import { Calendar, Filter, AlertTriangle } from 'lucide-react';
 
-const healthData = [
-  { date: 'Jan 1', deliveryRate: 99.8, errorRate: 0.2, latency: 145 },
-  { date: 'Jan 2', deliveryRate: 99.9, errorRate: 0.1, latency: 142 },
-  { date: 'Jan 3', deliveryRate: 99.7, errorRate: 0.3, latency: 156 },
-  { date: 'Jan 4', deliveryRate: 99.9, errorRate: 0.1, latency: 138 },
-  { date: 'Jan 5', deliveryRate: 99.8, errorRate: 0.2, latency: 151 },
-  { date: 'Jan 6', deliveryRate: 99.6, errorRate: 0.4, latency: 167 },
-  { date: 'Jan 7', deliveryRate: 99.9, errorRate: 0.1, latency: 144 },
-];
-
-const versionStats = [
-  { version: '1.0.0', count: 4200, percentage: 65 },
-  { version: '0.9.5', count: 1800, percentage: 28 },
-  { version: '0.9.0', count: 400, percentage: 6 },
-  { version: 'Others', count: 100, percentage: 1 },
-];
-
-const errorTypes = [
-  { type: 'Network Error', count: 45, percentage: 42 },
-  { type: 'Invalid API Key', count: 32, percentage: 30 },
-  { type: 'Timeout', count: 20, percentage: 19 },
-  { type: 'Rate Limited', count: 10, percentage: 9 },
-];
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function SdkHealthPage() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/analytics/sdk-health');
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+        } else {
+          setError(result.error || 'Failed to fetch data');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching data');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
+        <p className="font-medium">Error</p>
+        <p className="text-sm">{error}</p>
+      </div>
+    );
+  }
+
+  const { metrics, healthData, versionStats, errorTypes } = data;
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-start">
@@ -66,23 +86,23 @@ export default function SdkHealthPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4 border border-border bg-card">
           <p className="text-muted-foreground text-sm mb-1">Delivery Rate</p>
-          <p className="text-3xl font-bold text-foreground">99.8%</p>
-          <p className="text-xs text-green-600 mt-2">↑ 0.2% from last week</p>
+          <p className="text-3xl font-bold text-foreground">{metrics.deliveryRate}%</p>
+          <p className="text-xs text-green-600 mt-2">Target: 99.9%</p>
         </Card>
         <Card className="p-4 border border-border bg-card">
           <p className="text-muted-foreground text-sm mb-1">Error Rate</p>
-          <p className="text-3xl font-bold text-foreground">0.2%</p>
-          <p className="text-xs text-red-600 mt-2">↑ 0.1% from last week</p>
+          <p className="text-3xl font-bold text-foreground">{metrics.errorRate}%</p>
+          <p className="text-xs text-green-600 mt-2">Healthy</p>
         </Card>
         <Card className="p-4 border border-border bg-card">
           <p className="text-muted-foreground text-sm mb-1">Avg Latency</p>
-          <p className="text-3xl font-bold text-foreground">149ms</p>
-          <p className="text-xs text-green-600 mt-2">↓ 8ms from last week</p>
+          <p className="text-3xl font-bold text-foreground">{metrics.avgLatency}ms</p>
+          <p className="text-xs text-green-600 mt-2">Healthy</p>
         </Card>
         <Card className="p-4 border border-border bg-card">
           <p className="text-muted-foreground text-sm mb-1">p95 Latency</p>
-          <p className="text-3xl font-bold text-foreground">267ms</p>
-          <p className="text-xs text-green-600 mt-2">↓ 12ms from last week</p>
+          <p className="text-3xl font-bold text-foreground">{metrics.p95Latency}ms</p>
+          <p className="text-xs text-green-600 mt-2">Healthy</p>
         </Card>
       </div>
 
@@ -127,7 +147,7 @@ export default function SdkHealthPage() {
         <Card className="p-6 border border-border bg-card">
           <h2 className="text-xl font-semibold text-foreground mb-6">SDK Version Distribution</h2>
           <div className="space-y-4">
-            {versionStats.map((version) => (
+            {versionStats.map((version: any) => (
               <div key={version.version}>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium text-foreground">{version.version}</span>
@@ -197,7 +217,7 @@ export default function SdkHealthPage() {
               </tr>
             </thead>
             <tbody>
-              {errorTypes.map((error) => (
+              {errorTypes.map((error: any) => (
                 <tr
                   key={error.type}
                   className="border-b border-border hover:bg-secondary/30 transition-colors"
@@ -206,7 +226,7 @@ export default function SdkHealthPage() {
                     {error.type}
                   </td>
                   <td className="px-6 py-4 text-sm text-foreground">{error.count}</td>
-                  <td className="px-6 py-4 text-sm text-foreground">{error.percentage}%</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{error.percentage.toFixed(1)}%</td>
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-3 py-1 rounded text-xs font-medium ${
@@ -232,19 +252,13 @@ export default function SdkHealthPage() {
           <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded">
             <p className="text-sm font-semibold text-foreground">Update SDK versions</p>
             <p className="text-xs text-muted-foreground mt-1">
-              28% of SDKs are on 0.9.5. Consider notifying users to upgrade to 1.0.0
-            </p>
-          </div>
-          <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded">
-            <p className="text-sm font-semibold text-foreground">API key validation</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              30% of errors are invalid API keys. Review key rotation policies
+              Some users are still on older versions. Consider notifying them to upgrade to 1.1.4
             </p>
           </div>
           <div className="p-4 bg-green-500/10 border border-green-500/20 rounded">
             <p className="text-sm font-semibold text-foreground">Performance is healthy</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Delivery rate is 99.8% and latency is under 150ms average
+              Delivery rate is {metrics.deliveryRate}% and latency is under 150ms average
             </p>
           </div>
         </div>

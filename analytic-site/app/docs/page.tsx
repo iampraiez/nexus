@@ -140,11 +140,47 @@ export default function PublicDocsPage() {
               Quick Start (5 minutes)
             </h2>
 
-            {/* Step 1 */}
+            {/* Step 0: API Key */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
                   1
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">
+                  Get Your API Key
+                </h3>
+              </div>
+              <div className="bg-card/40 border border-border/50 rounded-lg p-6 space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Before you can start tracking events, you need to create a project and generate an API key in your Nexus dashboard.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                    <span>Create an account or sign in</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                    <span>Create a new project</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                    <span>Go to <strong>Settings &gt; API Keys</strong> to find your credentials</span>
+                  </div>
+                </div>
+                <Link href="/auth/register">
+                  <Button size="sm" className="mt-2">
+                    Go to Dashboard
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Step 1 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
+                  2
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
                   Install the SDK
@@ -164,7 +200,7 @@ export default function PublicDocsPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
-                  2
+                  3
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
                   Initialize the SDK
@@ -176,7 +212,7 @@ export default function PublicDocsPage() {
 
 // Initialize once at app startup
 Nexus.init({
-  apiKey: 'pk_live_your_api_key',
+  apiKey: 'pk_live_your_api_key', // Generate at https://nexus-anal.vercel.app/
   projectId: 'your_project_id',
   environment: 'production'
 });`}
@@ -189,7 +225,7 @@ Nexus.init({
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
-                  3
+                  4
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
                   Start Tracking Events
@@ -227,7 +263,7 @@ Nexus.track('order_created', {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
-                  4
+                  5
                 </div>
                 <h3 className="text-xl font-semibold text-foreground">
                   View Your Analytics

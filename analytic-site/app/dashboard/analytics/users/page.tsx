@@ -16,30 +16,51 @@ import {
 } from 'recharts';
 import { Calendar, Filter, TrendingUp } from 'lucide-react';
 
-const userGrowthData = [
-  { date: 'Jan 1', newUsers: 45, activeUsers: 320, returning: 275 },
-  { date: 'Jan 2', newUsers: 52, activeUsers: 372, returning: 320 },
-  { date: 'Jan 3', newUsers: 38, activeUsers: 410, returning: 372 },
-  { date: 'Jan 4', newUsers: 61, activeUsers: 471, returning: 410 },
-  { date: 'Jan 5', newUsers: 48, activeUsers: 519, returning: 471 },
-  { date: 'Jan 6', newUsers: 55, activeUsers: 574, returning: 519 },
-  { date: 'Jan 7', newUsers: 50, activeUsers: 624, returning: 574 },
-];
-
-const userSegments = [
-  { segment: 'Power Users', count: 342, percentage: 34.2, trend: '+12.5%' },
-  { segment: 'Regular Users', count: 445, percentage: 44.5, trend: '+8.3%' },
-  { segment: 'Dormant Users', count: 156, percentage: 15.6, trend: '-2.1%' },
-  { segment: 'One-time Users', count: 57, percentage: 5.7, trend: '+1.2%' },
-];
-
-const deviceData = [
-  { device: 'Desktop', users: 542, percentage: 54.2 },
-  { device: 'Mobile', users: 385, percentage: 38.5 },
-  { device: 'Tablet', users: 73, percentage: 7.3 },
-];
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function UsersPage() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/analytics/users');
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+        } else {
+          setError(result.error || 'Failed to fetch data');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching data');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
+        <p className="font-medium">Error</p>
+        <p className="text-sm">{error}</p>
+      </div>
+    );
+  }
+
+  const { metrics, userGrowth, deviceData, userSegments } = data;
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-start">
@@ -65,23 +86,23 @@ export default function UsersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4 border border-border bg-card">
           <p className="text-muted-foreground text-sm mb-1">Total Users</p>
-          <p className="text-3xl font-bold text-foreground">1,000</p>
-          <p className="text-xs text-green-600 mt-2">+18.2% this week</p>
+          <p className="text-3xl font-bold text-foreground">{metrics.totalUsers.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground mt-2">Across all projects</p>
         </Card>
         <Card className="p-4 border border-border bg-card">
           <p className="text-muted-foreground text-sm mb-1">New Users</p>
-          <p className="text-3xl font-bold text-foreground">349</p>
-          <p className="text-xs text-green-600 mt-2">+12.5% from last week</p>
+          <p className="text-3xl font-bold text-foreground">{metrics.newUsers.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground mt-2">Last 7 days</p>
         </Card>
         <Card className="p-4 border border-border bg-card">
           <p className="text-muted-foreground text-sm mb-1">Active Users (7d)</p>
-          <p className="text-3xl font-bold text-foreground">624</p>
-          <p className="text-xs text-green-600 mt-2">+8.3% from last week</p>
+          <p className="text-3xl font-bold text-foreground">{metrics.activeUsers.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground mt-2">Last 7 days</p>
         </Card>
         <Card className="p-4 border border-border bg-card">
           <p className="text-muted-foreground text-sm mb-1">Returning Users</p>
-          <p className="text-3xl font-bold text-foreground">574</p>
-          <p className="text-xs text-blue-600 mt-2">92% of active users</p>
+          <p className="text-3xl font-bold text-foreground">{metrics.returningUsers.toLocaleString()}</p>
+          <p className="text-xs text-blue-600 mt-2">{metrics.returningPercentage.toFixed(1)}% of active users</p>
         </Card>
       </div>
 
@@ -89,7 +110,7 @@ export default function UsersPage() {
       <Card className="p-6 border border-border bg-card">
         <h2 className="text-xl font-semibold text-foreground mb-6">User Growth</h2>
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={userGrowthData}>
+          <LineChart data={userGrowth}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
             <XAxis dataKey="date" stroke="var(--color-muted-foreground)" />
             <YAxis stroke="var(--color-muted-foreground)" />
@@ -190,7 +211,7 @@ export default function UsersPage() {
               </tr>
             </thead>
             <tbody>
-              {userSegments.map((segment) => (
+              {userSegments.map((segment: any) => (
                 <tr
                   key={segment.segment}
                   className="border-b border-border hover:bg-secondary/30 transition-colors"
@@ -198,7 +219,7 @@ export default function UsersPage() {
                   <td className="px-6 py-4 text-sm font-medium text-foreground">
                     {segment.segment}
                   </td>
-                  <td className="px-6 py-4 text-sm text-foreground">{segment.count}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{segment.count.toLocaleString()}</td>
                   <td className="px-6 py-4 text-sm text-foreground">
                     {segment.percentage.toFixed(1)}%
                   </td>

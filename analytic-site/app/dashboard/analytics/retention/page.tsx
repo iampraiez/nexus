@@ -4,62 +4,51 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Filter } from 'lucide-react';
 
-const retentionData = [
-  {
-    cohort: 'Week of Jan 1',
-    users: 245,
-    day1: 245,
-    day7: 198,
-    day14: 167,
-    day30: 112,
-  },
-  {
-    cohort: 'Week of Jan 8',
-    users: 312,
-    day1: 312,
-    day7: 267,
-    day14: 198,
-    day30: null,
-  },
-  {
-    cohort: 'Week of Jan 15',
-    users: 289,
-    day1: 289,
-    day7: 231,
-    day14: null,
-    day30: null,
-  },
-  {
-    cohort: 'Week of Jan 22',
-    users: 356,
-    day1: 356,
-    day7: null,
-    day14: null,
-    day30: null,
-  },
-];
-
-const keyMetrics = [
-  {
-    label: 'Day 1 Retention',
-    value: '100%',
-    description: 'Users active on signup day',
-  },
-  {
-    label: 'Day 7 Retention',
-    value: '82.3%',
-    description: 'Coming back within 7 days',
-    trend: '+5.2%',
-  },
-  {
-    label: 'Day 30 Retention',
-    value: '45.7%',
-    description: 'Active after 30 days',
-    trend: '-3.1%',
-  },
-];
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function RetentionPage() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/analytics/retention');
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+        } else {
+          setError(result.error || 'Failed to fetch data');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching data');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
+        <p className="font-medium">Error</p>
+        <p className="text-sm">{error}</p>
+      </div>
+    );
+  }
+
+  const { cohorts, keyMetrics } = data;
   const getRetentionPercent = (retained: number | null, total: number) => {
     if (!retained) return '-';
     return ((retained / total) * 100).toFixed(0) + '%';
@@ -88,92 +77,59 @@ export default function RetentionPage() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {keyMetrics.map((metric) => (
+        {keyMetrics.map((metric: any) => (
           <Card key={metric.label} className="p-4 border border-border bg-card">
             <p className="text-muted-foreground text-sm mb-1">{metric.label}</p>
             <p className="text-3xl font-bold text-foreground">{metric.value}</p>
-            <p className="text-xs text-muted-foreground mt-1">{metric.description}</p>
-            {metric.trend && (
-              <p
-                className={`text-xs mt-2 ${
-                  metric.trend.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                }`}
-              >
-                {metric.trend} from last month
-              </p>
-            )}
+            <p className="text-xs text-muted-foreground mt-2">{metric.description}</p>
           </Card>
         ))}
       </div>
 
-      {/* Cohort Retention Table */}
+      {/* Retention Table */}
       <Card className="border border-border bg-card overflow-hidden">
         <div className="p-6 border-b border-border">
-          <h2 className="text-xl font-semibold text-foreground">Retention Cohorts</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            User retention by signup cohort (week)
-          </p>
+          <h2 className="text-xl font-semibold text-foreground">Cohort Retention</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-secondary/50 border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Cohort
-                </th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
-                  Users
-                </th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
-                  Day 1
-                </th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
-                  Day 7
-                </th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
-                  Day 14
-                </th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
-                  Day 30
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Cohort</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Users</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">Day 1</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">Day 7</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">Day 14</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">Day 30</th>
               </tr>
             </thead>
             <tbody>
-              {retentionData.map((cohort) => (
-                <tr
-                  key={cohort.cohort}
-                  className="border-b border-border hover:bg-secondary/30 transition-colors"
-                >
-                  <td className="px-6 py-4 text-sm font-medium text-foreground">
-                    {cohort.cohort}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-center text-foreground">
-                    {cohort.users}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-center font-bold bg-green-500/10">
-                    100%
-                  </td>
-                  <td
-                    className={`px-6 py-4 text-sm text-center font-bold ${
-                      cohort.day7 ? 'bg-blue-500/10' : 'text-muted-foreground'
-                    }`}
-                  >
-                    {getRetentionPercent(cohort.day7, cohort.users)}
-                  </td>
-                  <td
-                    className={`px-6 py-4 text-sm text-center font-bold ${
-                      cohort.day14 ? 'bg-blue-500/10' : 'text-muted-foreground'
-                    }`}
-                  >
-                    {getRetentionPercent(cohort.day14, cohort.users)}
-                  </td>
-                  <td
-                    className={`px-6 py-4 text-sm text-center font-bold ${
-                      cohort.day30 ? 'bg-blue-500/10' : 'text-muted-foreground'
-                    }`}
-                  >
-                    {getRetentionPercent(cohort.day30, cohort.users)}
-                  </td>
+              {cohorts.map((row: any) => (
+                <tr key={row.cohort} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{row.cohort}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{row.users.toLocaleString()}</td>
+                  {[row.day1, row.day7, row.day14, row.day30].map((val, i) => {
+                    const percentage = val !== null ? (val / row.users) * 100 : null;
+                    const opacity = percentage !== null ? Math.max(0.1, percentage / 100) : 0;
+                    
+                    return (
+                      <td key={i} className="px-2 py-4 text-center">
+                        {percentage !== null ? (
+                          <div 
+                            className="py-2 rounded text-xs font-bold"
+                            style={{ 
+                              backgroundColor: `rgba(59, 130, 246, ${opacity})`,
+                              color: opacity > 0.5 ? 'white' : 'inherit'
+                            }}
+                          >
+                            {percentage.toFixed(1)}%
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
@@ -186,9 +142,9 @@ export default function RetentionPage() {
         <Card className="p-6 border border-border bg-card">
           <h2 className="text-xl font-semibold text-foreground mb-6">Day 7 Retention Trends</h2>
           <div className="space-y-4">
-            {retentionData
-              .filter((c) => c.day7)
-              .map((cohort) => {
+            {cohorts
+              .filter((c: any) => c.day7)
+              .map((cohort: any) => {
                 const retention = ((cohort.day7! / cohort.users) * 100).toFixed(0);
                 return (
                   <div key={cohort.cohort}>

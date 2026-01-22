@@ -1,8 +1,7 @@
 'use client';
 
-import React from "react"
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,21 +24,62 @@ const alertTriggers = [
 
 export default function AlertsPage() {
   const [showForm, setShowForm] = useState(false);
-  const [alerts, setAlerts] = useState([
-    {
-      id: '1',
-      name: 'High Error Rate',
-      type: 'email',
-      triggers: ['high_error_rate'],
-      enabled: true,
-      target: 'admin@company.com',
-    },
-  ]);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCreateAlert = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function fetchAlerts() {
+      try {
+        const response = await fetch('/api/alerts');
+        const result = await response.json();
+        if (result.success) {
+          setAlerts(result.data);
+        } else {
+          setError(result.error || 'Failed to fetch alerts');
+        }
+      } catch (err) {
+        setError('An error occurred while fetching alerts');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAlerts();
+  }, []);
+
+  const handleCreateAlert = async (e: React.FormEvent) => {
     e.preventDefault();
-    setShowForm(false);
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const newAlert = {
+      name: formData.get('alertName'),
+      type: formData.get('alertType'),
+      target: formData.get('alertTarget'),
+      triggers: Array.from(formData.getAll('triggers')),
+    };
+
+    try {
+      const response = await fetch('/api/alerts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newAlert),
+      });
+      const result = await response.json();
+      if (result.success) {
+        setAlerts([...alerts, result.data]);
+        setShowForm(false);
+      }
+    } catch (err) {
+      console.error('Error creating alert:', err);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -66,12 +106,14 @@ export default function AlertsPage() {
               <Label htmlFor="alertName">Alert Name</Label>
               <Input
                 id="alertName"
+                name="alertName"
                 placeholder="e.g., High Error Rate"
+                required
               />
             </div>
             <div>
               <Label htmlFor="alertType">Notification Type</Label>
-              <Select>
+              <Select name="alertType" defaultValue="email">
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -85,7 +127,9 @@ export default function AlertsPage() {
               <Label htmlFor="alertTarget">Target (Email or URL)</Label>
               <Input
                 id="alertTarget"
+                name="alertTarget"
                 placeholder="email@example.com or https://example.com/webhook"
+                required
               />
             </div>
             <div>
@@ -93,7 +137,7 @@ export default function AlertsPage() {
               <div className="space-y-2">
                 {alertTriggers.map((trigger) => (
                   <label key={trigger.value} className="flex items-center gap-2">
-                    <input type="checkbox" />
+                    <input type="checkbox" name="triggers" value={trigger.value} />
                     <span className="text-sm text-foreground">{trigger.label}</span>
                   </label>
                 ))}
@@ -146,7 +190,7 @@ export default function AlertsPage() {
                         <span className="font-mono text-foreground">{alert.target}</span>
                       </p>
                       <div className="flex gap-2 flex-wrap">
-                        {alert.triggers.map((trigger) => {
+                        {alert.triggers.map((trigger: string) => {
                           const triggerLabel = alertTriggers.find(
                             (t) => t.value === trigger
                           )?.label;

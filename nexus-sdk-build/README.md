@@ -62,7 +62,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### 3. Install in Your Project
+### 3. Getting an API Key
+
+Before you can track events, you need to create a project and generate an API key:
+1.  Sign up at [Nexus Analytics](https://nexus-anal.vercel.app/)
+2.  Create a new project in the dashboard
+3.  Go to **Settings > API Keys** to find your `apiKey` and `projectId`
+
+### 4. Install in Your Project
 
 ```bash
 npm install nexus-avail
@@ -71,8 +78,9 @@ npm install nexus-avail
 ```typescript
 import { Nexus } from "nexus-avail";
 
+// 1. Initialize
 Nexus.init({
-  apiKey: "your-api-key",
+  apiKey: "your-api-key", // Found in Settings > API Keys
   projectId: "your-project-id",
   environment: "production",
 });

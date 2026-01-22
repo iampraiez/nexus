@@ -12,22 +12,31 @@ Production-ready TypeScript SDK for the Nexus analytics platform. Track user eve
 - **Dual Environment**: Works seamlessly in both browser and Node.js environments
 - **ESM & CommonJS**: Supports both module systems
 
-## Installation
+## 🚀 Quick Start
+
+### 1. Install
 
 ```bash
 npm install nexus-avail
 ```
 
-## Quick Start
+### 2. Getting an API Key
+
+Before you can track events, you need to create a project and generate an API key:
+1.  Sign up at [Nexus Analytics](https://nexus-anal.vercel.app/)
+2.  Create a new project in the dashboard
+3.  Go to **Settings > API Keys** to find your `apiKey` and `projectId`
+
+### 3. Usage
 
 ### Browser
 
 ```typescript
 import { Nexus } from "nexus-avail";
 
-// Initialize
+// 1. Initialize
 Nexus.init({
-  apiKey: "your-api-key",
+  apiKey: "your-api-key", // Found in Settings > API Keys
   projectId: "your-project-id",
   environment: "production",
 });
@@ -58,9 +67,9 @@ window.addEventListener("beforeunload", () => {
 ```typescript
 import { Nexus } from "nexus-avail";
 
-// Initialize
+// 1. Initialize
 Nexus.init({
-  apiKey: "your-api-key",
+  apiKey: "your-api-key", // Found in Settings > API Keys
   projectId: "your-project-id",
   environment: "production",
 });

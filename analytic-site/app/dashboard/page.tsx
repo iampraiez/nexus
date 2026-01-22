@@ -13,42 +13,50 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SdkInstallCard } from "@/components/sdk-install-card";
 
-const stats = [
-  {
-    label: "Total Events",
-    value: "2,543",
-    change: "+12.5%",
-    icon: Activity,
-    href: "/dashboard/analytics/events",
-    positive: true,
-  },
-  {
-    label: "Active Users",
-    value: "524",
-    change: "+8.2%",
-    icon: Users,
-    href: "/dashboard/analytics/users",
-    positive: true,
-  },
-  {
-    label: "Conversion Rate",
-    value: "3.24%",
-    change: "-2.1%",
-    icon: TrendingUp,
-    href: "/dashboard/analytics/funnels",
-    positive: false,
-  },
-  {
-    label: "Projects",
-    value: "3",
-    change: "All active",
-    icon: BarChart3,
-    href: "/dashboard/projects",
-    positive: true,
-  },
-];
+import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const response = await fetch("/api/analytics/overview");
+        const result = await response.json();
+        if (result.success) {
+          setStats(result.data.stats);
+        } else {
+          setError(result.error || "Failed to fetch stats");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching stats");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
+        <p className="font-medium">Error</p>
+        <p className="text-sm">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div>
@@ -61,12 +69,19 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => {
-          const Icon = stat.icon;
+          const Icon = stat.label === "Total Events" ? Activity : 
+                       stat.label === "Active Users" ? Users :
+                       stat.label === "Conversion Rate" ? TrendingUp : BarChart3;
           const ChangeIcon = stat.positive ? ArrowUpRight : ArrowDownRight;
           const changeColor = stat.positive ? "text-green-600" : "text-red-600";
 
           return (
-            <Link key={stat.href} href={stat.href}>
+            <Link key={stat.label} href={
+              stat.label === "Total Events" ? "/dashboard/analytics/events" :
+              stat.label === "Active Users" ? "/dashboard/analytics/users" :
+              stat.label === "Conversion Rate" ? "/dashboard/analytics/funnels" :
+              "/dashboard/projects"
+            }>
               <Card className="p-6 hover:bg-secondary/50 transition-colors cursor-pointer border border-border bg-card">
                 <div className="flex items-start justify-between mb-4">
                   <div className="p-2 rounded-lg bg-primary/10">

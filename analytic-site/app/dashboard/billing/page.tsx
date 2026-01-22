@@ -170,7 +170,7 @@ export default function BillingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <p className="text-muted-foreground text-sm mb-1">Events This Month</p>
-              <p className="text-3xl font-bold text-foreground">2,543</p>
+              <p className="text-3xl font-bold text-foreground">0</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {currentPlan === 'free'
                   ? 'of 10,000 allowed'
@@ -179,7 +179,7 @@ export default function BillingPage() {
             </div>
             <div>
               <p className="text-muted-foreground text-sm mb-1">Storage Used</p>
-              <p className="text-3xl font-bold text-foreground">1.2 GB</p>
+              <p className="text-3xl font-bold text-foreground">0 GB</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {currentPlan === 'free'
                   ? 'of 5 GB limit'

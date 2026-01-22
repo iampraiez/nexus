@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,34 +25,59 @@ import {
   Mail,
 } from 'lucide-react';
 
-const apiKeys = [
-  {
-    id: 'key_1',
-    name: 'Production SDK',
-    key: 'pk_live_****9a7b2',
-    created: 'Dec 15, 2024',
-    lastUsed: 'Jan 20, 2025',
-  },
-  {
-    id: 'key_2',
-    name: 'Development',
-    key: 'pk_test_****3c1d5',
-    created: 'Dec 1, 2024',
-    lastUsed: 'Jan 19, 2025',
-  },
-];
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'general' | 'api' | 'team' | 'security' | 'email'>(
     'general'
   );
+  const [company, setCompany] = useState<any>(null);
+  const [apiKeys, setApiKeys] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch session/company info
+        const sessionRes = await fetch('/api/auth/session');
+        const sessionData = await sessionRes.json();
+        if (sessionData.success) {
+          setCompany(sessionData.data.company);
+        }
+
+        // Fetch projects to get API keys (simplified for now)
+        const projectsRes = await fetch('/api/projects');
+        const projectsData = await projectsRes.json();
+        if (projectsData.success && projectsData.data.length > 0) {
+          const firstProjectId = projectsData.data[0]._id;
+          const keysRes = await fetch(`/api/projects/${firstProjectId}/api-keys`);
+          const keysData = await keysRes.json();
+          if (keysData.success) {
+            setApiKeys(keysData.data);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching settings data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   const handleCopyKey = (key: string) => {
     navigator.clipboard.writeText(key);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -133,7 +159,7 @@ export default function SettingsPage() {
                 <Label htmlFor="companyName">Company Name</Label>
                 <Input
                   id="companyName"
-                  defaultValue="Acme Inc."
+                  defaultValue={company?.name || 'Acme Inc.'}
                   className="mt-1"
                 />
               </div>
@@ -142,7 +168,7 @@ export default function SettingsPage() {
                 <Input
                   id="companyEmail"
                   type="email"
-                  defaultValue="admin@acme.com"
+                  defaultValue={company?.email || 'admin@acme.com'}
                   className="mt-1"
                 />
               </div>
