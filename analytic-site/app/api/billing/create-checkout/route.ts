@@ -2,8 +2,7 @@ import { NextRequest } from 'next/server';
 import { getSessionCompany } from '@/lib/auth';
 import { getDatabase } from '@/lib/db';
 import stripe, { PLANS } from '@/lib/stripe';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
-import { ObjectId } from 'mongodb';
+import { createSuccessResponse, createErrorResponse } from "@/lib/api-response";
 
 export async function POST(request: NextRequest) {
   try {

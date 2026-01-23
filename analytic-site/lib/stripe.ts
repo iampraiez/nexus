@@ -20,7 +20,7 @@ export const PLANS = {
   pro: {
     name: "Pro",
     priceId: process.env.STRIPE_PRO_PRICE_ID || "",
-    amount: 9900, // $99.00
+    amount: 999, // $9.99
     eventsPerMonth: 1000000,
     features: [
       "Unlimited events",
@@ -71,7 +71,7 @@ export async function createSubscription(
 
   return {
     subscriptionId: subscription.id,
-    clientSecret: paymentIntent?.client_secret,
+    clientSecret: paymentIntent?.client_secret as string,
   };
 }
 
@@ -91,7 +91,7 @@ export async function getSubscription(
 export async function cancelSubscription(
   subscriptionId: string,
 ): Promise<Stripe.Subscription> {
-  return stripe.subscriptions.del(subscriptionId);
+  return stripe.subscriptions.cancel(subscriptionId);
 }
 
 export async function updateSubscription(
