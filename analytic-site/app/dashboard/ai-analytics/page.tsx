@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Sparkles, Calendar, Download, Mail, History, FileText } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AIAnalyticsPage() {
   const { company } = useDashboard();
@@ -21,6 +22,8 @@ export default function AIAnalyticsPage() {
   const [currentReport, setCurrentReport] = useState<any>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchHistory();
@@ -64,9 +67,20 @@ export default function AIAnalyticsPage() {
         if (data.data.dataAvailable) {
           fetchHistory(); // Refresh list to get real ID
         }
+        toast({
+          title: "Report Generated",
+          description: "Your AI analytics report is ready.",
+        });
+      } else {
+        throw new Error(data.error || 'Failed to generate report');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Generation failed:', err);
+      toast({
+        title: "Generation Failed",
+        description: err.message || "Could not generate report. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setGenerating(false);
     }
@@ -74,15 +88,27 @@ export default function AIAnalyticsPage() {
 
   const handleDownload = () => {
     if (!currentReport) return;
-    const blob = new Blob([currentReport.content], { type: 'text/markdown' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `nexus-report-${new Date(currentReport.generatedAt).toISOString().split('T')[0]}.md`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    try {
+      const blob = new Blob([currentReport.content], { type: 'text/markdown' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nexus-report-${new Date(currentReport.generatedAt).toISOString().split('T')[0]}.md`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast({
+        title: "Download Started",
+        description: "Your report is being downloaded.",
+      });
+    } catch (err) {
+      toast({
+        title: "Download Failed",
+        description: "Could not download the report.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
