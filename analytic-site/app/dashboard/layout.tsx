@@ -24,7 +24,9 @@ import {
   BarChart3,
   Loader2,
   Info,
+  Sparkles,
 } from "lucide-react";
+import { DashboardProvider, useDashboard } from "./dashboard-context";
 
 interface NavItem {
   href?: string;
@@ -36,6 +38,7 @@ interface NavItem {
 const navigationItems: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: Home },
   { href: "/dashboard/projects", label: "Projects", icon: BarChart3 },
+  { href: "/dashboard/ai-analytics", label: "AI Analytics", icon: Sparkles },
   { href: "/dashboard/analytics", label: "Analytics", icon: Activity },
   {
     label: "Analytics Details",
@@ -61,7 +64,20 @@ const navigationItems: NavItem[] = [
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
+
 export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <DashboardProvider>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </DashboardProvider>
+  );
+}
+
+function DashboardLayoutContent({
   children,
 }: {
   children: React.ReactNode;
@@ -69,28 +85,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-    async function checkAuth() {
-      try {
-        const response = await fetch("/api/auth/session");
-        if (!isMounted) return;
-        if (!response.ok) {
-          router.push("/auth/login");
-          return;
-        }
-        setLoading(false);
-      } catch (error) {
-        if (isMounted) router.push("/auth/login");
-      }
-    }
-    checkAuth();
-    return () => {
-      isMounted = false;
-    };
-  }, [router]);
+  const { loading } = useDashboard();
 
   async function handleLogout() {
     try {

@@ -51,7 +51,10 @@ interface ApiKey {
   createdAt: string;
 }
 
+import { useDashboard } from '../dashboard-context';
+
 export default function ProjectsPage() {
+  const { projects: contextProjects, loading: contextLoading, refreshData } = useDashboard();
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
@@ -74,29 +77,33 @@ export default function ProjectsPage() {
 
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (contextProjects.length > 0) {
+      setProjects(contextProjects);
+      if (!selectedProject) {
+        setSelectedProject(contextProjects[0]);
+        loadApiKeys(contextProjects[0]._id);
+      }
+    }
+  }, [contextProjects]);
+
   const loadProjects = useCallback(async () => {
+    // If we have context data, don't re-fetch unless forced or empty
+    if (contextProjects.length > 0) return;
+
     try {
       setLoading(true);
-      const response = await fetch('/api/projects');
-      if (response.ok) {
-        const data = await response.json();
-        const projectsData = data.data || [];
-        setProjects(projectsData);
-        if (projectsData.length > 0 && !selectedProject) {
-          setSelectedProject(projectsData[0]);
-          loadApiKeys(projectsData[0]._id);
-        }
-      }
+      await refreshData();
     } catch (error) {
       console.error('Error loading projects:', error);
     } finally {
       setLoading(false);
     }
-  }, [selectedProject]);
+  }, [contextProjects, refreshData]);
 
   useEffect(() => {
     loadProjects();
-  }, []);
+  }, [loadProjects]);
 
   async function loadApiKeys(projectId: string) {
     try {
@@ -131,9 +138,12 @@ export default function ProjectsPage() {
 
       const result = await response.json();
       if (response.ok) {
-        setProjects([...projects, result.data]);
+        await refreshData(); // Update global context
         setProjectName('');
         setShowNewProject(false);
+        // Optimistic update or wait for context? Context update will trigger useEffect
+        // But we want to select the new project.
+        // Let's just set selected manually for UX speed
         setSelectedProject(result.data);
         loadApiKeys(result.data._id);
         toast({

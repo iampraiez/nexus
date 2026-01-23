@@ -8,6 +8,7 @@ import {
   Activity,
   ArrowUpRight,
   ArrowDownRight,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,26 @@ export default function DashboardPage() {
         <p className="text-sm md:text-base text-muted-foreground">
           Welcome back. Here&apos;s your analytics overview.
         </p>
+      </div>
+
+      {/* New Feature Announcement */}
+      <div className="bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/20 rounded-full text-primary">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground">New: AI Analytics</h3>
+            <p className="text-sm text-muted-foreground">
+              Get insanely comprehensive insights and strategic recommendations powered by Gemini 2.0.
+            </p>
+          </div>
+        </div>
+        <Link href="/dashboard/ai-analytics">
+          <Button size="sm" className="gap-2">
+            Try it now <ArrowUpRight className="w-4 h-4" />
+          </Button>
+        </Link>
       </div>
  
       {/* Stats Grid */}

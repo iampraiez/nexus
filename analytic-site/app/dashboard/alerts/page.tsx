@@ -222,13 +222,20 @@ export default function AlertsPage() {
     <div className="space-y-6 md:space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Alerts</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            Alerts
+          </h1>
           <p className="text-sm md:text-base text-muted-foreground">
             Configure notifications and webhooks for important events
           </p>
         </div>
-        <Button onClick={() => { setShowForm(!showForm); setEditingAlert(null); }} className="gap-2 w-full md:w-auto">
-          <Plus className="w-4 h-4" />
+        <Button
+          onClick={() => {
+            setShowForm(!showForm);
+            setEditingAlert(null);
+          }}
+          className="gap-2 w-full md:w-auto"
+        >
           Create Alert
         </Button>
       </div>
@@ -236,9 +243,12 @@ export default function AlertsPage() {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>{editingAlert ? 'Edit Alert' : 'Create New Alert'}</DialogTitle>
+            <DialogTitle>
+              {editingAlert ? "Edit Alert" : "Create New Alert"}
+            </DialogTitle>
             <DialogDescription>
-              Configure your alert settings below. You'll receive notifications when triggers are met.
+              Configure your alert settings below. You'll receive notifications
+              when triggers are met.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateOrUpdateAlert} className="space-y-4 mt-4">
@@ -248,14 +258,17 @@ export default function AlertsPage() {
                 id="alertName"
                 name="alertName"
                 placeholder="e.g., High Error Rate"
-                defaultValue={editingAlert?.name || ''}
+                defaultValue={editingAlert?.name || ""}
                 required
                 className="mt-1.5"
               />
             </div>
             <div>
               <Label htmlFor="alertType">Notification Type</Label>
-              <Select name="alertType" defaultValue={editingAlert?.type || 'email'}>
+              <Select
+                name="alertType"
+                defaultValue={editingAlert?.type || "email"}
+              >
                 <SelectTrigger className="mt-1.5">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -271,7 +284,7 @@ export default function AlertsPage() {
                 id="alertTarget"
                 name="alertTarget"
                 placeholder="email@example.com or https://example.com/webhook"
-                defaultValue={editingAlert?.target || ''}
+                defaultValue={editingAlert?.target || ""}
                 required
                 className="mt-1.5"
               />
@@ -280,15 +293,22 @@ export default function AlertsPage() {
               <Label className="mb-2 block">Triggers</Label>
               <div className="space-y-3 border rounded-md p-3">
                 {alertTriggers.map((trigger) => (
-                  <label key={trigger.value} className="flex items-center gap-3 cursor-pointer hover:bg-secondary/50 p-1.5 rounded transition-colors">
-                    <input 
-                      type="checkbox" 
-                      name="triggers" 
+                  <label
+                    key={trigger.value}
+                    className="flex items-center gap-3 cursor-pointer hover:bg-secondary/50 p-1.5 rounded transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      name="triggers"
                       value={trigger.value}
-                      defaultChecked={editingAlert?.triggers?.includes(trigger.value)}
+                      defaultChecked={editingAlert?.triggers?.includes(
+                        trigger.value,
+                      )}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm text-foreground">{trigger.label}</span>
+                    <span className="text-sm text-foreground">
+                      {trigger.label}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -297,11 +317,16 @@ export default function AlertsPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => { setShowForm(false); setEditingAlert(null); }}
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingAlert(null);
+                }}
               >
                 Cancel
               </Button>
-              <Button type="submit">{editingAlert ? 'Update Alert' : 'Create Alert'}</Button>
+              <Button type="submit">
+                {editingAlert ? "Update Alert" : "Create Alert"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -318,9 +343,12 @@ export default function AlertsPage() {
           </Card>
         ) : (
           alerts.map((alert) => {
-            const Icon = alert.type === 'email' ? Mail : Webhook;
+            const Icon = alert.type === "email" ? Mail : Webhook;
             return (
-              <Card key={alert._id} className="p-4 md:p-6 border border-border bg-card">
+              <Card
+                key={alert._id}
+                className="p-4 md:p-6 border border-border bg-card"
+              >
                 <div className="flex flex-col md:flex-row items-start justify-between gap-4">
                   <div className="flex items-start gap-3 md:gap-4 flex-1">
                     <div className="p-2 rounded-lg bg-primary/10 shrink-0">
@@ -336,8 +364,10 @@ export default function AlertsPage() {
                         </span>
                       </div>
                       <p className="text-xs md:text-sm text-muted-foreground mb-3 break-all">
-                        {alert.type === 'email' ? 'Email to ' : 'Webhook to '}
-                        <span className="font-mono text-foreground">{alert.target}</span>
+                        {alert.type === "email" ? "Email to " : "Webhook to "}
+                        <span className="font-mono text-foreground">
+                          {alert.target}
+                        </span>
                       </p>
                       <div className="flex gap-2 flex-wrap">
                         {alert.triggers.map((trigger: string) => (
@@ -352,18 +382,18 @@ export default function AlertsPage() {
                     </div>
                   </div>
                   <div className="flex gap-2 w-full md:w-auto">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="gap-1 flex-1 md:flex-initial"
                       onClick={() => handleEditAlert(alert)}
                     >
                       <Edit2 className="w-4 h-4" />
                       <span className="md:hidden">Edit</span>
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="gap-1 text-destructive flex-1 md:flex-initial"
                       onClick={() => handleDeleteAlert(alert._id)}
                     >
@@ -381,7 +411,9 @@ export default function AlertsPage() {
       {/* Alert History with Infinite Scroll */}
       <Card className="border border-border bg-card overflow-hidden">
         <div className="p-4 md:p-6 border-b border-border">
-          <h2 className="text-lg md:text-xl font-semibold text-foreground">Alert History</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-foreground">
+            Alert History
+          </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -413,14 +445,18 @@ export default function AlertsPage() {
                   <td colSpan={4} className="px-6 py-12 text-center">
                     <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-30" />
                     <p className="text-muted-foreground text-sm">
-                      No alert history yet. Alerts will appear here when triggered.
+                      No alert history yet. Alerts will appear here when
+                      triggered.
                     </p>
                   </td>
                 </tr>
               ) : (
                 <>
                   {history.map((item, index) => (
-                    <tr key={`${item._id}-${index}`} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                    <tr
+                      key={`${item._id}-${index}`}
+                      className="border-b border-border hover:bg-secondary/30 transition-colors"
+                    >
                       <td className="px-4 md:px-6 py-4 text-xs md:text-sm font-medium text-foreground">
                         {item.alertName}
                       </td>
@@ -428,12 +464,14 @@ export default function AlertsPage() {
                         {getTriggerLabel(item.trigger)}
                       </td>
                       <td className="px-4 md:px-6 py-4">
-                        <span className={`px-2 py-1 rounded text-xs font-medium ${
-                          item.status === 'sent' 
-                            ? 'bg-green-500/10 text-green-600'
-                            : 'bg-red-500/10 text-red-600'
-                        }`}>
-                          {item.status === 'sent' ? 'Sent' : 'Failed'}
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${
+                            item.status === "sent"
+                              ? "bg-green-500/10 text-green-600"
+                              : "bg-red-500/10 text-red-600"
+                          }`}
+                        >
+                          {item.status === "sent" ? "Sent" : "Failed"}
                         </span>
                       </td>
                       <td className="px-4 md:px-6 py-4 text-xs md:text-sm text-muted-foreground">
