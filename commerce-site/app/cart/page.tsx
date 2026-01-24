@@ -92,6 +92,13 @@ export default function CartPage() {
 
       if (!response.ok) {
         setShowProcessing(false);
+        
+        // Track Payment Failure
+        Nexus.track("payment_failed", {
+          orderId: data.orderId || "unknown",
+          error: data.message || "Payment failed"
+        });
+
         alert(data.message || "Checkout failed");
         return;
       }

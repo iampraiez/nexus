@@ -38,9 +38,10 @@ export class HttpTransport implements ITransport {
   async send(
     events: SerializedEvent[],
     signature: string,
-    timestamp: number
+    timestamp: number,
+    apiKey: string
   ): Promise<void> {
-    return this.sendWithRetry(events, signature, timestamp, 0);
+    return this.sendWithRetry(events, signature, timestamp, apiKey, 0);
   }
 
   /**
@@ -50,10 +51,11 @@ export class HttpTransport implements ITransport {
     events: SerializedEvent[],
     signature: string,
     timestamp: number,
+    apiKey: string,
     attemptCount: number
   ): Promise<void> {
     try {
-      await this.sendRequest(events, signature, timestamp);
+      await this.sendRequest(events, signature, timestamp, apiKey);
       this.logger.info("Events sent successfully", { count: events.length });
     } catch (error) {
       if (attemptCount < this.retryConfig.maxRetries) {
@@ -68,6 +70,7 @@ export class HttpTransport implements ITransport {
           events,
           signature,
           timestamp,
+          apiKey,
           attemptCount + 1
         );
       }
@@ -83,7 +86,8 @@ export class HttpTransport implements ITransport {
   private async sendRequest(
     events: SerializedEvent[],
     signature: string,
-    timestamp: number
+    timestamp: number,
+    apiKey: string
   ): Promise<void> {
     if (typeof fetch === "undefined") {
       throw new Error(
@@ -97,6 +101,7 @@ export class HttpTransport implements ITransport {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
         "X-Signature": signature,
         "X-Timestamp": timestamp.toString(),
       },

@@ -1,0 +1,2 @@
+overrides:
+  nexus-avail: link:../nexus-sdk

@@ -32,12 +32,47 @@ class NexusSDKClass {
   ): void {
     NexusSDKClass.instance?.track(eventType, data);
   }
+  
+  /**
+   * Track a page view
+   */
+  static pageView(data?: { title?: string; referrer?: string }): void {
+    if (typeof window === "undefined") return;
+    
+    NexusSDKClass.instance?.track("page_view", {
+      url: window.location.href,
+      path: window.location.pathname,
+      title: data?.title || document.title,
+      referrer: data?.referrer || document.referrer,
+    });
+  }
+
+  /**
+   * Identify the current user
+   */
+  static identify(userId: string): void {
+    NexusSDKClass.instance?.identify(userId);
+  }
 
   /**
    * Flush pending events
    */
   static async flush(): Promise<void> {
     return NexusSDKClass.instance?.flush();
+  }
+
+  /**
+   * Track an error
+   */
+  static trackError(error: Error | string, context?: string): void {
+    const message = error instanceof Error ? error.message : error;
+    const stack = error instanceof Error ? error.stack : undefined;
+    
+    NexusSDKClass.instance?.track("sdk_error", {
+      message,
+      stack,
+      context,
+    });
   }
 
   /**
@@ -86,6 +121,13 @@ class NexusSDKClass {
     this.tracker.track(eventType, data);
   }
 
+  private identify(userId: string): void {
+    if (!this.tracker) {
+      throw new Error("Nexus SDK not initialized");
+    }
+    this.tracker.setUserId(userId);
+  }
+
   private async flush(): Promise<void> {
     if (!this.tracker) {
       return;
@@ -119,6 +161,9 @@ class NexusSDKClass {
 export const Nexus = {
   init: NexusSDKClass.init.bind(NexusSDKClass),
   track: NexusSDKClass.track.bind(NexusSDKClass),
+  trackError: NexusSDKClass.trackError.bind(NexusSDKClass),
+  pageView: NexusSDKClass.pageView.bind(NexusSDKClass),
+  identify: NexusSDKClass.identify.bind(NexusSDKClass),
   flush: NexusSDKClass.flush.bind(NexusSDKClass),
   getSessionId: NexusSDKClass.getSessionId.bind(NexusSDKClass),
   destroy: NexusSDKClass.destroy.bind(NexusSDKClass),

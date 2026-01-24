@@ -30,6 +30,8 @@ export interface BaseEvent {
 export type EventType =
   | "user_signup"
   | "user_login"
+  | "page_view"
+  | "session_started"
   | "product_viewed"
   | "product_added_to_cart"
   | "product_removed_from_cart"
@@ -37,7 +39,8 @@ export type EventType =
   | "checkout_completed"
   | "order_created"
   | "order_cancelled"
-  | "payment_failed";
+  | "payment_failed"
+  | "sdk_error";
 
 /**
  * Event schema mappings for type-safe tracking
@@ -49,6 +52,17 @@ export interface EventSchemas {
   };
   user_login: BaseEvent & {
     email: string;
+  };
+  page_view: BaseEvent & {
+    url: string;
+    path: string;
+    title?: string;
+    referrer?: string;
+  };
+  session_started: BaseEvent & {
+    device?: string;
+    browser?: string;
+    os?: string;
   };
   product_viewed: BaseEvent & {
     productId: string;
@@ -90,6 +104,11 @@ export interface EventSchemas {
     orderId: string;
     error: string;
   };
+  sdk_error: BaseEvent & {
+    message: string;
+    stack?: string;
+    context?: string;
+  };
 }
 
 /**
@@ -120,7 +139,8 @@ export interface ITransport {
   send(
     events: SerializedEvent[],
     signature: string,
-    timestamp: number
+    timestamp: number,
+    apiKey: string
   ): Promise<void>;
 }
 

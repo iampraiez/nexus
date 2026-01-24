@@ -26,6 +26,7 @@ export class EventTracker {
   private transport: ITransport;
   private logger: ILogger;
   private sessionId: string;
+  private userId: string | null = null;
   private isOnline: boolean = true;
 
   constructor(
@@ -70,6 +71,15 @@ export class EventTracker {
 
     this.setupOfflineDetection();
     this.restoreOfflineEvents();
+    this.trackSessionStart();
+  }
+
+  /**
+   * Set the user ID for subsequent events
+   */
+  setUserId(userId: string): void {
+    this.userId = userId;
+    this.logger.info(`User identified: ${userId}`);
   }
 
   /**
@@ -87,6 +97,7 @@ export class EventTracker {
         data: {
           ...data,
           sessionId: this.sessionId,
+          userId: this.userId || (data as any).userId,
           timestamp: Date.now(),
         },
         timestamp: Date.now(),
@@ -140,7 +151,7 @@ export class EventTracker {
         this.config.apiKey
       );
 
-      await this.transport.send(events, signature, timestamp);
+      await this.transport.send(events, signature, timestamp, this.config.apiKey);
     } catch (error) {
       // Save to offline storage
       await this.saveOfflineEvents(events);
@@ -217,6 +228,18 @@ export class EventTracker {
     window.addEventListener("offline", () => {
       this.isOnline = false;
       this.logger.info("Gone offline, events will be saved locally");
+    });
+  }
+
+  /**
+   * Track session start event
+   */
+  private trackSessionStart(): void {
+    const device = typeof window !== "undefined" ? window.navigator.userAgent : "node";
+    this.track("session_started", {
+      device,
+      browser: device, // Simplified for now
+      os: device, // Simplified for now
     });
   }
 }
