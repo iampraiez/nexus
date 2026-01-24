@@ -13,35 +13,13 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SdkInstallCard } from "@/components/sdk-install-card";
-
-import { useState, useEffect } from "react";
+import { useDashboard } from "./dashboard-context";
 import { Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { analyticsOverview, loading: contextLoading } = useDashboard();
 
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const response = await fetch("/api/analytics/overview");
-        const result = await response.json();
-        if (result.success) {
-          setStats(result.data.stats);
-        } else {
-          setError(result.error || "Failed to fetch stats");
-        }
-      } catch (err) {
-        setError("An error occurred while fetching stats");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchStats();
-  }, []);
-
-  if (loading) {
+  if (contextLoading && !analyticsOverview) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -49,14 +27,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
-        <p className="font-medium">Error</p>
-        <p className="text-sm">{error}</p>
-      </div>
-    );
-  }
+  const stats = analyticsOverview?.stats || [];
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -89,7 +60,7 @@ export default function DashboardPage() {
  
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-        {stats.map((stat) => {
+        {stats.map((stat: any) => {
           const Icon = stat.label === "Total Events" ? Activity : 
                        stat.label === "Active Users" ? Users :
                        stat.label === "Conversion Rate" ? TrendingUp : BarChart3;

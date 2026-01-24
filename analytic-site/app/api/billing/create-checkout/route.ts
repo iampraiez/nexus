@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan } = body;
+    const { plan, currency } = body;
 
     if (!plan || !['free', 'pro'].includes(plan)) {
       return createErrorResponse('Invalid plan', 400);
@@ -41,8 +41,10 @@ export async function POST(request: NextRequest) {
     }
 
     // For pro plan, create checkout session
-    if (!planConfig.priceId) {
-      console.error('Stripe Price ID is missing for plan:', plan);
+    const priceId = currency === 'NGN' ? planConfig.priceIdNgn : planConfig.priceId;
+
+    if (!priceId) {
+      console.error('Stripe Price ID is missing for plan:', plan, 'currency:', currency);
       return createErrorResponse('Billing configuration error. Please contact support.', 500);
     }
 
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: planConfig.priceId,
+          price: priceId,
           quantity: 1,
         },
       ],
@@ -62,6 +64,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         companyId: company._id?.toString(),
         plan,
+        currency: currency || 'USD',
       },
     });
 

@@ -13,14 +13,18 @@ export const PLANS = {
   free: {
     name: "Free",
     priceId: process.env.STRIPE_FREE_PRICE_ID || "",
+    priceIdNgn: "",
     amount: 0,
+    amountNgn: 0,
     eventsPerMonth: 10000,
-    features: ["Basic analytics", "Limited retention", "Community support"],
+    features: ["Basic analytics", "Limited retention"],
   },
   pro: {
     name: "Pro",
     priceId: process.env.STRIPE_PRO_PRICE_ID || "",
-    amount: 999, // $9.99
+    priceIdNgn: process.env.STRIPE_PRO_PRICE_ID_NGN || "",
+    amount: 9900,
+    amountNgn: 1400000,
     eventsPerMonth: 1000000,
     features: [
       "Unlimited events",
@@ -66,12 +70,12 @@ export async function createSubscription(
     expand: ["latest_invoice.payment_intent"],
   });
 
-  const invoice = subscription.latest_invoice as Stripe.Invoice;
-  const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+  const invoice = subscription.latest_invoice as any;
+  const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent;
 
   return {
     subscriptionId: subscription.id,
-    clientSecret: paymentIntent?.client_secret as string,
+    clientSecret: paymentIntent?.client_secret || undefined,
   };
 }
 

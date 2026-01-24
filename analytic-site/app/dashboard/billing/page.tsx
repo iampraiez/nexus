@@ -42,6 +42,7 @@ export default function BillingPage() {
   const searchParams = useSearchParams();
   const { usage, company, loading: contextLoading } = useDashboard();
   const [currentPlan, setCurrentPlan] = useState<string>('free');
+  const [currency, setCurrency] = useState<'USD' | 'NGN'>('USD');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -66,7 +67,7 @@ export default function BillingPage() {
       const response = await fetch('/api/billing/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, currency }),
       });
 
       const data = await response.json();
@@ -97,11 +98,37 @@ export default function BillingPage() {
   return (
     <div className="space-y-8">
       <Suspense fallback={<Loading />}>
-        <div>
-          <h1 className="text-4xl font-bold text-foreground mb-2">Billing</h1>
-          <p className="text-muted-foreground">
-            Manage your plan and billing information
-          </p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Billing</h1>
+            <p className="text-muted-foreground">
+              Manage your plan and billing information
+            </p>
+          </div>
+
+          {/* Currency Toggle */}
+          <div className="flex items-center bg-secondary/50 p-1 rounded-lg border border-border w-fit">
+            <button
+              onClick={() => setCurrency('USD')}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                currency === 'USD' 
+                  ? 'bg-background text-foreground shadow-sm' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              USD ($)
+            </button>
+            <button
+              onClick={() => setCurrency('NGN')}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                currency === 'NGN' 
+                  ? 'bg-background text-foreground shadow-sm' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              NGN (₦)
+            </button>
+          </div>
         </div>
 
         {message && (
@@ -127,6 +154,9 @@ export default function BillingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {plans.map((plan) => {
             const isCurrent = plan.id === currentPlan;
+            const price = currency === 'NGN' && plan.id === 'pro' ? '14,000' : plan.price;
+            const symbol = currency === 'NGN' ? '₦' : '$';
+            
             return (
               <Card
                 key={plan.id}
@@ -150,7 +180,7 @@ export default function BillingPage() {
 
                 <div className="mb-6">
                   <span className="text-4xl font-bold text-foreground">
-                    ${plan.price}
+                    {symbol}{price}
                   </span>
                   <span className="text-muted-foreground">/month</span>
                 </div>

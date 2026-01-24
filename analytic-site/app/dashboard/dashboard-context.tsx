@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 interface DashboardContextType {
   company: any;
   projects: any[];
+  analyticsOverview: any;
   usage: {
     eventsCount: number;
     projectsCount: number;
@@ -13,12 +14,13 @@ interface DashboardContextType {
     isFreeTierExceeded: boolean;
   };
   loading: boolean;
-  refreshData: () => Promise<void>;
+  refreshData: (force?: boolean) => Promise<void>;
 }
 
 const DashboardContext = createContext<DashboardContextType>({
   company: null,
   projects: [],
+  analyticsOverview: null,
   usage: {
     eventsCount: 0,
     projectsCount: 0,
@@ -32,6 +34,8 @@ const DashboardContext = createContext<DashboardContextType>({
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [company, setCompany] = useState<any>(null);
   const [projects, setProjects] = useState<any[]>([]);
+  const [analyticsOverview, setAnalyticsOverview] = useState<any>(null);
+  const [lastFetched, setLastFetched] = useState<number>(0);
   const [usage, setUsage] = useState({
     eventsCount: 0,
     projectsCount: 0,
@@ -41,13 +45,19 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (force = false) => {
+    // Only fetch if forced or data is older than 5 minutes
+    const now = Date.now();
+    if (!force && lastFetched && now - lastFetched < 5 * 60 * 1000) {
+      return;
+    }
+
     try {
       // Parallel fetch for core data
       const [sessionRes, projectsRes, analyticsRes] = await Promise.all([
         fetch('/api/auth/session'),
         fetch('/api/projects'),
-        fetch('/api/analytics/overview') // Reusing existing endpoint for event count
+        fetch('/api/analytics/overview')
       ]);
 
       const sessionData = await sessionRes.json();
@@ -69,6 +79,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         currentProjects = projectsData.data;
       }
 
+      if (analyticsData.success) {
+        setAnalyticsOverview(analyticsData.data);
+      }
+
       // Calculate Usage & Limits
       let eventsCount = 0;
       if (analyticsData.success) {
@@ -88,19 +102,20 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         isFreeTierExceeded,
       });
 
+      setLastFetched(now);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  }, [router, lastFetched]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   return (
-    <DashboardContext.Provider value={{ company, projects, usage, loading, refreshData: fetchData }}>
+    <DashboardContext.Provider value={{ company, projects, analyticsOverview, usage, loading, refreshData: fetchData }}>
       {children}
     </DashboardContext.Provider>
   );
