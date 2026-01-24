@@ -13,11 +13,6 @@ export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-    }
-  }, [status]);
 
   if (status === "loading") {
     return (
@@ -27,7 +22,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!session?.user) {
+  if (!session) {
     return null;
   }
 

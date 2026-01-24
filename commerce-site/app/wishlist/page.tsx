@@ -37,15 +37,10 @@ export default function WishlistPage() {
   }, []);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-      return;
-    }
-
     if (status === "authenticated") {
       fetchWishlist();
     }
-  }, [status, session, router]);
+  }, [status, session]);
 
   const fetchWishlist = async () => {
     setIsLoading(true);
@@ -100,7 +95,7 @@ export default function WishlistPage() {
     }
   };
 
-  if (status === "loading" || isLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <LoadingSpinner />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,10 @@ import { User, LogOut, Package, Heart, HelpCircle, Mail, MessageCircle } from "l
 export default function AccountPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   console.log('Session', session)
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/auth/login");
-    }
-  }, [status]);
 
   if (status === "loading") {
     return (
@@ -29,7 +25,7 @@ export default function AccountPage() {
     );
   }
 
-  if (!session?.user) {
+  if (!session) {
     return null;
   }
 
