@@ -24,16 +24,16 @@ An interactive demonstration of the Nexus Analytics SDK showcasing all event typ
 1. Build the Nexus SDK first:
 
 ```bash
-cd ../nexus-avail
-npm install
-npm run build
+cd ../nexus-sdk
+pnpm install
+pnpm run build
 ```
 
 2. Install demo dependencies:
 
 ```bash
-cd ../nexus-avail-demo
-npm install
+cd ../nexus-sdk-demo
+pnpm install
 ```
 
 ### Development
@@ -214,9 +214,9 @@ npm start
 
 ## Resources
 
-- [SDK Documentation](../nexus-avail/README.md)
-- [API Reference](../nexus-avail/docs/API.md)
-- [Event Schema Reference](../nexus-avail/docs/EVENTS.md)
+- [SDK Documentation](../nexus-sdk/README.md)
+- [API Reference](../nexus-sdk/docs/API.md)
+- [Event Schema Reference](../nexus-sdk/docs/EVENTS.md)
 
 ## License
 

@@ -17,7 +17,7 @@ Production-ready TypeScript SDK for the Nexus analytics platform. Track user eve
 ### 1. Install
 
 ```bash
-npm install nexus-avail
+pnpm add nexus-avail
 ```
 
 ### 2. Getting an API Key

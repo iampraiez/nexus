@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SessionProviderWrapper } from "@/components/session-provider";
 import "./globals.css";
 import { Header } from "@/components/header";
+import { NexusProvider } from "@/components/nexus-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,8 +54,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <SessionProviderWrapper>
-          <Header />
-          {children}
+          <NexusProvider>
+            <Header />
+            {children}
+          </NexusProvider>
         </SessionProviderWrapper>
         {process.env.NODE_ENV === "development" && <Analytics />}
       </body>

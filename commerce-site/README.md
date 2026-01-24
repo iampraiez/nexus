@@ -5,6 +5,7 @@ A full-stack e-commerce application built with Next.js, featuring user authentic
 ## 🚀 Features
 
 - **User Authentication**: Secure login/registration with NextAuth
+- **Nexus Analytics**: Integrated with `nexus-avail` SDK for real-time user behavior tracking
 - **Product Management**: Browse, search, and view detailed product information
 - **Shopping Cart**: Add/remove items, persistent cart storage
 - **Demo Checkout**: Integrated simulated payment processing with random success/failure and delivery fees
@@ -54,6 +55,11 @@ A full-stack e-commerce application built with Next.js, featuring user authentic
    # NextAuth
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=your-secret-key-here
+
+   # Nexus Analytics
+   NEXT_PUBLIC_NEXUS_API_KEY=your_nexus_api_key
+   NEXT_PUBLIC_NEXUS_PROJECT_ID=your_nexus_project_id
+   NEXT_PUBLIC_NEXUS_ENVIRONMENT=development
    ```
 
 4. **Initialize the database:**

@@ -18,6 +18,8 @@ import {
 } from "@/lib/cart";
 import Image from "next/image";
 
+import { Nexus } from "nexus-avail";
+
 export default function CartPage() {
   const router = useRouter();
   const [items, setItems] = useState<CartItem[]>([]);
@@ -96,6 +98,13 @@ export default function CartPage() {
 
       // Clear cart and redirect to success
       clearCart();
+      
+      // Track Checkout
+      Nexus.track("checkout_completed", {
+        orderId: data.orderId,
+        cartValue: total
+      });
+
       router.push(`/checkout/success?orderId=${data.orderId}`);
     } catch (error) {
       console.error("Checkout error:", error);

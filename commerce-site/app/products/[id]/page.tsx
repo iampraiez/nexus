@@ -11,6 +11,8 @@ import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
 import Image from "next/image";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
+import { Nexus } from "nexus-avail";
+
 interface Product {
   _id: string;
   name: string;
@@ -58,6 +60,13 @@ export default function ProductDetailPage() {
         setProduct(data);
         addRecentlyViewed(params.id as string);
         checkWishlist(params.id as string);
+        
+        // Track Product View
+        Nexus.track("product_viewed", {
+          productId: data._id,
+          productName: data.name,
+          category: data.category
+        });
       } catch (err) {
         setError("Failed to load product");
       } finally {
@@ -112,6 +121,14 @@ export default function ProductDetailPage() {
     }
 
     localStorage.setItem("cart", JSON.stringify(existingCart));
+    
+    // Track Add to Cart
+    Nexus.track("product_added_to_cart", {
+      productId: product._id,
+      quantity,
+      price: product.price
+    });
+
     router.push("/cart");
   };
 

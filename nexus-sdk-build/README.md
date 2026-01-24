@@ -47,17 +47,17 @@ An interactive demonstration showcasing:
 ### 1. Build the SDK
 
 ```bash
-cd nexus-avail
-npm install
-npm run build
+cd nexus-sdk
+pnpm install
+pnpm run build
 ```
 
 ### 2. Run the Demo
 
 ```bash
-cd ../nexus-avail-demo
-npm install
-npm run dev
+cd ../nexus-sdk-demo
+pnpm install
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
@@ -98,10 +98,10 @@ Nexus.track("user_signup", {
 | Document                       | Purpose                       |
 | ------------------------------ | ----------------------------- |
 | **QUICK_START.md**             | Get started in 5 minutes      |
-| **nexus-avail/README.md**      | SDK package documentation     |
-| **nexus-avail/docs/API.md**    | Complete API reference        |
-| **nexus-avail/docs/EVENTS.md** | Event schema reference        |
-| **nexus-avail-demo/README.md** | Demo app documentation        |
+| **nexus-sdk/README.md**        | SDK package documentation     |
+| **nexus-sdk/docs/API.md**      | Complete API reference        |
+| **nexus-sdk/docs/EVENTS.md**   | Event schema reference        |
+| **nexus-sdk-demo/README.md**   | Demo app documentation        |
 | **PROJECT_STRUCTURE.md**       | Complete project architecture |
 | **ARCHITECTURE.md**            | System design and data flow   |
 | **IMPLEMENTATION_SUMMARY.md**  | Overview of what was built    |
