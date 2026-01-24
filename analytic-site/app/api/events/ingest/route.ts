@@ -1,16 +1,29 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/db';
 import { hashApiKey } from '@/lib/crypto';
 import { isValidEventName, isValidUserId } from '@/lib/validation';
 import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
 import { ObjectId } from 'mongodb';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Signature, X-Timestamp',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Get API key from header
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return createErrorResponse('Missing or invalid API key', 401);
+      return NextResponse.json(
+        { success: false, error: 'Missing or invalid API key' },
+        { status: 401, headers: corsHeaders }
+      );
     }
 
     const apiKey = authHeader.substring(7);
@@ -21,7 +34,10 @@ export async function POST(request: NextRequest) {
     // Find API key and project
     const keyDoc = await db.collection('api_keys').findOne({ key: hashedKey });
     if (!keyDoc) {
-      return createErrorResponse('Invalid API key', 401);
+      return NextResponse.json(
+        { success: false, error: 'Invalid API key' },
+        { status: 401, headers: corsHeaders }
+      );
     }
 
     // Update last used
@@ -34,7 +50,10 @@ export async function POST(request: NextRequest) {
     const { events, batch } = body;
 
     if (!events || !Array.isArray(events) || events.length === 0) {
-      return createErrorResponse('No events provided', 400);
+      return NextResponse.json(
+        { success: false, error: 'No events provided' },
+        { status: 400, headers: corsHeaders }
+      );
     }
 
     // Process events
@@ -111,16 +130,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return createSuccessResponse(
+    return NextResponse.json(
       {
-        received: processedEvents.length,
-        batchId: batch?.id,
+        success: true,
+        data: {
+          received: processedEvents.length,
+          batchId: batch?.id,
+        },
+        message: 'Events accepted for processing'
       },
-      202,
-      'Events accepted for processing'
+      { status: 202, headers: corsHeaders }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Event ingestion error:', error);
-    return createErrorResponse('Event ingestion failed', 500);
+    return NextResponse.json(
+      { success: false, error: error.message || 'Event ingestion failed' },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
