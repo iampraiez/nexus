@@ -163,7 +163,11 @@ export default function BillingPage() {
               <Card
                 key={plan.id}
                 className={`p-6 border relative overflow-hidden transition-all ${
-                  isCurrent ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10' : 'border-border bg-card hover:border-primary/50'
+                  isCurrent 
+                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10' 
+                    : !usage.isFreeTier && plan.id === 'free'
+                      ? 'border-border bg-card/50 opacity-60' // Dim free plan if Pro is active
+                      : 'border-border bg-card hover:border-primary/50'
                 }`}
               >
                 {isCurrent && (
@@ -189,7 +193,7 @@ export default function BillingPage() {
 
                 <Button
                   className="w-full mb-6"
-                  variant={isCurrent ? 'outline' : 'default'}
+                  variant={isCurrent || (!usage.isFreeTier && plan.id === 'free') ? 'outline' : 'default'}
                   onClick={() => handleUpgrade(plan.id)}
                   disabled={loading || isCurrent || (!usage.isFreeTier && plan.id === 'free')}
                 >
@@ -198,7 +202,7 @@ export default function BillingPage() {
                   ) : isCurrent ? (
                     'Active'
                   ) : !usage.isFreeTier ? (
-                    'Premium User'
+                    'Included'
                   ) : (
                     `Upgrade to ${plan.name}`
                   )}
