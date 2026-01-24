@@ -39,9 +39,7 @@ export default withAuth(
 
     if (isProtectedRoute && !token) {
       const callbackUrl = encodeURIComponent(pathname + req.nextUrl.search);
-      return NextResponse.redirect(
-        new URL(`/auth/login?callbackUrl=${callbackUrl}`, req.url),
-      );
+      return NextResponse.redirect(new URL(callbackUrl, req.url));
     }
 
     return NextResponse.next();
