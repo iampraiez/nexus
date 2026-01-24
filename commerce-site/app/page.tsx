@@ -64,12 +64,15 @@ function HomeContent() {
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("viewMode") as "grid" | "list") || "grid";
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  // Handle hydration mismatch for viewMode
+  useEffect(() => {
+    const savedViewMode = localStorage.getItem("viewMode") as "grid" | "list";
+    if (savedViewMode) {
+      setViewMode(savedViewMode);
     }
-    return "grid";
-  });
+  }, []);
 
   // Use ref to track if we're currently fetching to prevent duplicate requests
   const isFetchingRef = useRef(false);

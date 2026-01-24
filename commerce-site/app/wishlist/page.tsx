@@ -26,12 +26,15 @@ export default function WishlistPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("viewMode") as "grid" | "list") || "grid";
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  // Handle hydration mismatch for viewMode
+  useEffect(() => {
+    const savedViewMode = localStorage.getItem("viewMode") as "grid" | "list";
+    if (savedViewMode) {
+      setViewMode(savedViewMode);
     }
-    return "grid";
-  });
+  }, []);
 
   useEffect(() => {
     if (status === "unauthenticated") {

@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
 
     // Create order in database with "paid" status (Demo Mode - No payment required)
     
-    // Random success probability (75% success rate)
-    const isSuccess = Math.random() < 0.75;
+    // Random success probability (50% success rate)
+    const isSuccess = Math.random() < 0.5;
 
     if (!isSuccess) {
       return NextResponse.json(
