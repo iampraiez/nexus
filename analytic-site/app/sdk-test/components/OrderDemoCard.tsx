@@ -15,7 +15,7 @@ interface OrderDemoCardProps {
 
 export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
   const { track } = useNexus();
-  const [orderId, setOrderId] = useState(`order-${Date.now().toString().slice(-6)}`);
+  const [orderId, setOrderId] = useState(() => `order-${Date.now().toString().slice(-6)}`);
   const [userId, setUserId] = useState("user-123456");
   const [amount, setAmount] = useState(299.97);
   const [currency, setCurrency] = useState("USD");

@@ -58,7 +58,7 @@ export default function BillingPage() {
       refreshData(true); // Force refresh to update plan and limits
       setTimeout(() => setMessage(''), 5000);
     }
-  }, [company, searchParams]);
+  }, [company, searchParams, refreshData]);
 
   async function handleUpgrade(plan: string) {
     if (plan === currentPlan) return;

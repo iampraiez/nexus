@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDashboard } from '../dashboard-context';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,9 +27,26 @@ export default function AIAnalyticsPage() {
 
   const { toast } = useToast();
 
+  const fetchHistory = useCallback(async () => {
+    try {
+      const res = await fetch('/api/ai/generate');
+      const data = await res.json();
+      if (data.success) {
+        setHistory(data.data);
+        if (data.data.length > 0 && !currentReport) {
+          setCurrentReport(data.data[0]);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch history:', err);
+    } finally {
+      setLoadingHistory(false);
+    }
+  }, [currentReport]);
+
   useEffect(() => {
     fetchHistory();
-  }, []);
+  }, [fetchHistory]);
 
   // Polling effect for pending reports
   useEffect(() => {
@@ -72,24 +89,7 @@ export default function AIAnalyticsPage() {
     }, 3000); 
 
     return () => clearInterval(interval);
-  }, [pollingReportId]);
-
-  const fetchHistory = async () => {
-    try {
-      const res = await fetch('/api/ai/generate');
-      const data = await res.json();
-      if (data.success) {
-        setHistory(data.data);
-        if (data.data.length > 0 && !currentReport) {
-          setCurrentReport(data.data[0]);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch history:', err);
-    } finally {
-      setLoadingHistory(false);
-    }
-  };
+  }, [pollingReportId, toast]);
 
   const handleGenerate = async () => {
     setGenerating(true);

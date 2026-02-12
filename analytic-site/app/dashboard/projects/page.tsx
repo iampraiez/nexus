@@ -85,7 +85,7 @@ export default function ProjectsPage() {
         loadApiKeys(contextProjects[0]._id);
       }
     }
-  }, [contextProjects]);
+  }, [contextProjects, selectedProject]);
 
   const loadProjects = useCallback(async () => {
     // If we have context data, don't re-fetch unless forced or empty

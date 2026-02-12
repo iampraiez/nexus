@@ -19,10 +19,16 @@ const API_KEY = env.NEXT_PUBLIC_NEXUS_API_KEY;
 const PROJECT_ID = env.NEXT_PUBLIC_NEXUS_PROJECT_ID;
 
 export function useNexus(): NexusHook {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [status, setStatus] = useState<{
+    initialized: boolean;
+    session: string | null;
+  }>({
+    initialized: false,
+    session: null,
+  });
 
   useEffect(() => {
+    let mounted = true;
     try {
       Nexus.init({
         apiKey: API_KEY,
@@ -32,15 +38,19 @@ export function useNexus(): NexusHook {
         flushInterval: 3000,
       });
 
-      setIsInitialized(true);
-      setSessionId(Nexus.getSessionId());
-
-      console.log("[Demo] Nexus SDK initialized");
+      if (mounted) {
+        setStatus({
+          initialized: true,
+          session: Nexus.getSessionId(),
+        });
+        console.log("[Demo] Nexus SDK initialized");
+      }
     } catch (error) {
       console.error("[Demo] Failed to initialize Nexus SDK:", error);
     }
 
     return () => {
+      mounted = false;
       Nexus.destroy();
     };
   }, []);
@@ -50,7 +60,7 @@ export function useNexus(): NexusHook {
       eventType: T,
       data: Omit<EventSchemas[T], "timestamp" | "sessionId">,
     ) => {
-      if (!isInitialized) {
+      if (!status.initialized) {
         console.warn("[Demo] SDK not initialized");
         return;
       }
@@ -62,7 +72,7 @@ export function useNexus(): NexusHook {
         console.error("[Demo] Failed to track event:", error);
       }
     },
-    [isInitialized],
+    [status.initialized],
   );
 
   const flush = useCallback(async () => {
@@ -75,8 +85,8 @@ export function useNexus(): NexusHook {
   }, []);
 
   return {
-    isInitialized,
-    sessionId,
+    isInitialized: status.initialized,
+    sessionId: status.session,
     track,
     flush,
   };
