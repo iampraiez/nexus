@@ -1,0 +1,40 @@
+name: Nexus SDK CI
+
+on:
+  push:
+    paths:
+      - 'nexus-sdk/**'
+    branches: [ main, master ]
+  pull_request:
+    paths:
+      - 'nexus-sdk/**'
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'nexus-sdk/package.json'
+
+      - name: Install dependencies
+        run: |
+          cd nexus-sdk
+          pnpm install
+
+      - name: Build SDK
+        run: |
+          cd nexus-sdk
+          pnpm run build

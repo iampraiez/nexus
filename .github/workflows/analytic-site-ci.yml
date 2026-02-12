@@ -1,0 +1,59 @@
+name: Analytic Site CI
+
+on:
+  push:
+    paths:
+      - 'analytic-site/**'
+    branches: [ main, master ]
+  pull_request:
+    paths:
+      - 'analytic-site/**'
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'analytic-site/package.json'
+
+      - name: Install dependencies
+        run: |
+          cd analytic-site
+          pnpm install
+
+      - name: Lint
+        run: |
+          cd analytic-site
+          pnpm run lint
+
+      - name: Build
+        run: |
+          cd analytic-site
+          pnpm run build
+        env:
+          NEXT_PUBLIC_NEXUS_API_KEY: ${{ secrets.NEXT_PUBLIC_NEXUS_API_KEY }}
+          NEXT_PUBLIC_NEXUS_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_NEXUS_PROJECT_ID }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          STRIPE_FREE_PRICE_ID: ${{ secrets.STRIPE_FREE_PRICE_ID }}
+          STRIPE_PRO_PRICE_ID_NGN: ${{ secrets.STRIPE_PRO_PRICE_ID_NGN }}
+          STRIPE_PRO_PRICE_ID: ${{ secrets.STRIPE_PRO_PRICE_ID }}
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ALERT_CRON_SECRET: ${{ secrets.ALERT_CRON_SECRET }}

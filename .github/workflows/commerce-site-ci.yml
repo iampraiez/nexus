@@ -1,0 +1,40 @@
+name: Commerce Site CI
+
+on:
+  push:
+    paths:
+      - 'commerce-site/**'
+    branches: [ main, master ]
+  pull_request:
+    paths:
+      - 'commerce-site/**'
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'commerce-site/package.json'
+
+      - name: Install dependencies
+        run: |
+          cd commerce-site
+          pnpm install
+
+      - name: Build
+        run: |
+          cd commerce-site
+          pnpm run build
