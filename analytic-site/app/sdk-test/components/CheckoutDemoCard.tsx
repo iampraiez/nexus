@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useNexus } from "../use-nexus";
+import { useState, useMemo, useEffect } from "react";
+import { useNexus } from "../NexusProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,9 +16,18 @@ export default function CheckoutDemoCard({
   onEventTracked,
 }: CheckoutDemoCardProps) {
   const { track } = useNexus();
+  const [mounted, setMounted] = useState(false);
   const [cartValue, setCartValue] = useState(149.97);
   const [itemCount, setItemCount] = useState(3);
-  const orderIdPreview = useMemo(() => `order-${Date.now().toString().slice(-6)}`, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const orderIdPreview = useMemo(() => {
+    if (!mounted) return "order-......";
+    return `order-${Date.now().toString().slice(-6)}`;
+  }, [mounted]);
 
   const handleCheckoutStarted = () => {
     track("checkout_started", {

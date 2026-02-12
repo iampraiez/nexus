@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useNexus } from "../use-nexus";
+import { useState, useEffect } from "react";
+import { useNexus } from "../NexusProvider";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,11 +15,17 @@ interface OrderDemoCardProps {
 
 export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
   const { track } = useNexus();
-  const [orderId, setOrderId] = useState(() => `order-${Date.now().toString().slice(-6)}`);
+  const [mounted, setMounted] = useState(false);
+  const [orderId, setOrderId] = useState("order-......");
   const [userId, setUserId] = useState("user-123456");
   const [amount, setAmount] = useState(299.97);
   const [currency, setCurrency] = useState("USD");
   const [errorMsg, setErrorMsg] = useState("Card declined");
+
+  useEffect(() => {
+    setMounted(true);
+    setOrderId(`order-${Date.now().toString().slice(-6)}`);
+  }, []);
 
   const handleOrderCreated = () => {
     track("order_created", {
