@@ -1,0 +1,35 @@
+Installed and configured Vercel Speed Insights for Next.js
+
+SUMMARY:
+Successfully installed @vercel/speed-insights package and integrated it into the commerce-site Next.js application.
+
+FILES MODIFIED:
+1. commerce-site/app/layout.tsx
+   - Added import: `import { SpeedInsights } from "@vercel/speed-insights/next"`
+   - Added component: `<SpeedInsights />` inside the body element, after SessionProviderWrapper and before Analytics
+
+2. commerce-site/package.json
+   - Added dependency: "@vercel/speed-insights": "^1.3.1"
+
+INSTALLATION STEPS COMPLETED:
+✓ Detected Next.js 16.0.10 (>= 13.5) with App Router
+✓ Installed @vercel/speed-insights v1.3.1 using npm
+✓ Updated package.json with new dependency
+✓ Generated package-lock.json
+✓ Integrated SpeedInsights component in root layout (app/layout.tsx)
+✓ Component placed inside <body> tag after SessionProviderWrapper
+✓ Verified build succeeds without errors
+✓ Verified linting passes without errors
+
+CONFIGURATION DETAILS:
+- Framework: Next.js 16.0.10 (Turbopack)
+- Router Type: App Router
+- Implementation: Next.js 13.5+ pattern using '@vercel/speed-insights/next'
+- Component Placement: Root layout body element for global tracking
+
+VERIFICATION:
+✓ npm run lint - No errors
+✓ npm run build - Build succeeded with 27 pages generated
+✓ No TypeScript or ESLint violations introduced
+
+The SpeedInsights component is now configured to automatically track and monitor Core Web Vitals and performance metrics for the application without any additional configuration needed.
