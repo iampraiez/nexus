@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Check, Loader2, AlertTriangle, Zap } from 'lucide-react';
-import { Suspense } from 'react';
-import Loading from './loading';
-import { useDashboard } from '../dashboard-context';
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Check, Loader2, AlertTriangle, Zap } from "lucide-react";
+import { Suspense } from "react";
+import Loading from "./loading";
+import { useDashboard } from "../dashboard-context";
 
 const plans = [
   {
@@ -15,12 +15,7 @@ const plans = [
     id: "free",
     price: "0",
     description: "Perfect for getting started",
-    features: [
-      "10,000 events/month",
-      "3 API Projects",
-      "Basic analytics",
-      "1 Day Data Retention",
-    ],
+    features: ["10,000 events/month", "3 API Projects", "Basic analytics", "1 Day Data Retention"],
   },
   {
     name: "Pro",
@@ -41,22 +36,22 @@ const plans = [
 export default function BillingPage() {
   const searchParams = useSearchParams();
   const { usage, company, loading: contextLoading, refreshData } = useDashboard();
-  const [currentPlan, setCurrentPlan] = useState<string>('free');
-  const [currency, setCurrency] = useState<'USD' | 'NGN'>('USD');
+  const [currentPlan, setCurrentPlan] = useState<string>("free");
+  const [currency, setCurrency] = useState<"USD" | "NGN">("USD");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (company) {
-      setCurrentPlan(company.plan || 'free');
+      setCurrentPlan(company.plan || "free");
     }
-    
+
     // Check if returning from Stripe checkout
-    const sessionId = searchParams.get('session');
+    const sessionId = searchParams.get("session");
     if (sessionId) {
-      setMessage('Payment successful! Your subscription has been activated.');
+      setMessage("Payment successful! Your subscription has been activated.");
       refreshData(true); // Force refresh to update plan and limits
-      setTimeout(() => setMessage(''), 5000);
+      setTimeout(() => setMessage(""), 5000);
     }
   }, [company, searchParams, refreshData]);
 
@@ -65,9 +60,9 @@ export default function BillingPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/billing/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/billing/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan, currency }),
       });
 
@@ -76,17 +71,17 @@ export default function BillingPage() {
       if (response.ok && data.data?.url) {
         // Redirect to Stripe checkout
         window.location.href = data.data.url;
-      } else if (response.ok && plan === 'free') {
+      } else if (response.ok && plan === "free") {
         // Successfully downgraded to free
         await refreshData(true); // Force refresh to update plan and limits
-        setCurrentPlan('free');
-        setMessage('Downgraded to Free plan');
-        setTimeout(() => setMessage(''), 3000);
+        setCurrentPlan("free");
+        setMessage("Downgraded to Free plan");
+        setTimeout(() => setMessage(""), 3000);
       } else {
-        setMessage(data.error || 'Failed to process upgrade');
+        setMessage(data.error || "Failed to process upgrade");
       }
     } catch (error) {
-      setMessage('An error occurred. Please try again.');
+      setMessage("An error occurred. Please try again.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -103,29 +98,27 @@ export default function BillingPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h1 className="text-4xl font-bold text-foreground mb-2">Billing</h1>
-            <p className="text-muted-foreground">
-              Manage your plan and billing information
-            </p>
+            <p className="text-muted-foreground">Manage your plan and billing information</p>
           </div>
 
           {/* Currency Toggle */}
           <div className="flex items-center bg-secondary/50 p-1 rounded-lg border border-border w-fit">
             <button
-              onClick={() => setCurrency('USD')}
+              onClick={() => setCurrency("USD")}
               className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-                currency === 'USD' 
-                  ? 'bg-background text-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
+                currency === "USD"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               USD ($)
             </button>
             <button
-              onClick={() => setCurrency('NGN')}
+              onClick={() => setCurrency("NGN")}
               className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-                currency === 'NGN' 
-                  ? 'bg-background text-foreground shadow-sm' 
-                  : 'text-muted-foreground hover:text-foreground'
+                currency === "NGN"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               NGN (₦)
@@ -146,8 +139,8 @@ export default function BillingPage() {
             <div>
               <h3 className="font-semibold text-destructive">Free Tier Limit Exceeded</h3>
               <p className="text-sm text-destructive/80 mt-1">
-                You have exceeded the 10,000 events limit for the Free tier. 
-                Data ingestion is currently paused. Please upgrade to Pro to resume tracking.
+                You have exceeded the 10,000 events limit for the Free tier. Data ingestion is
+                currently paused. Please upgrade to Pro to resume tracking.
               </p>
             </div>
           </Card>
@@ -156,9 +149,9 @@ export default function BillingPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {plans.map((plan) => {
             const isCurrent = plan.id === currentPlan;
-            const price = currency === 'NGN' && plan.id === 'pro' ? '14,000' : plan.price;
-            const symbol = currency === 'NGN' ? '₦' : '$';
-            
+            const price = currency === "NGN" && plan.id === "pro" ? "14,000" : plan.price;
+            const symbol = currency === "NGN" ? "₦" : "$";
+
             return (
               <Card
                 key={plan.id}
@@ -183,9 +176,7 @@ export default function BillingPage() {
                       <Zap className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                     )}
                   </h2>
-                  <p className="text-muted-foreground text-sm">
-                    {plan.description}
-                  </p>
+                  <p className="text-muted-foreground text-sm">{plan.description}</p>
                 </div>
 
                 <div className="mb-6">
@@ -198,9 +189,7 @@ export default function BillingPage() {
 
                 <Button
                   className="w-full mb-6"
-                  variant={
-                    isCurrent || !usage.isFreeTier ? "outline" : "default"
-                  }
+                  variant={isCurrent || !usage.isFreeTier ? "outline" : "default"}
                   onClick={() => handleUpgrade(plan.id)}
                   disabled={loading || isCurrent || !usage.isFreeTier}
                 >
@@ -241,25 +230,27 @@ export default function BillingPage() {
               <div className="flex justify-between items-end">
                 <p className="text-sm font-medium text-muted-foreground">Monthly Events</p>
                 <p className="text-sm font-medium text-foreground">
-                  {usage.eventsCount.toLocaleString()} / {currentPlan === 'free' ? '10,000' : 'Unlimited'}
+                  {usage.eventsCount.toLocaleString()} /{" "}
+                  {currentPlan === "free" ? "10,000" : "Unlimited"}
                 </p>
               </div>
               <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                <div 
+                <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    usage.isFreeTierExceeded ? 'bg-destructive' : 'bg-primary'
+                    usage.isFreeTierExceeded ? "bg-destructive" : "bg-primary"
                   }`}
-                  style={{ 
-                    width: currentPlan === 'free' 
-                      ? `${Math.min((usage.eventsCount / 10000) * 100, 100)}%` 
-                      : '100%' 
+                  style={{
+                    width:
+                      currentPlan === "free"
+                        ? `${Math.min((usage.eventsCount / 10000) * 100, 100)}%`
+                        : "100%",
                   }}
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                {usage.isFreeTierExceeded 
-                  ? 'Limit exceeded. Upgrade to continue tracking.' 
-                  : 'Resets on the 1st of next month.'}
+                {usage.isFreeTierExceeded
+                  ? "Limit exceeded. Upgrade to continue tracking."
+                  : "Resets on the 1st of next month."}
               </p>
             </div>
 
@@ -268,23 +259,24 @@ export default function BillingPage() {
               <div className="flex justify-between items-end">
                 <p className="text-sm font-medium text-muted-foreground">Active Projects</p>
                 <p className="text-sm font-medium text-foreground">
-                  {usage.projectsCount} / {currentPlan === 'free' ? '3' : 'Unlimited'}
+                  {usage.projectsCount} / {currentPlan === "free" ? "3" : "Unlimited"}
                 </p>
               </div>
               <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                  style={{ 
-                    width: currentPlan === 'free' 
-                      ? `${Math.min((usage.projectsCount / 3) * 100, 100)}%` 
-                      : `${Math.min((usage.projectsCount / 10) * 100, 100)}%` // Visual filler for pro
+                  style={{
+                    width:
+                      currentPlan === "free"
+                        ? `${Math.min((usage.projectsCount / 3) * 100, 100)}%`
+                        : `${Math.min((usage.projectsCount / 10) * 100, 100)}%`, // Visual filler for pro
                   }}
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                {currentPlan === 'free' && usage.projectsCount >= 3
-                  ? 'Project limit reached.'
-                  : 'Create more projects to organize your data.'}
+                {currentPlan === "free" && usage.projectsCount >= 3
+                  ? "Project limit reached."
+                  : "Create more projects to organize your data."}
               </p>
             </div>
           </div>

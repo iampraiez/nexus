@@ -7,13 +7,7 @@ import UserDemoCard from "./components/UserDemoCard";
 import ProductDemoCard from "./components/ProductDemoCard";
 import CheckoutDemoCard from "./components/CheckoutDemoCard";
 import OrderDemoCard from "./components/OrderDemoCard";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -39,8 +33,7 @@ interface EventLog {
 }
 
 function SdkTestContent() {
-  const { isInitialized, sessionId, error, flush, config, updateConfig } =
-    useNexus();
+  const { isInitialized, sessionId, error, flush, config, updateConfig } = useNexus();
   const [events, setEvents] = useState<EventLog[]>([]);
   const { toast } = useToast();
   const [localApiKey, setLocalApiKey] = useState(config.apiKey);
@@ -80,24 +73,24 @@ function SdkTestContent() {
   const statusColor = isInitialized
     ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"
     : isKilled
-    ? "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]"
-    : error
-    ? "bg-destructive"
-    : "bg-amber-500";
+      ? "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+      : error
+        ? "bg-destructive"
+        : "bg-amber-500";
 
   const statusLabel = isInitialized
     ? "ACTIVE"
     : isKilled
-    ? "TERMINATED"
-    : error
-    ? "ERROR"
-    : "OFFLINE";
+      ? "TERMINATED"
+      : error
+        ? "ERROR"
+        : "OFFLINE";
 
   const statusBadgeClass = isInitialized
     ? "bg-emerald-500/10 text-emerald-500 border-none"
     : isKilled || error
-    ? "bg-destructive/10 text-destructive border-none"
-    : "text-amber-500 border-amber-500/30";
+      ? "bg-destructive/10 text-destructive border-none"
+      : "text-amber-500 border-amber-500/30";
 
   return (
     <div className="min-h-screen bg-background p-6 md:p-10 space-y-10">
@@ -105,16 +98,13 @@ function SdkTestContent() {
       <section className="max-w-3xl mx-auto text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary">
           <Rocket className="w-3.5 h-3.5" />
-          <span className="text-xs font-bold tracking-widest uppercase">
-            Nexus SDK Sandbox
-          </span>
+          <span className="text-xs font-bold tracking-widest uppercase">Nexus SDK Sandbox</span>
         </div>
         <h1 className="text-4xl md:text-5xl font-black tracking-tighter bg-linear-to-b from-foreground to-foreground/50 bg-clip-text text-transparent">
           Interactive Event Sandbox
         </h1>
         <p className="text-muted-foreground text-base max-w-xl mx-auto">
-          Connect your project, fire real analytics events, and watch the live
-          stream in real-time.
+          Connect your project, fire real analytics events, and watch the live stream in real-time.
         </p>
       </section>
 
@@ -173,9 +163,13 @@ function SdkTestContent() {
               className="w-full h-8 text-xs font-bold border-primary/20 hover:bg-primary/10 hover:text-primary transition-all active:scale-[0.98]"
             >
               {isInitialized ? (
-                <><Wifi className="mr-2 w-3.5 h-3.5" /> Reconnect</>
+                <>
+                  <Wifi className="mr-2 w-3.5 h-3.5" /> Reconnect
+                </>
               ) : (
-                <><WifiOff className="mr-2 w-3.5 h-3.5" /> Connect SDK</>
+                <>
+                  <WifiOff className="mr-2 w-3.5 h-3.5" /> Connect SDK
+                </>
               )}
             </Button>
 
@@ -194,7 +188,10 @@ function SdkTestContent() {
                 <div className={`w-1.5 h-1.5 rounded-full ${statusColor}`} />
                 <span className="text-[10px] font-bold text-muted-foreground">Status</span>
               </div>
-              <Badge variant="outline" className={`h-5 text-[9px] px-2 font-black ${statusBadgeClass}`}>
+              <Badge
+                variant="outline"
+                className={`h-5 text-[9px] px-2 font-black ${statusBadgeClass}`}
+              >
                 {statusLabel}
               </Badge>
             </div>
@@ -223,9 +220,7 @@ function SdkTestContent() {
               </div>
               <div className="p-2 rounded-lg bg-black/40 font-mono text-[9px] break-all border border-primary/5 text-primary/70 min-h-8 flex items-center justify-center">
                 {sessionId || (
-                  <span className="text-muted-foreground/25 italic">
-                    Not connected
-                  </span>
+                  <span className="text-muted-foreground/25 italic">Not connected</span>
                 )}
               </div>
             </div>
@@ -245,7 +240,10 @@ function SdkTestContent() {
         </Card>
 
         {/* Live Event Feed */}
-        <Card className="lg:col-span-2 border-border/50 bg-card/40 backdrop-blur-xl flex flex-col" style={{ minHeight: "420px" }}>
+        <Card
+          className="lg:col-span-2 border-border/50 bg-card/40 backdrop-blur-xl flex flex-col"
+          style={{ minHeight: "420px" }}
+        >
           <CardHeader className="flex flex-row items-start justify-between pb-2">
             <div>
               <CardTitle className="text-sm font-bold flex items-center gap-2">
@@ -259,7 +257,10 @@ function SdkTestContent() {
             <div className="flex items-center gap-2 pt-0.5">
               {events.length > 0 && (
                 <>
-                  <Badge variant="outline" className="text-[10px] border-primary/30 text-primary h-5">
+                  <Badge
+                    variant="outline"
+                    className="text-[10px] border-primary/30 text-primary h-5"
+                  >
                     {events.length}
                   </Badge>
                   <button
@@ -281,9 +282,7 @@ function SdkTestContent() {
                     <Activity className="w-7 h-7 text-muted-foreground/30" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      No events yet
-                    </p>
+                    <p className="text-sm font-medium text-muted-foreground">No events yet</p>
                     <p className="text-xs text-muted-foreground/40 mt-1">
                       {isInitialized
                         ? "Use the modules below to fire events"

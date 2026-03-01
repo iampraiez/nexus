@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Loader2, Plus, Trash2, Edit2, Mail, Webhook, Bell, Clock } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect, useRef } from "react";
+import { Loader2, Plus, Trash2, Edit2, Mail, Webhook, Bell, Clock } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -20,14 +20,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
 const alertTriggers = [
-  { value: 'high_error_rate', label: 'High Error Rate (>5%)' },
-  { value: 'delivery_failure', label: 'Delivery Failure' },
-  { value: 'usage_limit', label: 'Usage Limit Approaching' },
-  { value: 'api_key_abuse', label: 'Potential API Key Abuse' },
-  { value: 'latency_spike', label: 'Latency Spike (>500ms)' },
+  { value: "high_error_rate", label: "High Error Rate (>5%)" },
+  { value: "delivery_failure", label: "Delivery Failure" },
+  { value: "usage_limit", label: "Usage Limit Approaching" },
+  { value: "api_key_abuse", label: "Potential API Key Abuse" },
+  { value: "latency_spike", label: "Latency Spike (>500ms)" },
 ];
 
 export default function AlertsPage() {
@@ -40,7 +40,7 @@ export default function AlertsPage() {
   const [error, setError] = useState<string | null>(null);
   const [editingAlert, setEditingAlert] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -54,13 +54,13 @@ export default function AlertsPage() {
   // Infinite scroll observer
   useEffect(() => {
     const observer = new IntersectionObserver(
-      entries => {
+      (entries) => {
         if (entries[0].isIntersecting && hasMore && !loadingMore && !historyLoading) {
-          console.log('[Alerts] Loading more history, page:', currentPage + 1);
+          console.log("[Alerts] Loading more history, page:", currentPage + 1);
           fetchHistory(currentPage + 1);
         }
       },
-      { threshold: 0.1, rootMargin: '100px' }
+      { threshold: 0.1, rootMargin: "100px" }
     );
 
     if (observerTarget.current) {
@@ -72,17 +72,17 @@ export default function AlertsPage() {
 
   const fetchAlerts = async () => {
     try {
-      const response = await fetch('/api/alerts');
+      const response = await fetch("/api/alerts");
       const result = await response.json();
-      
+
       if (result && result.success && result.data) {
         setAlerts(Array.isArray(result.data) ? result.data : []);
       } else if (result && !result.success) {
-        setError(result.error || 'Failed to fetch alerts');
+        setError(result.error || "Failed to fetch alerts");
       }
     } catch (err) {
-      console.error('[Alerts] Error fetching alerts:', err);
-      setError('An error occurred while fetching alerts');
+      console.error("[Alerts] Error fetching alerts:", err);
+      setError("An error occurred while fetching alerts");
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,7 @@ export default function AlertsPage() {
     try {
       const response = await fetch(`/api/alerts/history?page=${page}&limit=20`);
       const result = await response.json();
-      
+
       if (result && result.success && result.data) {
         const dataObj = result.data;
         const historyItems = Array.isArray(dataObj.data) ? dataObj.data : [];
@@ -107,9 +107,9 @@ export default function AlertsPage() {
         if (page === 1) {
           setHistory(historyItems);
         } else {
-          setHistory(prev => [...prev, ...historyItems]);
+          setHistory((prev) => [...prev, ...historyItems]);
         }
-        
+
         setCurrentPage(page);
         setHasMore(!!pagination.hasMore);
       } else {
@@ -117,7 +117,7 @@ export default function AlertsPage() {
         setHasMore(false);
       }
     } catch (err) {
-      console.error('[Alerts] Failed to fetch alert history:', err);
+      console.error("[Alerts] Failed to fetch alert history:", err);
       if (page === 1) setHistory([]);
       setHasMore(false);
     } finally {
@@ -131,27 +131,27 @@ export default function AlertsPage() {
     setSubmitting(true);
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     const alertData = {
-      name: formData.get('alertName'),
-      type: formData.get('alertType'),
-      target: formData.get('alertTarget'),
-      triggers: Array.from(formData.getAll('triggers')),
+      name: formData.get("alertName"),
+      type: formData.get("alertType"),
+      target: formData.get("alertTarget"),
+      triggers: Array.from(formData.getAll("triggers")),
     };
 
     try {
-      const url = '/api/alerts';
-      const method = editingAlert ? 'PATCH' : 'POST';
+      const url = "/api/alerts";
+      const method = editingAlert ? "PATCH" : "POST";
       const body = editingAlert ? { ...alertData, id: editingAlert._id } : alertData;
 
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      
+
       const result = await response.json();
       if (result.success) {
         if (editingAlert) {
-          setAlerts(alerts.map(a => a._id === editingAlert._id ? { ...a, ...alertData } : a));
+          setAlerts(alerts.map((a) => (a._id === editingAlert._id ? { ...a, ...alertData } : a)));
         } else {
           setAlerts([...alerts, { _id: result.data._id, ...alertData, enabled: true }]);
         }
@@ -159,27 +159,25 @@ export default function AlertsPage() {
         setEditingAlert(null);
       }
     } catch (err) {
-      console.error('[Alerts] Error saving alert:', err);
+      console.error("[Alerts] Error saving alert:", err);
     } finally {
       setSubmitting(false);
     }
   };
 
-
-
   const handleDeleteAlert = async (alertId: string) => {
-    if (!confirm('Are you sure you want to delete this alert?')) return;
+    if (!confirm("Are you sure you want to delete this alert?")) return;
 
     try {
       const response = await fetch(`/api/alerts?id=${alertId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       const result = await response.json();
       if (result.success) {
-        setAlerts(alerts.filter(a => a._id !== alertId));
+        setAlerts(alerts.filter((a) => a._id !== alertId));
       }
     } catch (err) {
-      console.error('[Alerts] Error deleting alert:', err);
+      console.error("[Alerts] Error deleting alert:", err);
     }
   };
 
@@ -189,17 +187,17 @@ export default function AlertsPage() {
   };
 
   const formatTimeAgo = (date: string) => {
-    if (!date) return 'Unknown';
+    if (!date) return "Unknown";
     const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
-    if (isNaN(seconds)) return 'Invalid date';
-    if (seconds < 60) return 'Just now';
+    if (isNaN(seconds)) return "Invalid date";
+    if (seconds < 60) return "Just now";
     if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
     return `${Math.floor(seconds / 86400)} days ago`;
   };
 
   const getTriggerLabel = (value: string) => {
-    return alertTriggers.find(t => t.value === value)?.label || value;
+    return alertTriggers.find((t) => t.value === value)?.label || value;
   };
 
   if (loading) {
@@ -214,9 +212,7 @@ export default function AlertsPage() {
     <div className="space-y-6 md:space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Alerts
-          </h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Alerts</h1>
           <p className="text-sm md:text-base text-muted-foreground">
             Configure notifications and webhooks for important events
           </p>
@@ -235,12 +231,10 @@ export default function AlertsPage() {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="sm:max-w-125">
           <DialogHeader>
-            <DialogTitle>
-              {editingAlert ? "Edit Alert" : "Create New Alert"}
-            </DialogTitle>
+            <DialogTitle>{editingAlert ? "Edit Alert" : "Create New Alert"}</DialogTitle>
             <DialogDescription>
-              Configure your alert settings below. You&apos;ll receive
-              notifications when triggers are met.
+              Configure your alert settings below. You&apos;ll receive notifications when triggers
+              are met.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateOrUpdateAlert} className="space-y-4 mt-4">
@@ -257,10 +251,7 @@ export default function AlertsPage() {
             </div>
             <div>
               <Label htmlFor="alertType">Notification Type</Label>
-              <Select
-                name="alertType"
-                defaultValue={editingAlert?.type || "email"}
-              >
+              <Select name="alertType" defaultValue={editingAlert?.type || "email"}>
                 <SelectTrigger className="mt-1.5">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -295,14 +286,10 @@ export default function AlertsPage() {
                       type="checkbox"
                       name="triggers"
                       value={trigger.value}
-                      defaultChecked={editingAlert?.triggers?.includes(
-                        trigger.value,
-                      )}
+                      defaultChecked={editingAlert?.triggers?.includes(trigger.value)}
                       className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                     />
-                    <span className="text-sm text-foreground">
-                      {trigger.label}
-                    </span>
+                    <span className="text-sm text-foreground">{trigger.label}</span>
                   </label>
                 ))}
               </div>
@@ -320,9 +307,7 @@ export default function AlertsPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={submitting}>
-                {submitting && (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                )}
+                {submitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {editingAlert ? "Update Alert" : "Create Alert"}
               </Button>
             </DialogFooter>
@@ -343,10 +328,7 @@ export default function AlertsPage() {
           alerts.map((alert) => {
             const Icon = alert.type === "email" ? Mail : Webhook;
             return (
-              <Card
-                key={alert._id}
-                className="p-4 md:p-6 border border-border bg-card"
-              >
+              <Card key={alert._id} className="p-4 md:p-6 border border-border bg-card">
                 <div className="flex flex-col md:flex-row items-start justify-between gap-4">
                   <div className="flex items-start gap-3 md:gap-4 flex-1">
                     <div className="p-2 rounded-lg bg-primary/10 shrink-0">
@@ -363,9 +345,7 @@ export default function AlertsPage() {
                       </div>
                       <p className="text-xs md:text-sm text-muted-foreground mb-3 break-all">
                         {alert.type === "email" ? "Email to " : "Webhook to "}
-                        <span className="font-mono text-foreground">
-                          {alert.target}
-                        </span>
+                        <span className="font-mono text-foreground">{alert.target}</span>
                       </p>
                       <div className="flex gap-2 flex-wrap">
                         {alert.triggers.map((trigger: string) => (
@@ -409,9 +389,7 @@ export default function AlertsPage() {
       {/* Alert History with Infinite Scroll */}
       <Card className="border border-border bg-card overflow-hidden">
         <div className="p-4 md:p-6 border-b border-border">
-          <h2 className="text-lg md:text-xl font-semibold text-foreground">
-            Alert History
-          </h2>
+          <h2 className="text-lg md:text-xl font-semibold text-foreground">Alert History</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -443,8 +421,7 @@ export default function AlertsPage() {
                   <td colSpan={4} className="px-6 py-12 text-center">
                     <Clock className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-30" />
                     <p className="text-muted-foreground text-sm">
-                      No alert history yet. Alerts will appear here when
-                      triggered.
+                      No alert history yet. Alerts will appear here when triggered.
                     </p>
                   </td>
                 </tr>

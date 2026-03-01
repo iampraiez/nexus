@@ -1,8 +1,16 @@
-"use client"
-import { useState, useEffect, useCallback } from 'react';
-import { Loader2, Calendar, Filter, Database, Globe, AlertCircle, AlertTriangle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+"use client";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Loader2,
+  Calendar,
+  Filter,
+  Database,
+  Globe,
+  AlertCircle,
+  AlertTriangle,
+} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   LineChart,
   Line,
@@ -14,7 +22,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 import {
   Select,
   SelectContent,
@@ -31,47 +39,50 @@ export default function SdkHealthPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Filters
-  const [range, setRange] = useState('7d');
-  const [projectId, setProjectId] = useState('all');
-  const [environment, setEnvironment] = useState('all');
+  const [range, setRange] = useState("7d");
+  const [projectId, setProjectId] = useState("all");
+  const [environment, setEnvironment] = useState("all");
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch("/api/projects");
       const result = await response.json();
       if (result.success) {
         setProjects(result.data);
       }
     } catch (err) {
-      console.error('Failed to fetch projects:', err);
+      console.error("Failed to fetch projects:", err);
     }
   };
 
-  const fetchData = useCallback(async (isInitial = false) => {
-    if (isInitial) setLoading(true);
-    else setRefreshing(true);
-    
-    try {
-      const params = new URLSearchParams({
-        range,
-        projectId,
-        environment
-      });
-      const response = await fetch(`/api/analytics/sdk-health?${params.toString()}`);
-      const result = await response.json();
-      if (result.success) {
-        setData(result.data);
-        setError(null);
-      } else {
-        setError(result.error || 'Failed to fetch data');
+  const fetchData = useCallback(
+    async (isInitial = false) => {
+      if (isInitial) setLoading(true);
+      else setRefreshing(true);
+
+      try {
+        const params = new URLSearchParams({
+          range,
+          projectId,
+          environment,
+        });
+        const response = await fetch(`/api/analytics/sdk-health?${params.toString()}`);
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+          setError(null);
+        } else {
+          setError(result.error || "Failed to fetch data");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching data");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    } catch (err) {
-      setError('An error occurred while fetching data');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [range, projectId, environment]);
+    },
+    [range, projectId, environment]
+  );
 
   useEffect(() => {
     fetchProjects();
@@ -94,11 +105,7 @@ export default function SdkHealthPage() {
       <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
         <p className="font-medium">Error</p>
         <p className="text-sm">{error}</p>
-        <Button 
-          variant="outline" 
-          className="mt-4" 
-          onClick={() => fetchData(true)}
-        >
+        <Button variant="outline" className="mt-4" onClick={() => fetchData(true)}>
           Try Again
         </Button>
       </div>
@@ -124,7 +131,7 @@ export default function SdkHealthPage() {
             Monitor SDK performance, delivery rates, and errors
           </p>
         </div>
-        
+
         <div className="flex flex-wrap gap-2 w-full lg:w-auto">
           {/* Project Filter */}
           <Select value={projectId} onValueChange={setProjectId} disabled={refreshing}>
@@ -137,7 +144,9 @@ export default function SdkHealthPage() {
             <SelectContent>
               <SelectItem value="all">All Projects</SelectItem>
               {projects.map((p) => (
-                <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>
+                <SelectItem key={p._id} value={p._id}>
+                  {p.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -179,18 +188,43 @@ export default function SdkHealthPage() {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
-          { label: 'Delivery Rate', value: `${metrics.deliveryRate}%`, sub: 'Target: 99.9%', subClass: 'text-green-600' },
-          { label: 'Error Rate', value: `${metrics.errorRate}%`, sub: 'Healthy', subClass: 'text-green-600' },
-          { label: 'Avg Latency', value: `${metrics.avgLatency}ms`, sub: 'Healthy', subClass: 'text-green-600' },
-          { label: 'p95 Latency', value: `${metrics.p95Latency}ms`, sub: 'Healthy', subClass: 'text-green-600' }
+          {
+            label: "Delivery Rate",
+            value: `${metrics.deliveryRate}%`,
+            sub: "Target: 99.9%",
+            subClass: "text-green-600",
+          },
+          {
+            label: "Error Rate",
+            value: `${metrics.errorRate}%`,
+            sub: "Healthy",
+            subClass: "text-green-600",
+          },
+          {
+            label: "Avg Latency",
+            value: `${metrics.avgLatency}ms`,
+            sub: "Healthy",
+            subClass: "text-green-600",
+          },
+          {
+            label: "p95 Latency",
+            value: `${metrics.p95Latency}ms`,
+            sub: "Healthy",
+            subClass: "text-green-600",
+          },
         ].map((m, i) => (
-          <Card key={i} className="p-3 md:p-4 border border-border bg-card relative overflow-hidden">
+          <Card
+            key={i}
+            className="p-3 md:p-4 border border-border bg-card relative overflow-hidden"
+          >
             {refreshing && (
               <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] z-10" />
             )}
             <p className="text-muted-foreground text-xs md:text-sm mb-1">{m.label}</p>
             <p className="text-xl md:text-3xl font-bold text-foreground">{m.value}</p>
-            <p className={`hidden md:block text-xs mt-2 ${m.subClass || 'text-muted-foreground'}`}>{m.sub}</p>
+            <p className={`hidden md:block text-xs mt-2 ${m.subClass || "text-muted-foreground"}`}>
+              {m.sub}
+            </p>
             {refreshing && (
               <div className="absolute top-2 right-2">
                 <Loader2 className="w-3 h-3 animate-spin text-primary/40" />
@@ -207,25 +241,36 @@ export default function SdkHealthPage() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         )}
-        <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">Delivery Rate & Latency</h2>
+        <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">
+          Delivery Rate & Latency
+        </h2>
         <div className="h-[300px] md:h-[400px] w-full">
           {healthData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={healthData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="var(--color-muted-foreground)" 
-                  fontSize={12} 
-                  tickFormatter={(val) => range === '24h' ? val.split(' ')[1] : val}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickFormatter={(val) => (range === "24h" ? val.split(" ")[1] : val)}
                 />
                 <YAxis yAxisId="left" stroke="var(--color-muted-foreground)" fontSize={12} />
-                <YAxis yAxisId="right" orientation="right" stroke="var(--color-muted-foreground)" fontSize={12} />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--color-card)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '8px',
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "8px",
                   }}
                 />
                 <Legend />
@@ -236,7 +281,7 @@ export default function SdkHealthPage() {
                   name="Delivery Rate"
                   stroke="#10b981"
                   strokeWidth={3}
-                  dot={{ fill: '#10b981', r: 4 }}
+                  dot={{ fill: "#10b981", r: 4 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
                 <Line
@@ -246,7 +291,7 @@ export default function SdkHealthPage() {
                   name="Latency (ms)"
                   stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#3b82f6', r: 4 }}
+                  dot={{ fill: "#3b82f6", r: 4 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
               </LineChart>
@@ -276,7 +321,9 @@ export default function SdkHealthPage() {
                       <span className="text-sm font-bold text-foreground">
                         {version.count.toLocaleString()}
                       </span>
-                      <span className="text-xs text-muted-foreground ml-2">({version.percentage}%)</span>
+                      <span className="text-xs text-muted-foreground ml-2">
+                        ({version.percentage}%)
+                      </span>
                     </div>
                   </div>
                   <div className="w-full bg-secondary/50 rounded h-2">
@@ -288,8 +335,9 @@ export default function SdkHealthPage() {
                 </div>
               ))}
               <p className="text-xs text-muted-foreground mt-4">
-                Latest version adoption: {versionStats[0]?.percentage || 0}% 
-                {versionStats.length > 1 && ` (recommend updating ${100 - (versionStats[0]?.percentage || 0)}% on older versions)`}
+                Latest version adoption: {versionStats[0]?.percentage || 0}%
+                {versionStats.length > 1 &&
+                  ` (recommend updating ${100 - (versionStats[0]?.percentage || 0)}% on older versions)`}
               </p>
             </div>
           ) : (
@@ -309,21 +357,31 @@ export default function SdkHealthPage() {
             {healthData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={healthData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="var(--color-muted-foreground)" 
-                    tickFormatter={(val) => range === '24h' ? val.split(' ')[1] : val}
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--color-border)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="date"
+                    stroke="var(--color-muted-foreground)"
+                    tickFormatter={(val) => (range === "24h" ? val.split(" ")[1] : val)}
                   />
                   <YAxis stroke="var(--color-muted-foreground)" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'var(--color-card)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '8px',
+                      backgroundColor: "var(--color-card)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "8px",
                     }}
                   />
-                  <Bar dataKey="errorRate" name="Error Rate (%)" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={40} />
+                  <Bar
+                    dataKey="errorRate"
+                    name="Error Rate (%)"
+                    fill="#ef4444"
+                    radius={[4, 4, 0, 0]}
+                    barSize={40}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -351,9 +409,7 @@ export default function SdkHealthPage() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                   Error Type
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Count
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Count</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                   % of Total
                 </th>
@@ -369,20 +425,20 @@ export default function SdkHealthPage() {
                     key={error.type}
                     className="border-b border-border hover:bg-secondary/30 transition-colors"
                   >
-                    <td className="px-6 py-4 text-sm font-medium text-foreground">
-                      {error.type}
-                    </td>
+                    <td className="px-6 py-4 text-sm font-medium text-foreground">{error.type}</td>
                     <td className="px-6 py-4 text-sm text-foreground">{error.count}</td>
-                    <td className="px-6 py-4 text-sm text-foreground">{error.percentage.toFixed(1)}%</td>
+                    <td className="px-6 py-4 text-sm text-foreground">
+                      {error.percentage.toFixed(1)}%
+                    </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-block px-3 py-1 rounded text-xs font-medium ${
                           error.percentage > 30
-                            ? 'bg-red-500/10 text-red-600'
-                            : 'bg-yellow-500/10 text-yellow-600'
+                            ? "bg-red-500/10 text-red-600"
+                            : "bg-yellow-500/10 text-yellow-600"
                         }`}
                       >
-                        {error.percentage > 30 ? 'High' : 'Monitor'}
+                        {error.percentage > 30 ? "High" : "Monitor"}
                       </span>
                     </td>
                   </tr>
@@ -415,20 +471,25 @@ export default function SdkHealthPage() {
               <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded">
                 <p className="text-sm font-semibold text-foreground">SDK Version Status</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Most users are on v{versionStats[0].version} ({versionStats[0].percentage}%). 
-                  {versionStats.length > 1 && ` Consider encouraging updates for the ${100 - versionStats[0].percentage}% on older versions.`}
+                  Most users are on v{versionStats[0].version} ({versionStats[0].percentage}%).
+                  {versionStats.length > 1 &&
+                    ` Consider encouraging updates for the ${100 - versionStats[0].percentage}% on older versions.`}
                 </p>
               </div>
             )}
 
             {/* Performance Recommendation */}
-            <div className={`p-4 border rounded ${metrics.deliveryRate >= 99 ? 'bg-green-500/10 border-green-500/20' : 'bg-yellow-500/10 border-yellow-500/20'}`}>
+            <div
+              className={`p-4 border rounded ${metrics.deliveryRate >= 99 ? "bg-green-500/10 border-green-500/20" : "bg-yellow-500/10 border-yellow-500/20"}`}
+            >
               <p className="text-sm font-semibold text-foreground">
-                {metrics.deliveryRate >= 99 ? 'Performance is healthy' : 'Check Delivery Rates'}
+                {metrics.deliveryRate >= 99 ? "Performance is healthy" : "Check Delivery Rates"}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Delivery rate is {metrics.deliveryRate}% and latency is {metrics.avgLatency}ms average.
-                {metrics.deliveryRate < 99 && " Investigate potential network issues or client-side blocking."}
+                Delivery rate is {metrics.deliveryRate}% and latency is {metrics.avgLatency}ms
+                average.
+                {metrics.deliveryRate < 99 &&
+                  " Investigate potential network issues or client-side blocking."}
               </p>
             </div>
 
@@ -437,7 +498,8 @@ export default function SdkHealthPage() {
               <div className="p-4 bg-red-500/10 border border-red-500/20 rounded">
                 <p className="text-sm font-semibold text-foreground">High Error Rate Detected</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Error rate is {metrics.errorRate}%. Review the error breakdown to identify top failing events.
+                  Error rate is {metrics.errorRate}%. Review the error breakdown to identify top
+                  failing events.
                 </p>
               </div>
             )}

@@ -1,13 +1,13 @@
-import { NextRequest } from 'next/server';
-import { getSessionCompany } from '@/lib/auth';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
+import { NextRequest } from "next/server";
+import { getSessionCompany } from "@/lib/auth";
+import { createSuccessResponse, createErrorResponse } from "@/lib/api-response";
 
 export async function GET(request: NextRequest) {
   try {
     const company = await getSessionCompany();
 
     if (!company) {
-      return createErrorResponse('Not authenticated', 401);
+      return createErrorResponse("Not authenticated", 401);
     }
 
     return createSuccessResponse({
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       isEmailVerified: company.isEmailVerified,
     });
   } catch (error) {
-    console.error('Session check error:', error);
-    return createErrorResponse('Session check failed', 500);
+    console.error("Session check error:", error);
+    return createErrorResponse("Session check failed", 500);
   }
 }

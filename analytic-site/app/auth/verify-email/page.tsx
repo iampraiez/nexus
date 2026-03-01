@@ -31,10 +31,7 @@ export default function VerifyEmailPage() {
           <p className="text-muted-foreground text-sm mb-4">
             Company ID is missing. Please start the registration process again.
           </p>
-          <Button
-            onClick={() => router.push("/auth/register")}
-            className="w-full"
-          >
+          <Button onClick={() => router.push("/auth/register")} className="w-full">
             Back to Registration
           </Button>
         </Card>
@@ -107,12 +104,10 @@ export default function VerifyEmailPage() {
         <div className="w-full max-w-md">
           <Card className="p-6 text-center border border-border bg-card">
             <CheckCircle2 className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-foreground mb-2">
-              Email Verified!
-            </h2>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Email Verified!</h2>
             <p className="text-muted-foreground mb-6">
-              Your email has been successfully verified. You&apos;ll be
-              redirected to the login page...
+              Your email has been successfully verified. You&apos;ll be redirected to the login
+              page...
             </p>
             <Loader2 className="w-5 h-5 animate-spin mx-auto text-muted-foreground" />
           </Card>
@@ -135,8 +130,7 @@ export default function VerifyEmailPage() {
               Verify Your Email
             </h1>
             <p className="text-muted-foreground text-center">
-              We&apos;ve sent a verification code to your email. Enter it below
-              to continue.
+              We&apos;ve sent a verification code to your email. Enter it below to continue.
             </p>
           </div>
 
@@ -169,27 +163,17 @@ export default function VerifyEmailPage() {
                   disabled={loading}
                   className="text-center text-2xl tracking-widest font-mono"
                 />
-                <p className="text-xs text-muted-foreground">
-                  6-digit code from your email
-                </p>
+                <p className="text-xs text-muted-foreground">6-digit code from your email</p>
               </div>
 
-              <Button
-                type="submit"
-                disabled={loading || code.length !== 6}
-                className="w-full"
-              >
-                {loading ? (
-                  <Loader2 className="w-4 h-4 animate-spin mx-auto" />
-                ) : (
-                  "Verify Email"
-                )}
+              <Button type="submit" disabled={loading || code.length !== 6} className="w-full">
+                {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Verify Email"}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
               Didn&apos;t receive the code?{" "}
-              <button 
+              <button
                 onClick={handleResend}
                 disabled={resendLoading}
                 className="text-primary hover:underline font-medium disabled:opacity-50"

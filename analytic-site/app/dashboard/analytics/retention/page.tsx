@@ -1,8 +1,8 @@
-"use client"
-import { useState, useEffect, useCallback } from 'react';
-import { Loader2, Calendar, Filter, Database, Globe, AlertCircle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+"use client";
+import { useState, useEffect, useCallback } from "react";
+import { Loader2, Calendar, Filter, Database, Globe, AlertCircle } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -19,47 +19,50 @@ export default function RetentionPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Filters
-  const [range, setRange] = useState('30d');
-  const [projectId, setProjectId] = useState('all');
-  const [environment, setEnvironment] = useState('all');
+  const [range, setRange] = useState("30d");
+  const [projectId, setProjectId] = useState("all");
+  const [environment, setEnvironment] = useState("all");
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch("/api/projects");
       const result = await response.json();
       if (result.success) {
         setProjects(result.data);
       }
     } catch (err) {
-      console.error('Failed to fetch projects:', err);
+      console.error("Failed to fetch projects:", err);
     }
   };
 
-  const fetchData = useCallback(async (isInitial = false) => {
-    if (isInitial) setLoading(true);
-    else setRefreshing(true);
-    
-    try {
-      const params = new URLSearchParams({
-        range,
-        projectId,
-        environment
-      });
-      const response = await fetch(`/api/analytics/retention?${params.toString()}`);
-      const result = await response.json();
-      if (result.success) {
-        setData(result.data);
-        setError(null);
-      } else {
-        setError(result.error || 'Failed to fetch data');
+  const fetchData = useCallback(
+    async (isInitial = false) => {
+      if (isInitial) setLoading(true);
+      else setRefreshing(true);
+
+      try {
+        const params = new URLSearchParams({
+          range,
+          projectId,
+          environment,
+        });
+        const response = await fetch(`/api/analytics/retention?${params.toString()}`);
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+          setError(null);
+        } else {
+          setError(result.error || "Failed to fetch data");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching data");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    } catch (err) {
-      setError('An error occurred while fetching data');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [range, projectId, environment]);
+    },
+    [range, projectId, environment]
+  );
 
   useEffect(() => {
     fetchProjects();
@@ -82,11 +85,7 @@ export default function RetentionPage() {
       <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
         <p className="font-medium">Error</p>
         <p className="text-sm">{error}</p>
-        <Button 
-          variant="outline" 
-          className="mt-4" 
-          onClick={() => fetchData(true)}
-        >
+        <Button variant="outline" className="mt-4" onClick={() => fetchData(true)}>
           Try Again
         </Button>
       </div>
@@ -107,12 +106,14 @@ export default function RetentionPage() {
     <div className="space-y-6 md:space-y-8">
       <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Retention Analysis</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            Retention Analysis
+          </h1>
           <p className="text-sm md:text-base text-muted-foreground">
             Monitor user retention metrics and cohort behavior
           </p>
         </div>
-        
+
         <div className="flex flex-wrap gap-2 w-full lg:w-auto">
           {/* Project Filter */}
           <Select value={projectId} onValueChange={setProjectId} disabled={refreshing}>
@@ -125,7 +126,9 @@ export default function RetentionPage() {
             <SelectContent>
               <SelectItem value="all">All Projects</SelectItem>
               {projects.map((p) => (
-                <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>
+                <SelectItem key={p._id} value={p._id}>
+                  {p.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -167,13 +170,18 @@ export default function RetentionPage() {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         {keyMetrics.map((metric: any) => (
-          <Card key={metric.label} className="p-3 md:p-4 border border-border bg-card relative overflow-hidden">
+          <Card
+            key={metric.label}
+            className="p-3 md:p-4 border border-border bg-card relative overflow-hidden"
+          >
             {refreshing && (
               <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] z-10" />
             )}
             <p className="text-muted-foreground text-xs md:text-sm mb-1">{metric.label}</p>
             <p className="text-xl md:text-3xl font-bold text-foreground">{metric.value}</p>
-            <p className="hidden md:block text-xs text-muted-foreground mt-2">{metric.description}</p>
+            <p className="hidden md:block text-xs text-muted-foreground mt-2">
+              {metric.description}
+            </p>
             {refreshing && (
               <div className="absolute top-2 right-2">
                 <Loader2 className="w-3 h-3 animate-spin text-primary/40" />
@@ -197,32 +205,48 @@ export default function RetentionPage() {
           <table className="w-full">
             <thead className="bg-secondary/50 border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Cohort</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                  Cohort
+                </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Users</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">Day 1</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">Day 7</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">Day 14</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">Day 30</th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
+                  Day 1
+                </th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
+                  Day 7
+                </th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
+                  Day 14
+                </th>
+                <th className="px-6 py-3 text-center text-sm font-semibold text-foreground">
+                  Day 30
+                </th>
               </tr>
             </thead>
             <tbody>
               {cohorts.some((c: any) => c.users > 0) ? (
                 cohorts.map((row: any) => (
-                  <tr key={row.cohort} className="border-b border-border hover:bg-secondary/30 transition-colors">
+                  <tr
+                    key={row.cohort}
+                    className="border-b border-border hover:bg-secondary/30 transition-colors"
+                  >
                     <td className="px-6 py-4 text-sm font-medium text-foreground">{row.cohort}</td>
-                    <td className="px-6 py-4 text-sm text-foreground">{row.users.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-foreground">
+                      {row.users.toLocaleString()}
+                    </td>
                     {[row.day1, row.day7, row.day14, row.day30].map((val, i) => {
-                      const percentage = val !== null && row.users > 0 ? (val / row.users) * 100 : null;
+                      const percentage =
+                        val !== null && row.users > 0 ? (val / row.users) * 100 : null;
                       const opacity = percentage !== null ? Math.max(0.1, percentage / 100) : 0;
-                      
+
                       return (
                         <td key={i} className="px-2 py-4 text-center">
                           {percentage !== null ? (
-                            <div 
+                            <div
                               className="py-2 rounded text-xs font-bold transition-all duration-500"
-                              style={{ 
+                              style={{
                                 backgroundColor: `rgba(59, 130, 246, ${opacity})`,
-                                color: opacity > 0.5 ? 'white' : 'inherit'
+                                color: opacity > 0.5 ? "white" : "inherit",
                               }}
                             >
                               {percentage.toFixed(1)}%
@@ -265,9 +289,7 @@ export default function RetentionPage() {
                   return (
                     <div key={cohort.cohort}>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium text-foreground">
-                          {cohort.cohort}
-                        </span>
+                        <span className="text-sm font-medium text-foreground">{cohort.cohort}</span>
                         <span className="text-sm font-bold text-foreground">{retention}%</span>
                       </div>
                       <div className="w-full bg-secondary/50 rounded h-2">

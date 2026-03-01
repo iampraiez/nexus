@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  Code,
-  Github,
-  Globe,
-  CheckCircle2,
-  AlertCircle,
-  Activity,
-} from "lucide-react";
+import { Code, Github, Globe, CheckCircle2, AlertCircle, Activity } from "lucide-react";
 import { CopyableCode } from "@/components/copyable-code";
 
 export default function PublicDocsPage() {
@@ -48,40 +41,33 @@ export default function PublicDocsPage() {
           <div className="space-y-4">
             <h1 className="text-5xl md:text-6xl font-light text-foreground leading-relaxed flex items-center gap-3">
               <Activity className="w-10 h-10 text-primary shrink-0" />
-              Nexus{" "}
-              <span className="text-primary font-semibold">Analytics</span>
+              Nexus <span className="text-primary font-semibold">Analytics</span>
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl">
-              A powerful, production-ready event tracking SDK for understanding
-              user behavior. Track events in real-time, build powerful
-              analytics, and make data-driven decisions with confidence.
+              A powerful, production-ready event tracking SDK for understanding user behavior. Track
+              events in real-time, build powerful analytics, and make data-driven decisions with
+              confidence.
             </p>
           </div>
 
           {/* What is Nexus */}
           <div className="space-y-6">
-            <h2 className="text-3xl font-semibold text-foreground">
-              What is Nexus?
-            </h2>
+            <h2 className="text-3xl font-semibold text-foreground">What is Nexus?</h2>
             <p className="text-base text-muted-foreground leading-relaxed">
-              Nexus is a modern analytics platform that helps you understand
-              your users through real-time event tracking. Instead of relying on
-              third-party analytics services, Nexus gives you full control over
-              your data with a simple, developer-friendly SDK and powerful
-              backend infrastructure.
+              Nexus is a modern analytics platform that helps you understand your users through
+              real-time event tracking. Instead of relying on third-party analytics services, Nexus
+              gives you full control over your data with a simple, developer-friendly SDK and
+              powerful backend infrastructure.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
               <div className="p-6 rounded-lg border border-border/50 bg-card/30 backdrop-blur">
                 <div className="flex items-start gap-4">
                   <CheckCircle2 className="w-6 h-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      Real-time Data
-                    </h3>
+                    <h3 className="font-semibold text-foreground mb-2">Real-time Data</h3>
                     <p className="text-sm text-muted-foreground">
-                      Events are tracked and available instantly on your
-                      dashboards. No delays, no batching tricks—pure real-time
-                      analytics.
+                      Events are tracked and available instantly on your dashboards. No delays, no
+                      batching tricks—pure real-time analytics.
                     </p>
                   </div>
                 </div>
@@ -90,12 +76,10 @@ export default function PublicDocsPage() {
                 <div className="flex items-start gap-4">
                   <CheckCircle2 className="w-6 h-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      Reliable at Scale
-                    </h3>
+                    <h3 className="font-semibold text-foreground mb-2">Reliable at Scale</h3>
                     <p className="text-sm text-muted-foreground">
-                      Designed to handle millions of events. Automatic batching,
-                      retries, and failsafe delivery ensure nothing is lost.
+                      Designed to handle millions of events. Automatic batching, retries, and
+                      failsafe delivery ensure nothing is lost.
                     </p>
                   </div>
                 </div>
@@ -104,12 +88,10 @@ export default function PublicDocsPage() {
                 <div className="flex items-start gap-4">
                   <CheckCircle2 className="w-6 h-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      Privacy First
-                    </h3>
+                    <h3 className="font-semibold text-foreground mb-2">Privacy First</h3>
                     <p className="text-sm text-muted-foreground">
-                      Your data stays yours. We don&apos;t sell data, and you
-                      have complete control over what gets tracked.
+                      Your data stays yours. We don&apos;t sell data, and you have complete control
+                      over what gets tracked.
                     </p>
                   </div>
                 </div>
@@ -118,12 +100,10 @@ export default function PublicDocsPage() {
                 <div className="flex items-start gap-4">
                   <CheckCircle2 className="w-6 h-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      Developer Friendly
-                    </h3>
+                    <h3 className="font-semibold text-foreground mb-2">Developer Friendly</h3>
                     <p className="text-sm text-muted-foreground">
-                      Simple, intuitive API that takes minutes to integrate. No
-                      complex configuration needed.
+                      Simple, intuitive API that takes minutes to integrate. No complex
+                      configuration needed.
                     </p>
                   </div>
                 </div>
@@ -133,9 +113,7 @@ export default function PublicDocsPage() {
 
           {/* Quick Start */}
           <div className="space-y-8">
-            <h2 className="text-3xl font-semibold text-foreground">
-              Quick Start (5 minutes)
-            </h2>
+            <h2 className="text-3xl font-semibold text-foreground">Quick Start (5 minutes)</h2>
 
             {/* Step 0: API Key */}
             <div className="space-y-4">
@@ -143,14 +121,12 @@ export default function PublicDocsPage() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
                   1
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  Get Your API Key
-                </h3>
+                <h3 className="text-xl font-semibold text-foreground">Get Your API Key</h3>
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6 space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Before you can start tracking events, you need to create a
-                  project and generate an API key in your Nexus dashboard.
+                  Before you can start tracking events, you need to create a project and generate an
+                  API key in your Nexus dashboard.
                 </p>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2 text-sm text-foreground">
@@ -164,8 +140,7 @@ export default function PublicDocsPage() {
                   <div className="flex items-center gap-2 text-sm text-foreground">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
                     <span>
-                      Go to <strong>Settings &gt; API Keys</strong> to find your
-                      credentials
+                      Go to <strong>Settings &gt; API Keys</strong> to find your credentials
                     </span>
                   </div>
                 </div>
@@ -183,9 +158,7 @@ export default function PublicDocsPage() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
                   2
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  Install the SDK
-                </h3>
+                <h3 className="text-xl font-semibold text-foreground">Install the SDK</h3>
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6 space-y-3">
                 <p className="text-sm text-muted-foreground">
@@ -203,9 +176,7 @@ export default function PublicDocsPage() {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
                   3
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  Initialize the SDK
-                </h3>
+                <h3 className="text-xl font-semibold text-foreground">Initialize the SDK</h3>
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6">
                 <CopyableCode
@@ -228,9 +199,7 @@ Nexus.init({
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
                   4
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  Start Tracking Events
-                </h3>
+                <h3 className="text-xl font-semibold text-foreground">Start Tracking Events</h3>
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6">
                 <CopyableCode
@@ -266,15 +235,12 @@ Nexus.track('order_created', {
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold">
                   5
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  View Your Analytics
-                </h3>
+                <h3 className="text-xl font-semibold text-foreground">View Your Analytics</h3>
               </div>
               <div className="bg-card/40 border border-border/50 rounded-lg p-6 space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Go to your Nexus dashboard and watch your events stream in
-                  real-time. Explore trends, user behavior, and conversion
-                  funnels.
+                  Go to your Nexus dashboard and watch your events stream in real-time. Explore
+                  trends, user behavior, and conversion funnels.
                 </p>
               </div>
             </div>
@@ -282,22 +248,18 @@ Nexus.track('order_created', {
 
           {/* SDK Playground */}
           <div className="space-y-6">
-            <h2 className="text-3xl font-semibold text-foreground">
-              SDK Playground
-            </h2>
+            <h2 className="text-3xl font-semibold text-foreground">SDK Playground</h2>
             <p className="text-base text-muted-foreground leading-relaxed">
-              Want to see the SDK in action without writing any code? Check out
-              our interactive SDK Playground. It's a live demo where you can
-              trigger events and see how they are tracked in real-time.
+              Want to see the SDK in action without writing any code? Check out our interactive SDK
+              Playground. It&apos;s a live demo where you can trigger events and see how they are
+              tracked in real-time.
             </p>
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
-                <h4 className="text-xl font-semibold text-foreground mb-2">
-                  Interactive Demo
-                </h4>
+                <h4 className="text-xl font-semibold text-foreground mb-2">Interactive Demo</h4>
                 <p className="text-sm text-muted-foreground max-w-md">
-                  A complete environment to test event tracking, including user
-                  auth, product telemetry, and order life-cycles.
+                  A complete environment to test event tracking, including user auth, product
+                  telemetry, and order life-cycles.
                 </p>
               </div>
               <Link href="/sdk-test">
@@ -311,26 +273,21 @@ Nexus.track('order_created', {
 
           {/* Environment Support */}
           <div className="space-y-6">
-            <h2 className="text-3xl font-semibold text-foreground">
-              Cross-Platform Support
-            </h2>
+            <h2 className="text-3xl font-semibold text-foreground">Cross-Platform Support</h2>
             <p className="text-base text-muted-foreground leading-relaxed">
-              The Nexus SDK is designed to work seamlessly in any environment.
-              It automatically detects where it&apos;s running and adjusts its
-              behavior for maximum performance and reliability.
+              The Nexus SDK is designed to work seamlessly in any environment. It automatically
+              detects where it&apos;s running and adjusts its behavior for maximum performance and
+              reliability.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
               <div className="p-6 rounded-lg border border-border/50 bg-card/30 backdrop-blur">
                 <div className="flex items-start gap-4">
                   <Globe className="w-6 h-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      Browser Environment
-                    </h3>
+                    <h3 className="font-semibold text-foreground mb-2">Browser Environment</h3>
                     <p className="text-sm text-muted-foreground">
-                      Uses IndexedDB for robust offline persistence and
-                      SubtleCrypto for secure request signing. Perfect for
-                      React, Next.js, and Vue apps.
+                      Uses IndexedDB for robust offline persistence and SubtleCrypto for secure
+                      request signing. Perfect for React, Next.js, and Vue apps.
                     </p>
                   </div>
                 </div>
@@ -339,13 +296,10 @@ Nexus.track('order_created', {
                 <div className="flex items-start gap-4">
                   <Code className="w-6 h-6 text-primary shrink-0 mt-1" />
                   <div>
-                    <h3 className="font-semibold text-foreground mb-2">
-                      Node.js Environment
-                    </h3>
+                    <h3 className="font-semibold text-foreground mb-2">Node.js Environment</h3>
                     <p className="text-sm text-muted-foreground">
-                      Uses the filesystem for event caching and the native
-                      crypto module. Ideal for server-side tracking in API
-                      routes or backend services.
+                      Uses the filesystem for event caching and the native crypto module. Ideal for
+                      server-side tracking in API routes or backend services.
                     </p>
                   </div>
                 </div>
@@ -355,19 +309,14 @@ Nexus.track('order_created', {
 
           {/* Core Concepts */}
           <div className="space-y-6">
-            <h2 className="text-3xl font-semibold text-foreground">
-              Core Concepts
-            </h2>
+            <h2 className="text-3xl font-semibold text-foreground">Core Concepts</h2>
 
             <div className="space-y-4">
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h3 className="font-semibold text-foreground mb-2 text-lg">
-                  Type-Safe Events
-                </h3>
+                <h3 className="font-semibold text-foreground mb-2 text-lg">Type-Safe Events</h3>
                 <p className="text-muted-foreground text-sm mb-4">
-                  Nexus uses TypeScript to ensure your event data is always
-                  correct. No more missing fields or typos in your analytics
-                  data.
+                  Nexus uses TypeScript to ensure your event data is always correct. No more missing
+                  fields or typos in your analytics data.
                 </p>
                 <CopyableCode
                   code={`Nexus.track('payment_failed', { 
@@ -379,12 +328,12 @@ Nexus.track('order_created', {
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h3 className="font-semibold text-foreground mb-2 text-lg">
-                  Automatic Batching
-                </h3>
+                <h3 className="font-semibold text-foreground mb-2 text-lg">Automatic Batching</h3>
                 <p className="text-muted-foreground text-sm mb-4">
-                  To optimize performance, events are automatically batched and
-                  sent every 2 seconds or when the batch size reaches 10.
+                  Events are automatically batched and flushed every <strong>30 seconds</strong> or
+                  when the batch size reaches <strong>20 events</strong> — whichever comes first.
+                  This matches industry-standard defaults (Segment, Amplitude). You can override
+                  both via config.
                 </p>
                 <CopyableCode
                   code={`// Events are queued and sent efficiently
@@ -395,16 +344,13 @@ Nexus.track('product_viewed', { productId: '2' });`}
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h3 className="font-semibold text-foreground mb-2 text-lg">
-                  Offline Persistence
-                </h3>
+                <h3 className="font-semibold text-foreground mb-2 text-lg">Offline Persistence</h3>
                 <p className="text-muted-foreground text-sm mb-4">
-                  If the user goes offline, events are saved locally and
-                  automatically synced when the connection is restored.
+                  If the user goes offline, events are saved locally and automatically synced when
+                  the connection is restored.
                 </p>
                 <div className="bg-secondary/30 rounded-lg p-4 text-sm text-muted-foreground italic">
-                  &ldquo;Never lose a single event due to network
-                  instability.&rdquo;
+                  &ldquo;Never lose a single event due to network instability.&rdquo;
                 </div>
               </div>
             </div>
@@ -412,9 +358,7 @@ Nexus.track('product_viewed', { productId: '2' });`}
 
           {/* SDK Methods */}
           <div className="space-y-6">
-            <h2 className="text-3xl font-semibold text-foreground">
-              SDK Methods Reference
-            </h2>
+            <h2 className="text-3xl font-semibold text-foreground">SDK Methods Reference</h2>
 
             <div className="space-y-4">
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
@@ -422,16 +366,19 @@ Nexus.track('product_viewed', { productId: '2' });`}
                   Nexus.init(config)
                 </h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Initializes the SDK. Must be called before tracking any
-                  events.
+                  Initializes the SDK. Must be called before tracking any events.
                 </p>
                 <CopyableCode
                   code={`Nexus.init({
   apiKey: 'your_key',
   projectId: 'your_id',
-  environment: 'production',
-  batchSize: 10,
-  flushInterval: 2000
+  environment: 'production', // 'development' | 'production'
+  batchSize: 20,             // default: 20 events per batch
+  flushInterval: 30000,      // default: 30 seconds
+  maxRetries: 3,             // default: 3 retries on failure
+  onKilled: (reason) => {    // called if SDK auto-disables due to repeated auth errors
+    console.error('SDK terminated:', reason);
+  }
 });`}
                   language="typescript"
                 />
@@ -453,17 +400,12 @@ Nexus.track('product_viewed', { productId: '2' });`}
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
-                  Nexus.flush()
-                </h4>
+                <h4 className="font-mono text-primary mb-3 text-sm font-semibold">Nexus.flush()</h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Immediately sends all queued events. Returns a promise that
-                  resolves when sending is complete.
+                  Immediately sends all queued events. Returns a promise that resolves when sending
+                  is complete.
                 </p>
-                <CopyableCode
-                  code={`await Nexus.flush();`}
-                  language="typescript"
-                />
+                <CopyableCode code={`await Nexus.flush();`} language="typescript" />
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
@@ -486,8 +428,50 @@ Nexus.track('product_viewed', { productId: '2' });`}
                 <p className="text-sm text-muted-foreground mb-4">
                   Flushes pending events and cleans up resources.
                 </p>
+                <CopyableCode code={`await Nexus.destroy();`} language="typescript" />
+              </div>
+
+              <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
+                <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
+                  Nexus.identify(userId)
+                </h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Associates all subsequent events with a specific user ID. Call this after login.
+                </p>
+                <CopyableCode code={`Nexus.identify('user_123');`} language="typescript" />
+              </div>
+
+              <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
+                <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
+                  Nexus.pageView(data?)
+                </h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Convenience method that automatically captures the current URL, path, title, and
+                  referrer.
+                </p>
                 <CopyableCode
-                  code={`await Nexus.destroy();`}
+                  code={`// Auto-captures current page URL, title, referrer
+Nexus.pageView();
+
+// Or with overrides
+Nexus.pageView({ title: 'Custom Title' });`}
+                  language="typescript"
+                />
+              </div>
+
+              <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
+                <h4 className="font-mono text-primary mb-3 text-sm font-semibold">
+                  Nexus.trackError(error, context?)
+                </h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Records an SDK error event. Useful for wiring up global error handlers.
+                </p>
+                <CopyableCode
+                  code={`// With an Error object
+Nexus.trackError(new Error('Payment timeout'), 'checkout');
+
+// Or with a string
+Nexus.trackError('Something went wrong', 'api_call');`}
                   language="typescript"
                 />
               </div>
@@ -496,86 +480,71 @@ Nexus.track('product_viewed', { productId: '2' });`}
 
           {/* Best Practices */}
           <div className="space-y-6">
-            <h2 className="text-3xl font-semibold text-foreground">
-              Best Practices
-            </h2>
+            <h2 className="text-3xl font-semibold text-foreground">Best Practices</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <h4 className="font-semibold text-foreground">
-                    Use Consistent Event Names
-                  </h4>
+                  <h4 className="font-semibold text-foreground">Use Consistent Event Names</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Stick to the predefined event types for maximum compatibility
-                  with Nexus dashboards.
+                  Stick to the predefined event types for maximum compatibility with Nexus
+                  dashboards.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <h4 className="font-semibold text-foreground">
-                    Initialize Once
-                  </h4>
+                  <h4 className="font-semibold text-foreground">Initialize Once</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Call `Nexus.init()` once at the root of your application
-                  (e.g., in `App.tsx` or `layout.tsx`).
+                  Call `Nexus.init()` once at the root of your application (e.g., in `App.tsx` or
+                  `layout.tsx`).
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <h4 className="font-semibold text-foreground">
-                    Include Contextual Data
-                  </h4>
+                  <h4 className="font-semibold text-foreground">Include Contextual Data</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Always include relevant properties with events. More context =
-                  better insights.
+                  Always include relevant properties with events. More context = better insights.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <h4 className="font-semibold text-foreground">
-                    Don&apos;t Track Sensitive Data
-                  </h4>
+                  <h4 className="font-semibold text-foreground">Don&apos;t Track Sensitive Data</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Never track passwords, API keys, or payment information. Only
-                  track what you need for analysis.
+                  Never track passwords, API keys, or payment information. Only track what you need
+                  for analysis.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <h4 className="font-semibold text-foreground">
-                    Flush Before Unload
-                  </h4>
+                  <h4 className="font-semibold text-foreground">Flush Before Unload</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Call `Nexus.destroy()` in your cleanup logic to ensure all
-                  pending events are sent.
+                  Call `Nexus.destroy()` in your cleanup logic to ensure all pending events are
+                  sent.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
                 <div className="flex items-start gap-3 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <h4 className="font-semibold text-foreground">
-                    Use TypeScript
-                  </h4>
+                  <h4 className="font-semibold text-foreground">Use TypeScript</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Take advantage of the SDK&apos;s full TypeScript support for
-                  autocompletion and error checking.
+                  Take advantage of the SDK&apos;s full TypeScript support for autocompletion and
+                  error checking.
                 </p>
               </div>
             </div>
@@ -583,88 +552,70 @@ Nexus.track('product_viewed', { productId: '2' });`}
 
           {/* Features */}
           <div className="space-y-6">
-            <h2 className="text-3xl font-semibold text-foreground">
-              Platform Features
-            </h2>
+            <h2 className="text-3xl font-semibold text-foreground">Platform Features</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-semibold text-foreground mb-2">
-                  Event Analytics
-                </h4>
+                <h4 className="font-semibold text-foreground mb-2">Event Analytics</h4>
                 <p className="text-sm text-muted-foreground">
-                  View event trends, distributions, and patterns. Understand
-                  which actions drive your business.
+                  View event trends, distributions, and patterns. Understand which actions drive
+                  your business.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-semibold text-foreground mb-2">
-                  User Cohorts
-                </h4>
+                <h4 className="font-semibold text-foreground mb-2">User Cohorts</h4>
                 <p className="text-sm text-muted-foreground">
-                  Segment users by behavior, traits, or time. Build cohorts for
-                  targeted analysis and campaigns.
+                  Segment users by behavior, traits, or time. Build cohorts for targeted analysis
+                  and campaigns.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-semibold text-foreground mb-2">
-                  Conversion Funnels
-                </h4>
+                <h4 className="font-semibold text-foreground mb-2">Conversion Funnels</h4>
                 <p className="text-sm text-muted-foreground">
-                  Track multi-step user journeys and identify where users drop
-                  off. Optimize conversion rates.
+                  Track multi-step user journeys and identify where users drop off. Optimize
+                  conversion rates.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-semibold text-foreground mb-2">
-                  Retention Analysis
-                </h4>
+                <h4 className="font-semibold text-foreground mb-2">Retention Analysis</h4>
                 <p className="text-sm text-muted-foreground">
-                  Measure user retention over time. Build cohort retention
-                  tables to track user engagement.
+                  Measure user retention over time. Build cohort retention tables to track user
+                  engagement.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-semibold text-foreground mb-2">
-                  Real-time Dashboards
-                </h4>
+                <h4 className="font-semibold text-foreground mb-2">Real-time Dashboards</h4>
                 <p className="text-sm text-muted-foreground">
-                  Live event streams and dashboards. See what&apos;s happening
-                  right now, not yesterday.
+                  Live event streams and dashboards. See what&apos;s happening right now, not
+                  yesterday.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-semibold text-foreground mb-2">
-                  Custom Alerts
-                </h4>
+                <h4 className="font-semibold text-foreground mb-2">Custom Alerts</h4>
                 <p className="text-sm text-muted-foreground">
-                  Get notified when something unusual happens. Set alerts for
-                  error rates, usage spikes, and more.
+                  Get notified when something unusual happens. Set alerts for error rates, usage
+                  spikes, and more.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-semibold text-foreground mb-2">
-                  Multiple Projects
-                </h4>
+                <h4 className="font-semibold text-foreground mb-2">Multiple Projects</h4>
                 <p className="text-sm text-muted-foreground">
-                  Manage analytics for multiple apps or environments. Each with
-                  its own API key and data.
+                  Manage analytics for multiple apps or environments. Each with its own API key and
+                  data.
                 </p>
               </div>
 
               <div className="border border-border/50 rounded-lg p-6 bg-card/30 backdrop-blur">
-                <h4 className="font-semibold text-foreground mb-2">
-                  Data Privacy
-                </h4>
+                <h4 className="font-semibold text-foreground mb-2">Data Privacy</h4>
                 <p className="text-sm text-muted-foreground">
-                  Your data is yours. No selling, no sharing. Complete control
-                  over what gets tracked.
+                  Your data is yours. No selling, no sharing. Complete control over what gets
+                  tracked.
                 </p>
               </div>
             </div>
@@ -675,9 +626,7 @@ Nexus.track('product_viewed', { productId: '2' });`}
             <div className="flex items-start gap-4">
               <AlertCircle className="w-6 h-6 text-primary shrink-0 mt-1" />
               <div>
-                <h3 className="font-semibold text-foreground mb-2">
-                  Need Help?
-                </h3>
+                <h3 className="font-semibold text-foreground mb-2">Need Help?</h3>
                 <p className="text-muted-foreground text-sm mb-4">
                   Have questions or need support? We&apos;re here to help.
                 </p>
@@ -709,8 +658,7 @@ Nexus.track('product_viewed', { productId: '2' });`}
         <div className="max-w-5xl mx-auto flex justify-between items-center gap-8">
           <div>
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Nexus • Modern Analytics, Built
-              Simple by{" "}
+              © {new Date().getFullYear()} Nexus • Modern Analytics, Built Simple by{" "}
               <a
                 href="https://github.com/iampraiez"
                 target="_blank"

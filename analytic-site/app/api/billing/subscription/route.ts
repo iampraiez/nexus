@@ -27,15 +27,13 @@ export async function GET(request: NextRequest) {
 
     // Get Stripe subscription details
     const stripeSubscription = await stripe.subscriptions.retrieve(
-      subscription.stripeSubscriptionId,
+      subscription.stripeSubscriptionId
     );
 
     return createSuccessResponse({
       plan: company.plan,
       status: stripeSubscription.status,
-      currentPeriodStart: new Date(
-        stripeSubscription.current_period_start * 1000,
-      ),
+      currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
       currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
       canceledAt: stripeSubscription.canceled_at
         ? new Date(stripeSubscription.canceled_at * 1000)
@@ -73,9 +71,7 @@ export async function POST(request: NextRequest) {
 
     if (action === "cancel") {
       // Cancel subscription
-      const stripeSubscription = await stripe.subscriptions.del(
-        subscription.stripeSubscriptionId,
-      );
+      const stripeSubscription = await stripe.subscriptions.del(subscription.stripeSubscriptionId);
 
       // Update database
       await db.collection("subscriptions").updateOne(
@@ -85,7 +81,7 @@ export async function POST(request: NextRequest) {
             status: "canceled",
             canceledAt: new Date(),
           },
-        },
+        }
       );
 
       // Downgrade company to free
@@ -96,21 +92,17 @@ export async function POST(request: NextRequest) {
             plan: "free",
             updatedAt: new Date(),
           },
-        },
+        }
       );
 
-      return createSuccessResponse(
-        { status: "canceled" },
-        200,
-        "Subscription canceled",
-      );
+      return createSuccessResponse({ status: "canceled" }, 200, "Subscription canceled");
     }
 
     if (action === "resume") {
       // Resume canceled subscription
       const stripeSubscription = await stripe.subscriptions.update(
         subscription.stripeSubscriptionId,
-        { pause_collection: null },
+        { pause_collection: null }
       );
 
       await db.collection("subscriptions").updateOne(
@@ -120,13 +112,13 @@ export async function POST(request: NextRequest) {
             status: stripeSubscription.status,
             canceledAt: null,
           },
-        },
+        }
       );
 
       return createSuccessResponse(
         { status: stripeSubscription.status },
         200,
-        "Subscription resumed",
+        "Subscription resumed"
       );
     }
 

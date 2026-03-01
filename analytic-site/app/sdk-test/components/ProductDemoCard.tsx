@@ -41,7 +41,11 @@ export default function ProductDemoCard({ onEventTracked }: ProductDemoCardProps
   const product = PRODUCTS.find((p) => p.id === selectedProductId)!;
 
   const handleProductView = () => {
-    track("product_viewed", { productId: product.id, productName: product.name, category: product.category });
+    track("product_viewed", {
+      productId: product.id,
+      productName: product.name,
+      category: product.category,
+    });
     onEventTracked("product_viewed");
   };
 
@@ -56,7 +60,9 @@ export default function ProductDemoCard({ onEventTracked }: ProductDemoCardProps
   };
 
   return (
-    <Card className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}>
+    <Card
+      className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <ShoppingBag className="w-4 h-4 text-primary" />
@@ -68,7 +74,9 @@ export default function ProductDemoCard({ onEventTracked }: ProductDemoCardProps
       </CardHeader>
       <CardContent className="space-y-3 flex-1">
         <div className="space-y-1.5">
-          <Label htmlFor="pde-product" className="text-xs text-muted-foreground">Product</Label>
+          <Label htmlFor="pde-product" className="text-xs text-muted-foreground">
+            Product
+          </Label>
           <Select value={selectedProductId} onValueChange={setSelectedProductId}>
             <SelectTrigger id="pde-product" className="bg-background/50 h-8 text-xs">
               <SelectValue />
@@ -123,11 +131,20 @@ export default function ProductDemoCard({ onEventTracked }: ProductDemoCardProps
           Track View
         </Button>
         <div className="grid grid-cols-2 gap-2 w-full">
-          <Button size="sm" onClick={handleAddToCart} className="text-xs bg-emerald-600 hover:bg-emerald-500">
+          <Button
+            size="sm"
+            onClick={handleAddToCart}
+            className="text-xs bg-emerald-600 hover:bg-emerald-500"
+          >
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             Add
           </Button>
-          <Button size="sm" variant="destructive" onClick={handleRemoveFromCart} className="text-xs">
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={handleRemoveFromCart}
+            className="text-xs"
+          >
             <Minus className="mr-1.5 h-3.5 w-3.5" />
             Remove
           </Button>

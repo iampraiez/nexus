@@ -42,7 +42,9 @@ export default function UserDemoCard({ onEventTracked }: UserDemoCardProps) {
   };
 
   return (
-    <Card className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}>
+    <Card
+      className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <User className="w-4 h-4 text-primary" />
@@ -54,7 +56,9 @@ export default function UserDemoCard({ onEventTracked }: UserDemoCardProps) {
       </CardHeader>
       <CardContent className="space-y-3 flex-1">
         <div className="space-y-1.5">
-          <Label htmlFor="ude-email" className="text-xs text-muted-foreground">Email</Label>
+          <Label htmlFor="ude-email" className="text-xs text-muted-foreground">
+            Email
+          </Label>
           <Input
             id="ude-email"
             type="email"
@@ -65,7 +69,9 @@ export default function UserDemoCard({ onEventTracked }: UserDemoCardProps) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="ude-source" className="text-xs text-muted-foreground">Signup Source</Label>
+          <Label htmlFor="ude-source" className="text-xs text-muted-foreground">
+            Signup Source
+          </Label>
           <Select value={source} onValueChange={setSource}>
             <SelectTrigger id="ude-source" className="bg-background/50 h-8 text-xs">
               <SelectValue />

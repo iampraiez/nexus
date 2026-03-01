@@ -1,47 +1,40 @@
-'use client';
+"use client";
 
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import {
-  Activity,
-  Users,
-  Fuel,
-  TrendingUp,
-  AlertTriangle,
-  ArrowRight,
-} from 'lucide-react';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Activity, Users, Fuel, TrendingUp, AlertTriangle, ArrowRight } from "lucide-react";
 
 const analyticsCategories = [
   {
-    title: 'Events',
-    description: 'Track and analyze user events in real-time',
+    title: "Events",
+    description: "Track and analyze user events in real-time",
     icon: Activity,
-    href: '/dashboard/analytics/events',
+    href: "/dashboard/analytics/events",
   },
   {
-    title: 'Users',
-    description: 'Understand user behavior and demographics',
+    title: "Users",
+    description: "Understand user behavior and demographics",
     icon: Users,
-    href: '/dashboard/analytics/users',
+    href: "/dashboard/analytics/users",
   },
   {
-    title: 'Funnels',
-    description: 'Analyze user conversion funnels',
+    title: "Funnels",
+    description: "Analyze user conversion funnels",
     icon: Fuel,
-    href: '/dashboard/analytics/funnels',
+    href: "/dashboard/analytics/funnels",
   },
   {
-    title: 'Retention',
-    description: 'Monitor user retention metrics',
+    title: "Retention",
+    description: "Monitor user retention metrics",
     icon: TrendingUp,
-    href: '/dashboard/analytics/retention',
+    href: "/dashboard/analytics/retention",
   },
   {
-    title: 'SDK Health',
-    description: 'Monitor SDK performance and errors',
+    title: "SDK Health",
+    description: "Monitor SDK performance and errors",
     icon: AlertTriangle,
-    href: '/dashboard/analytics/sdk-health',
+    href: "/dashboard/analytics/sdk-health",
   },
 ];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNexus } from "../NexusProvider";
 import {
   Card,
@@ -32,23 +32,17 @@ function generateOrderId() {
 
 export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
   const { track, isInitialized } = useNexus();
-  const [orderId, setOrderId] = useState("order-......");
-  const [userId, setUserId] = useState("user-123456");
+  const [orderId, setOrderId] = useState(generateOrderId);
   const [amount, setAmount] = useState(299.97);
   const [currency, setCurrency] = useState("USD");
   const [failureReason, setFailureReason] = useState("Card declined");
-
-  // Generate order ID only on client
-  useEffect(() => {
-    setOrderId(generateOrderId());
-  }, []);
 
   const refreshOrderId = () => setOrderId(generateOrderId());
 
   const handleOrderCreated = () => {
     track("order_created", {
       orderId,
-      userId,
+      userId: "user-123456",
       amount,
       currency,
       items: [
@@ -70,7 +64,9 @@ export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
   };
 
   return (
-    <Card className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}>
+    <Card
+      className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Package className="w-4 h-4 text-primary" />
@@ -84,7 +80,9 @@ export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
         {/* Order ID row */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <Label htmlFor="ode-order" className="text-xs text-muted-foreground">Order ID</Label>
+            <Label htmlFor="ode-order" className="text-xs text-muted-foreground">
+              Order ID
+            </Label>
             <button
               onClick={refreshOrderId}
               className="text-[9px] text-muted-foreground/50 hover:text-primary flex items-center gap-1 transition-colors"
@@ -103,7 +101,9 @@ export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="ode-amount" className="text-xs text-muted-foreground">Amount</Label>
+            <Label htmlFor="ode-amount" className="text-xs text-muted-foreground">
+              Amount
+            </Label>
             <Input
               id="ode-amount"
               type="number"
@@ -114,7 +114,9 @@ export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="ode-currency" className="text-xs text-muted-foreground">Currency</Label>
+            <Label htmlFor="ode-currency" className="text-xs text-muted-foreground">
+              Currency
+            </Label>
             <Select value={currency} onValueChange={setCurrency}>
               <SelectTrigger id="ode-currency" className="bg-background/50 h-8 text-xs">
                 <SelectValue />
@@ -130,7 +132,9 @@ export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="ode-failure" className="text-xs text-muted-foreground">Failure Reason</Label>
+          <Label htmlFor="ode-failure" className="text-xs text-muted-foreground">
+            Failure Reason
+          </Label>
           <Input
             id="ode-failure"
             value={failureReason}
@@ -158,12 +162,7 @@ export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
             <XCircle className="mr-1.5 h-3.5 w-3.5" />
             Cancel
           </Button>
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={handlePaymentFailed}
-            className="text-xs"
-          >
+          <Button size="sm" variant="destructive" onClick={handlePaymentFailed} className="text-xs">
             <AlertTriangle className="mr-1.5 h-3.5 w-3.5" />
             Pay Failed
           </Button>

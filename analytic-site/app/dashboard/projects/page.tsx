@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import React from "react"
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import Link from 'next/link';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import React from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import Link from "next/link";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -34,7 +34,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Settings, Trash2, Copy, Key, Loader2, Search, Check, ExternalLink, Activity, BarChart3 } from 'lucide-react';
+import {
+  Plus,
+  Settings,
+  Trash2,
+  Copy,
+  Key,
+  Loader2,
+  Search,
+  Check,
+  ExternalLink,
+  Activity,
+  BarChart3,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Project {
@@ -51,7 +63,7 @@ interface ApiKey {
   createdAt: string;
 }
 
-import { useDashboard } from '../dashboard-context';
+import { useDashboard } from "../dashboard-context";
 
 export default function ProjectsPage() {
   const { projects: contextProjects, loading: contextLoading, refreshData } = useDashboard();
@@ -59,18 +71,18 @@ export default function ProjectsPage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  
+  const [searchQuery, setSearchQuery] = useState("");
+
   // New Project State
   const [showNewProject, setShowNewProject] = useState(false);
-  const [projectName, setProjectName] = useState('');
-  const [environment, setEnvironment] = useState('production');
-  
+  const [projectName, setProjectName] = useState("");
+  const [environment, setEnvironment] = useState("production");
+
   // Settings State
   const [showSettings, setShowSettings] = useState(false);
-  const [editName, setEditName] = useState('');
-  const [editEnv, setEditEnv] = useState('');
-  
+  const [editName, setEditName] = useState("");
+  const [editEnv, setEditEnv] = useState("");
+
   // API Key State
   const [newlyGeneratedKey, setNewlyGeneratedKey] = useState<string | null>(null);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
@@ -95,7 +107,7 @@ export default function ProjectsPage() {
       setLoading(true);
       await refreshData();
     } catch (error) {
-      console.error('Error loading projects:', error);
+      console.error("Error loading projects:", error);
     } finally {
       setLoading(false);
     }
@@ -113,14 +125,15 @@ export default function ProjectsPage() {
         setApiKeys(data.data || []);
       }
     } catch (error) {
-      console.error('Error loading API keys:', error);
+      console.error("Error loading API keys:", error);
     }
   }
 
   const filteredProjects = useMemo(() => {
-    return projects.filter(p => 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.environment.toLowerCase().includes(searchQuery.toLowerCase())
+    return projects.filter(
+      (p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.environment.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [projects, searchQuery]);
 
@@ -130,16 +143,16 @@ export default function ProjectsPage() {
 
     try {
       setLoading(true);
-      const response = await fetch('/api/projects', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: projectName, environment }),
       });
 
       const result = await response.json();
       if (response.ok) {
         await refreshData(true); // Update global context (forced)
-        setProjectName('');
+        setProjectName("");
         setShowNewProject(false);
         // Optimistic update or wait for context? Context update will trigger useEffect
         // But we want to select the new project.
@@ -174,15 +187,15 @@ export default function ProjectsPage() {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${selectedProject._id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: editName, environment: editEnv }),
       });
 
       const result = await response.json();
       if (response.ok) {
         await refreshData(true); // Update global context (forced)
-        setProjects(projects.map(p => p._id === selectedProject._id ? result.data : p));
+        setProjects(projects.map((p) => (p._id === selectedProject._id ? result.data : p)));
         setSelectedProject(result.data);
         setShowSettings(false);
         toast({
@@ -213,12 +226,12 @@ export default function ProjectsPage() {
     try {
       setLoading(true);
       const response = await fetch(`/api/projects/${selectedProject._id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
         await refreshData(true); // Update global context (forced)
-        const remainingProjects = projects.filter(p => p._id !== selectedProject._id);
+        const remainingProjects = projects.filter((p) => p._id !== selectedProject._id);
         setProjects(remainingProjects);
         setSelectedProject(remainingProjects.length > 0 ? remainingProjects[0] : null);
         if (remainingProjects.length > 0) loadApiKeys(remainingProjects[0]._id);
@@ -251,7 +264,7 @@ export default function ProjectsPage() {
 
     try {
       const response = await fetch(`/api/projects/${selectedProject._id}/api-keys`, {
-        method: 'POST',
+        method: "POST",
       });
 
       const result = await response.json();
@@ -277,11 +290,11 @@ export default function ProjectsPage() {
 
     try {
       const response = await fetch(`/api/projects/${selectedProject._id}/api-keys/${keyId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setApiKeys(apiKeys.filter(k => k._id !== keyId));
+        setApiKeys(apiKeys.filter((k) => k._id !== keyId));
         toast({
           title: "Key revoked",
           description: "The API key has been permanently revoked.",
@@ -310,9 +323,7 @@ export default function ProjectsPage() {
     <div className="space-y-6 md:space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Projects
-          </h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Projects</h1>
           <p className="text-muted-foreground text-sm md:text-base">
             Create and manage API projects for event tracking
           </p>
@@ -355,16 +366,8 @@ export default function ProjectsPage() {
                 </Select>
               </div>
               <DialogFooter className="pt-4">
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full sm:w-auto"
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    "Create Project"
-                  )}
+                <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Project"}
                 </Button>
               </DialogFooter>
             </form>
@@ -484,11 +487,7 @@ export default function ProjectsPage() {
                     }}
                   >
                     <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-xl"
-                      >
+                      <Button variant="outline" size="icon" className="rounded-xl">
                         <Settings className="w-4 h-4" />
                       </Button>
                     </DialogTrigger>
@@ -502,10 +501,7 @@ export default function ProjectsPage() {
                       <div className="space-y-4 py-4">
                         <div className="space-y-2">
                           <Label>Project Name</Label>
-                          <Input
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                          />
+                          <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
                         </div>
                         <div className="space-y-2">
                           <Label>Environment</Label>
@@ -514,54 +510,37 @@ export default function ProjectsPage() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="production">
-                                Production
-                              </SelectItem>
+                              <SelectItem value="production">Production</SelectItem>
                               <SelectItem value="staging">Staging</SelectItem>
-                              <SelectItem value="development">
-                                Development
-                              </SelectItem>
+                              <SelectItem value="development">Development</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
                       <div className="flex flex-col gap-4">
-                        <Button
-                          onClick={handleUpdateProject}
-                          disabled={loading}
-                        >
-                          {loading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            "Save Changes"
-                          )}
+                        <Button onClick={handleUpdateProject} disabled={loading}>
+                          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Changes"}
                         </Button>
 
                         <div className="pt-4 border-t border-border">
                           <p className="text-xs text-muted-foreground mb-3">
-                            Danger Zone: Deleting a project will permanently
-                            remove all associated API keys and data.
+                            Danger Zone: Deleting a project will permanently remove all associated
+                            API keys and data.
                           </p>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button
-                                variant="destructive"
-                                className="w-full gap-2"
-                              >
+                              <Button variant="destructive" className="w-full gap-2">
                                 <Trash2 className="w-4 h-4" />
                                 Delete Project
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you absolutely sure?
-                                </AlertDialogTitle>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This action cannot be undone. This will
-                                  permanently delete the project{" "}
-                                  <strong>{selectedProject.name}</strong> and
-                                  all of its API keys.
+                                  This action cannot be undone. This will permanently delete the
+                                  project <strong>{selectedProject.name}</strong> and all of its API
+                                  keys.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -594,11 +573,7 @@ export default function ProjectsPage() {
                       Use these keys to authenticate your SDK requests
                     </p>
                   </div>
-                  <Button
-                    onClick={handleGenerateApiKey}
-                    size="sm"
-                    className="gap-2"
-                  >
+                  <Button onClick={handleGenerateApiKey} size="sm" className="gap-2">
                     Generate Key
                   </Button>
                 </div>
@@ -611,8 +586,7 @@ export default function ProjectsPage() {
                       New API Key Generated
                     </div>
                     <p className="text-xs text-muted-foreground mb-4">
-                      Copy this key now. For security reasons, it will not be
-                      shown again.
+                      Copy this key now. For security reasons, it will not be shown again.
                     </p>
                     <div className="flex gap-2">
                       <div className="flex-1 bg-background border border-primary/30 rounded-lg p-3 font-mono text-sm text-primary break-all">
@@ -656,8 +630,7 @@ export default function ProjectsPage() {
                             )}
                           </div>
                           <div className="text-[10px] text-muted-foreground">
-                            Created on{" "}
-                            {new Date(key.createdAt).toLocaleDateString()}
+                            Created on {new Date(key.createdAt).toLocaleDateString()}
                           </div>
                         </div>
 
@@ -689,13 +662,10 @@ export default function ProjectsPage() {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Revoke API Key?
-                                </AlertDialogTitle>
+                                <AlertDialogTitle>Revoke API Key?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This will immediately disable this API key.
-                                  Any applications using this key will no longer
-                                  be able to track events.
+                                  This will immediately disable this API key. Any applications using
+                                  this key will no longer be able to track events.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -722,19 +692,13 @@ export default function ProjectsPage() {
                   <ExternalLink className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-semibold text-foreground">
-                    Integration Guide
-                  </h4>
+                  <h4 className="text-sm font-semibold text-foreground">Integration Guide</h4>
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                     Ready to start tracking? Check out our{" "}
-                    <Link
-                      href="/docs"
-                      className="text-primary hover:underline font-medium"
-                    >
+                    <Link href="/docs" className="text-primary hover:underline font-medium">
                       SDK Documentation
                     </Link>{" "}
-                    to learn how to initialize the Nexus SDK with your project
-                    credentials.
+                    to learn how to initialize the Nexus SDK with your project credentials.
                   </p>
                 </div>
               </div>
@@ -745,19 +709,13 @@ export default function ProjectsPage() {
                 <BarChart3 className="w-12 h-12 text-muted-foreground opacity-20" />
               </div>
               <div className="max-w-xs">
-                <h3 className="text-lg font-semibold text-foreground">
-                  No Project Selected
-                </h3>
+                <h3 className="text-lg font-semibold text-foreground">No Project Selected</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Select a project from the list on the left or create a new one
-                  to manage your API keys and settings.
+                  Select a project from the list on the left or create a new one to manage your API
+                  keys and settings.
                 </p>
               </div>
-              <Button
-                onClick={() => setShowNewProject(true)}
-                variant="outline"
-                className="mt-4"
-              >
+              <Button onClick={() => setShowNewProject(true)} variant="outline" className="mt-4">
                 Create Your First Project
               </Button>
             </Card>

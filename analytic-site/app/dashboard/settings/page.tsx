@@ -1,19 +1,31 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Loader2, Settings, Users, Shield, Download, Mail, Trash2, LogOut, Laptop, Smartphone, Globe } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Loader2,
+  Settings,
+  Users,
+  Shield,
+  Download,
+  Mail,
+  Trash2,
+  LogOut,
+  Laptop,
+  Smartphone,
+  Globe,
+} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -22,26 +34,26 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
-import { useDashboard } from '../dashboard-context';
+import { useDashboard } from "../dashboard-context";
 
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { company, loading: contextLoading, refreshData } = useDashboard();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'general' | 'team' | 'security' | 'email'>('general');
+  const [activeTab, setActiveTab] = useState<"general" | "team" | "security" | "email">("general");
   const [sessions, setSessions] = useState<any[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
+
   // Form states
-  const [workspaceName, setWorkspaceName] = useState('');
+  const [workspaceName, setWorkspaceName] = useState("");
 
   useEffect(() => {
     if (company) {
@@ -52,13 +64,13 @@ export default function SettingsPage() {
 
   const fetchSessions = async () => {
     try {
-      const sessionsRes = await fetch('/api/auth/sessions');
+      const sessionsRes = await fetch("/api/auth/sessions");
       const sessionsData = await sessionsRes.json();
       if (sessionsData.success) {
         setSessions(sessionsData.data);
       }
     } catch (err) {
-      console.error('Error fetching sessions:', err);
+      console.error("Error fetching sessions:", err);
     } finally {
       setLoadingSessions(false);
     }
@@ -76,12 +88,12 @@ export default function SettingsPage() {
 
     setSaving(true);
     try {
-      const response = await fetch('/api/settings/update', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/settings/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: workspaceName }),
       });
-      
+
       if (response.ok) {
         await refreshData(true); // Update global context (forced)
         toast({
@@ -89,7 +101,7 @@ export default function SettingsPage() {
           description: "Workspace settings updated successfully.",
         });
       } else {
-        throw new Error('Failed to update');
+        throw new Error("Failed to update");
       }
     } catch (error) {
       toast({
@@ -109,16 +121,16 @@ export default function SettingsPage() {
       // Assuming we just want to show it works for now, or we can add state for them.
       // For now, let's just simulate the API call structure since the UI inputs aren't controlled yet.
       // Ideally we should make them controlled.
-      
-      const response = await fetch('/api/settings/update', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+
+      const response = await fetch("/api/settings/update", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           preferences: {
-            alerts: (document.getElementById('alerts') as HTMLInputElement)?.checked,
-            reports: (document.getElementById('reports') as HTMLInputElement)?.checked,
+            alerts: (document.getElementById("alerts") as HTMLInputElement)?.checked,
+            reports: (document.getElementById("reports") as HTMLInputElement)?.checked,
             // Add other prefs
-          } 
+          },
         }),
       });
 
@@ -128,7 +140,7 @@ export default function SettingsPage() {
           description: "Notification preferences saved.",
         });
       } else {
-        throw new Error('Failed to update');
+        throw new Error("Failed to update");
       }
     } catch (error) {
       toast({
@@ -144,20 +156,20 @@ export default function SettingsPage() {
   const handleExportData = async () => {
     setExporting(true);
     try {
-      const response = await fetch('/api/settings/export');
+      const response = await fetch("/api/settings/export");
       const result = await response.json();
-      
+
       if (result.success) {
-        const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: "application/json" });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = `nexus-export-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `nexus-export-${new Date().toISOString().split("T")[0]}.json`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        
+
         toast({
           title: "Export Complete",
           description: "Your data has been successfully exported.",
@@ -166,7 +178,7 @@ export default function SettingsPage() {
         throw new Error(result.error);
       }
     } catch (err) {
-      console.error('Export failed:', err);
+      console.error("Export failed:", err);
       toast({
         title: "Export Failed",
         description: "Could not export data. Please try again.",
@@ -179,15 +191,15 @@ export default function SettingsPage() {
 
   const handleRevokeSession = async (sessionId: string) => {
     try {
-      const response = await fetch(`/api/auth/sessions?id=${sessionId}`, { method: 'DELETE' });
+      const response = await fetch(`/api/auth/sessions?id=${sessionId}`, { method: "DELETE" });
       if (response.ok) {
-        setSessions(sessions.filter(s => s._id !== sessionId));
+        setSessions(sessions.filter((s) => s._id !== sessionId));
         toast({
           title: "Session Revoked",
           description: "The session has been successfully revoked.",
         });
       } else {
-        throw new Error('Failed to revoke');
+        throw new Error("Failed to revoke");
       }
     } catch (err) {
       toast({
@@ -201,18 +213,18 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     setDeleting(true);
     try {
-      const response = await fetch('/api/settings/delete-account', { method: 'DELETE' });
+      const response = await fetch("/api/settings/delete-account", { method: "DELETE" });
       if (response.ok) {
         toast({
           title: "Workspace Deleted",
           description: "Your workspace has been permanently deleted.",
         });
-        router.push('/auth/register');
+        router.push("/auth/register");
       } else {
-        throw new Error('Failed to delete');
+        throw new Error("Failed to delete");
       }
     } catch (err) {
-      console.error('Delete account failed:', err);
+      console.error("Delete account failed:", err);
       setDeleting(false);
       setShowDeleteDialog(false);
       toast({
@@ -271,9 +283,7 @@ export default function SettingsPage() {
         <div className="space-y-6 max-w-2xl">
           <Card className="p-6 border border-border bg-card space-y-6">
             <div>
-              <h2 className="text-lg font-semibold text-foreground mb-4">
-                Workspace Information
-              </h2>
+              <h2 className="text-lg font-semibold text-foreground mb-4">Workspace Information</h2>
               <div className="grid gap-4">
                 <div>
                   <Label htmlFor="companyName">Workspace Name</Label>
@@ -301,21 +311,17 @@ export default function SettingsPage() {
             </div>
             <div className="flex justify-end">
               <Button onClick={handleSaveGeneral} disabled={saving}>
-                {saving ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : null}
+                {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                 {saving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </Card>
 
           <Card className="p-6 border border-border bg-card">
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Data Export
-            </h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Data Export</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Download a complete archive of your workspace data including
-              events, users, and configuration.
+              Download a complete archive of your workspace data including events, users, and
+              configuration.
             </p>
             <Button
               variant="outline"
@@ -341,12 +347,9 @@ export default function SettingsPage() {
             <Users className="w-12 h-12 text-muted-foreground opacity-20" />
           </div>
           <div className="max-w-sm">
-            <h3 className="text-lg font-semibold text-foreground">
-              Team Management
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground">Team Management</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              We&apos;re currently building advanced team collaboration
-              features. Check back soon!
+              We&apos;re currently building advanced team collaboration features. Check back soon!
             </p>
           </div>
           <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
@@ -363,12 +366,9 @@ export default function SettingsPage() {
               <Shield className="w-10 h-10 text-muted-foreground opacity-20" />
             </div>
             <div className="max-w-sm">
-              <h3 className="text-lg font-semibold text-foreground">
-                Two-Factor Authentication
-              </h3>
+              <h3 className="text-lg font-semibold text-foreground">Two-Factor Authentication</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Enhanced security features including 2FA are currently under
-                development.
+                Enhanced security features including 2FA are currently under development.
               </p>
             </div>
             <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-600 border border-yellow-500/20">
@@ -377,9 +377,7 @@ export default function SettingsPage() {
           </Card>
 
           <Card className="p-6 border border-border bg-card">
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Active Sessions
-            </h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Active Sessions</h2>
             <div className="space-y-3">
               {sessions.map((session) => (
                 <div
@@ -391,12 +389,9 @@ export default function SettingsPage() {
                       <Laptop className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">
-                        Web Session
-                      </p>
+                      <p className="text-sm font-medium text-foreground">Web Session</p>
                       <p className="text-xs text-muted-foreground">
-                        Created{" "}
-                        {new Date(session.createdAt).toLocaleDateString()}
+                        Created {new Date(session.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -411,20 +406,16 @@ export default function SettingsPage() {
                 </div>
               ))}
               {sessions.length === 0 && (
-                <p className="text-sm text-muted-foreground">
-                  No active sessions found.
-                </p>
+                <p className="text-sm text-muted-foreground">No active sessions found.</p>
               )}
             </div>
           </Card>
 
           <Card className="p-6 border border-destructive/20 bg-destructive/5">
-            <h2 className="text-lg font-semibold text-destructive mb-2">
-              Delete Workspace
-            </h2>
+            <h2 className="text-lg font-semibold text-destructive mb-2">Delete Workspace</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Permanently delete your workspace and all associated data. This
-              action cannot be undone.
+              Permanently delete your workspace and all associated data. This action cannot be
+              undone.
             </p>
 
             <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -437,16 +428,12 @@ export default function SettingsPage() {
                 <DialogHeader>
                   <DialogTitle>Are you absolutely sure?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your workspace, all projects, events, and user data.
+                    This action cannot be undone. This will permanently delete your workspace, all
+                    projects, events, and user data.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                  <Button
-                    variant="destructive"
-                    onClick={handleDeleteAccount}
-                    disabled={deleting}
-                  >
+                  <Button variant="destructive" onClick={handleDeleteAccount} disabled={deleting}>
                     {deleting ? (
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     ) : (
@@ -464,9 +451,7 @@ export default function SettingsPage() {
       {/* Email/Notification Settings */}
       {activeTab === "email" && (
         <Card className="p-6 border border-border bg-card max-w-2xl">
-          <h2 className="text-lg font-semibold text-foreground mb-4">
-            Notification Preferences
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Notification Preferences</h2>
           <div className="space-y-4">
             <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card hover:bg-secondary/20 transition-colors">
               <input
@@ -476,9 +461,7 @@ export default function SettingsPage() {
                 className="mt-1 w-4 h-4 rounded border-primary text-primary focus:ring-primary"
               />
               <label htmlFor="alerts" className="cursor-pointer">
-                <p className="font-medium text-sm text-foreground">
-                  Alert Notifications
-                </p>
+                <p className="font-medium text-sm text-foreground">Alert Notifications</p>
                 <p className="text-xs text-muted-foreground">
                   Receive emails when your configured alerts are triggered.
                 </p>
@@ -493,17 +476,13 @@ export default function SettingsPage() {
                 className="mt-1 w-4 h-4 rounded border-primary text-primary focus:ring-primary"
               />
               <label htmlFor="reports" className="cursor-pointer">
-                <p className="font-medium text-sm text-foreground">
-                  Scheduled AI Reports
-                </p>
+                <p className="font-medium text-sm text-foreground">Scheduled AI Reports</p>
                 <p className="text-xs text-muted-foreground">
                   Receive automated AI insights directly to your email.
                 </p>
 
                 <div className="mt-3 flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">
-                    Frequency:
-                  </span>
+                  <span className="text-xs text-muted-foreground">Frequency:</span>
                   <Select defaultValue="weekly">
                     <SelectTrigger className="h-8 w-30 text-xs">
                       <SelectValue />
@@ -521,9 +500,7 @@ export default function SettingsPage() {
           </div>
           <div className="mt-6 flex justify-end">
             <Button onClick={handleSavePreferences} disabled={saving}>
-              {saving ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : null}
+              {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               {saving ? "Saving..." : "Save Preferences"}
             </Button>
           </div>

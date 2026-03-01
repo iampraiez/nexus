@@ -12,7 +12,7 @@ interface NexusContextType {
   updateConfig: (apiKey: string, projectId: string) => void;
   track: <T extends EventType>(
     eventType: T,
-    data: Omit<EventSchemas[T], "timestamp" | "sessionId">,
+    data: Omit<EventSchemas[T], "timestamp" | "sessionId">
   ) => void;
   flush: () => Promise<void>;
 }
@@ -21,8 +21,8 @@ const NexusContext = createContext<NexusContextType | null>(null);
 
 export function NexusProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<{ apiKey: string; projectId: string }>({
-    apiKey: '',
-    projectId: '',
+    apiKey: "",
+    projectId: "",
   });
 
   const [status, setStatus] = useState<{
@@ -46,13 +46,13 @@ export function NexusProvider({ children }: { children: ReactNode }) {
 
       try {
         await Nexus.destroy();
-        
+
         const sdkConfig: NexusConfig = {
           apiKey: config.apiKey,
           projectId: config.projectId,
           environment: "development",
           batchSize: 5,
-          flushInterval: 3000,
+          flushInterval: 30000,
           onKilled: (reason: string) => {
             setStatus({
               initialized: false,
@@ -72,14 +72,14 @@ export function NexusProvider({ children }: { children: ReactNode }) {
         console.log("[Nexus] SDK Provider re-initialized");
       } catch (error: any) {
         console.error("[Nexus] SDK Provider failed to initialize:", error);
-        const errorMessage = error?.message?.toLowerCase().includes("unauthorized") 
-          ? "Invalid API Key or Project ID" 
+        const errorMessage = error?.message?.toLowerCase().includes("unauthorized")
+          ? "Invalid API Key or Project ID"
           : error?.message || "Failed to initialize SDK";
-        
-        setStatus({ 
-          initialized: false, 
-          session: null, 
-          error: errorMessage 
+
+        setStatus({
+          initialized: false,
+          session: null,
+          error: errorMessage,
         });
       }
     };
@@ -96,10 +96,7 @@ export function NexusProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const track = useCallback(
-    <T extends EventType>(
-      eventType: T,
-      data: Omit<EventSchemas[T], "timestamp" | "sessionId">,
-    ) => {
+    <T extends EventType>(eventType: T, data: Omit<EventSchemas[T], "timestamp" | "sessionId">) => {
       if (!status.initialized) {
         console.warn("[Nexus] Cannot track: SDK not initialized");
         return;
@@ -111,7 +108,7 @@ export function NexusProvider({ children }: { children: ReactNode }) {
         console.error("[Nexus] Track failed:", error);
       }
     },
-    [status.initialized],
+    [status.initialized]
   );
 
   const flush = useCallback(async () => {

@@ -66,9 +66,7 @@ export default function LoginPage() {
 
         <div className="mb-8 space-y-2">
           <h1 className="text-3xl font-light text-foreground">Sign In</h1>
-          <p className="text-muted-foreground leading-relaxed">
-            Welcome back to Nexus
-          </p>
+          <p className="text-muted-foreground leading-relaxed">Welcome back to Nexus</p>
         </div>
 
         <div className="p-6 border border-border/50 bg-card/30 backdrop-blur rounded-lg">
@@ -109,11 +107,7 @@ export default function LoginPage() {
             </div>
 
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin mx-auto" />
-              ) : (
-                "Sign In"
-              )}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Sign In"}
             </Button>
           </form>
 

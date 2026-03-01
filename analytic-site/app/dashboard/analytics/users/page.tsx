@@ -1,8 +1,8 @@
-"use client"
-import { useState, useEffect, useCallback } from 'react';
-import { Loader2, Calendar, Filter, Database, Globe, AlertCircle, TrendingUp } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+"use client";
+import { useState, useEffect, useCallback } from "react";
+import { Loader2, Calendar, Filter, Database, Globe, AlertCircle, TrendingUp } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   LineChart,
   Line,
@@ -14,7 +14,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 import {
   Select,
   SelectContent,
@@ -31,47 +31,50 @@ export default function UsersPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Filters
-  const [range, setRange] = useState('7d');
-  const [projectId, setProjectId] = useState('all');
-  const [environment, setEnvironment] = useState('all');
+  const [range, setRange] = useState("7d");
+  const [projectId, setProjectId] = useState("all");
+  const [environment, setEnvironment] = useState("all");
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch("/api/projects");
       const result = await response.json();
       if (result.success) {
         setProjects(result.data);
       }
     } catch (err) {
-      console.error('Failed to fetch projects:', err);
+      console.error("Failed to fetch projects:", err);
     }
   };
 
-  const fetchData = useCallback(async (isInitial = false) => {
-    if (isInitial) setLoading(true);
-    else setRefreshing(true);
-    
-    try {
-      const params = new URLSearchParams({
-        range,
-        projectId,
-        environment
-      });
-      const response = await fetch(`/api/analytics/users?${params.toString()}`);
-      const result = await response.json();
-      if (result.success) {
-        setData(result.data);
-        setError(null);
-      } else {
-        setError(result.error || 'Failed to fetch data');
+  const fetchData = useCallback(
+    async (isInitial = false) => {
+      if (isInitial) setLoading(true);
+      else setRefreshing(true);
+
+      try {
+        const params = new URLSearchParams({
+          range,
+          projectId,
+          environment,
+        });
+        const response = await fetch(`/api/analytics/users?${params.toString()}`);
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+          setError(null);
+        } else {
+          setError(result.error || "Failed to fetch data");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching data");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    } catch (err) {
-      setError('An error occurred while fetching data');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [range, projectId, environment]);
+    },
+    [range, projectId, environment]
+  );
 
   useEffect(() => {
     fetchProjects();
@@ -94,11 +97,7 @@ export default function UsersPage() {
       <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
         <p className="font-medium">Error</p>
         <p className="text-sm">{error}</p>
-        <Button 
-          variant="outline" 
-          className="mt-4" 
-          onClick={() => fetchData(true)}
-        >
+        <Button variant="outline" className="mt-4" onClick={() => fetchData(true)}>
           Try Again
         </Button>
       </div>
@@ -124,7 +123,7 @@ export default function UsersPage() {
             Understand user behavior and demographics
           </p>
         </div>
-        
+
         <div className="flex flex-wrap gap-2 w-full lg:w-auto">
           {/* Project Filter */}
           <Select value={projectId} onValueChange={setProjectId} disabled={refreshing}>
@@ -137,7 +136,9 @@ export default function UsersPage() {
             <SelectContent>
               <SelectItem value="all">All Projects</SelectItem>
               {projects.map((p) => (
-                <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>
+                <SelectItem key={p._id} value={p._id}>
+                  {p.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -179,18 +180,36 @@ export default function UsersPage() {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
-          { label: 'Total Users', value: metrics.totalUsers.toLocaleString(), sub: 'All time' },
-          { label: 'New Users', value: metrics.newUsers.toLocaleString(), sub: 'In selected range' },
-          { label: 'Active Users', value: metrics.activeUsers.toLocaleString(), sub: 'In selected range' },
-          { label: 'Returning Users', value: metrics.returningUsers.toLocaleString(), sub: `${metrics.returningPercentage.toFixed(1)}% of active`, subClass: 'text-blue-600' }
+          { label: "Total Users", value: metrics.totalUsers.toLocaleString(), sub: "All time" },
+          {
+            label: "New Users",
+            value: metrics.newUsers.toLocaleString(),
+            sub: "In selected range",
+          },
+          {
+            label: "Active Users",
+            value: metrics.activeUsers.toLocaleString(),
+            sub: "In selected range",
+          },
+          {
+            label: "Returning Users",
+            value: metrics.returningUsers.toLocaleString(),
+            sub: `${metrics.returningPercentage.toFixed(1)}% of active`,
+            subClass: "text-blue-600",
+          },
         ].map((m, i) => (
-          <Card key={i} className="p-3 md:p-4 border border-border bg-card relative overflow-hidden">
+          <Card
+            key={i}
+            className="p-3 md:p-4 border border-border bg-card relative overflow-hidden"
+          >
             {refreshing && (
               <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] z-10" />
             )}
             <p className="text-muted-foreground text-xs md:text-sm mb-1">{m.label}</p>
             <p className="text-xl md:text-3xl font-bold text-foreground">{m.value}</p>
-            <p className={`hidden md:block text-xs mt-2 ${m.subClass || 'text-muted-foreground'}`}>{m.sub}</p>
+            <p className={`hidden md:block text-xs mt-2 ${m.subClass || "text-muted-foreground"}`}>
+              {m.sub}
+            </p>
             {refreshing && (
               <div className="absolute top-2 right-2">
                 <Loader2 className="w-3 h-3 animate-spin text-primary/40" />
@@ -207,24 +226,30 @@ export default function UsersPage() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         )}
-        <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">User Growth</h2>
+        <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">
+          User Growth
+        </h2>
         <div className="h-[300px] md:h-[400px] w-full">
           {userGrowth.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={userGrowth}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="var(--color-muted-foreground)" 
-                  fontSize={12} 
-                  tickFormatter={(val) => range === '24h' ? val.split(' ')[1] : val}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickFormatter={(val) => (range === "24h" ? val.split(" ")[1] : val)}
                 />
                 <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--color-card)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '8px',
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "8px",
                   }}
                 />
                 <Legend />
@@ -234,7 +259,7 @@ export default function UsersPage() {
                   name="Active Users"
                   stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#3b82f6', r: 4 }}
+                  dot={{ fill: "#3b82f6", r: 4 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
                 <Line
@@ -243,7 +268,7 @@ export default function UsersPage() {
                   name="New Users"
                   stroke="#10b981"
                   strokeWidth={3}
-                  dot={{ fill: '#10b981', r: 4 }}
+                  dot={{ fill: "#10b981", r: 4 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
               </LineChart>
@@ -262,22 +287,34 @@ export default function UsersPage() {
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           )}
-          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">Device Breakdown</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">
+            Device Breakdown
+          </h2>
           <div className="h-[250px] md:h-[300px] w-full">
             {deviceData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={deviceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--color-border)"
+                    vertical={false}
+                  />
                   <XAxis dataKey="device" stroke="var(--color-muted-foreground)" fontSize={12} />
                   <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'var(--color-card)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '8px',
+                      backgroundColor: "var(--color-card)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "8px",
                     }}
                   />
-                  <Bar dataKey="users" name="Users" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
+                  <Bar
+                    dataKey="users"
+                    name="Users"
+                    fill="#3b82f6"
+                    radius={[4, 4, 0, 0]}
+                    barSize={40}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -285,8 +322,6 @@ export default function UsersPage() {
             )}
           </div>
         </Card>
-
-
       </div>
 
       {/* User Segments */}
@@ -307,15 +342,11 @@ export default function UsersPage() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                   Segment
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Users
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Users</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                   % of Total
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Trend
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Trend</th>
               </tr>
             </thead>
             <tbody>
@@ -328,11 +359,15 @@ export default function UsersPage() {
                     <td className="px-6 py-4 text-sm font-medium text-foreground">
                       {segment.segment}
                     </td>
-                    <td className="px-6 py-4 text-sm text-foreground">{segment.count.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm text-foreground">
+                      {segment.count.toLocaleString()}
+                    </td>
                     <td className="px-6 py-4 text-sm text-foreground">
                       {segment.percentage.toFixed(1)}%
                     </td>
-                    <td className={`px-6 py-4 text-sm font-medium ${segment.trend.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                    <td
+                      className={`px-6 py-4 text-sm font-medium ${segment.trend.startsWith("+") ? "text-green-600" : "text-red-600"}`}
+                    >
                       {segment.trend}
                     </td>
                   </tr>

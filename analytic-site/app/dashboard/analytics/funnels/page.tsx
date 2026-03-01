@@ -1,8 +1,8 @@
-"use client"
-import { useState, useEffect, useCallback } from 'react';
-import { Loader2, Calendar, Filter, Database, Globe, AlertCircle, ArrowDown } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+"use client";
+import { useState, useEffect, useCallback } from "react";
+import { Loader2, Calendar, Filter, Database, Globe, AlertCircle, ArrowDown } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -19,47 +19,50 @@ export default function FunnelsPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Filters
-  const [range, setRange] = useState('30d');
-  const [projectId, setProjectId] = useState('all');
-  const [environment, setEnvironment] = useState('all');
+  const [range, setRange] = useState("30d");
+  const [projectId, setProjectId] = useState("all");
+  const [environment, setEnvironment] = useState("all");
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch("/api/projects");
       const result = await response.json();
       if (result.success) {
         setProjects(result.data);
       }
     } catch (err) {
-      console.error('Failed to fetch projects:', err);
+      console.error("Failed to fetch projects:", err);
     }
   };
 
-  const fetchData = useCallback(async (isInitial = false) => {
-    if (isInitial) setLoading(true);
-    else setRefreshing(true);
-    
-    try {
-      const params = new URLSearchParams({
-        range,
-        projectId,
-        environment
-      });
-      const response = await fetch(`/api/analytics/funnels?${params.toString()}`);
-      const result = await response.json();
-      if (result.success) {
-        setData(result.data);
-        setError(null);
-      } else {
-        setError(result.error || 'Failed to fetch data');
+  const fetchData = useCallback(
+    async (isInitial = false) => {
+      if (isInitial) setLoading(true);
+      else setRefreshing(true);
+
+      try {
+        const params = new URLSearchParams({
+          range,
+          projectId,
+          environment,
+        });
+        const response = await fetch(`/api/analytics/funnels?${params.toString()}`);
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+          setError(null);
+        } else {
+          setError(result.error || "Failed to fetch data");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching data");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    } catch (err) {
-      setError('An error occurred while fetching data');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [range, projectId, environment]);
+    },
+    [range, projectId, environment]
+  );
 
   useEffect(() => {
     fetchProjects();
@@ -82,11 +85,7 @@ export default function FunnelsPage() {
       <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
         <p className="font-medium">Error</p>
         <p className="text-sm">{error}</p>
-        <Button 
-          variant="outline" 
-          className="mt-4" 
-          onClick={() => fetchData(true)}
-        >
+        <Button variant="outline" className="mt-4" onClick={() => fetchData(true)}>
           Try Again
         </Button>
       </div>
@@ -107,12 +106,14 @@ export default function FunnelsPage() {
     <div className="space-y-6 md:space-y-8">
       <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">Conversion Funnels</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            Conversion Funnels
+          </h1>
           <p className="text-sm md:text-base text-muted-foreground">
             Analyze user conversion funnels and identify drop-off points
           </p>
         </div>
-        
+
         <div className="flex flex-wrap gap-2 w-full lg:w-auto">
           {/* Project Filter */}
           <Select value={projectId} onValueChange={setProjectId} disabled={refreshing}>
@@ -125,7 +126,9 @@ export default function FunnelsPage() {
             <SelectContent>
               <SelectItem value="all">All Projects</SelectItem>
               {projects.map((p) => (
-                <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>
+                <SelectItem key={p._id} value={p._id}>
+                  {p.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -176,13 +179,19 @@ export default function FunnelsPage() {
           </div>
           <div>
             <p className="text-muted-foreground text-xs md:text-sm mb-1">Overall Conversion</p>
-            <p className="text-lg md:text-2xl font-bold text-foreground">{overallConversion.toFixed(2)}%</p>
+            <p className="text-lg md:text-2xl font-bold text-foreground">
+              {overallConversion.toFixed(2)}%
+            </p>
             <p className="hidden md:block text-xs text-muted-foreground mt-1">In selected range</p>
           </div>
           <div className="col-span-2 md:col-span-1">
             <p className="text-muted-foreground text-xs md:text-sm mb-1">Total Users</p>
-            <p className="text-lg md:text-2xl font-bold text-foreground">{totalUsers.toLocaleString()}</p>
-            <p className="hidden md:block text-xs text-muted-foreground mt-1">Unique users in funnel</p>
+            <p className="text-lg md:text-2xl font-bold text-foreground">
+              {totalUsers.toLocaleString()}
+            </p>
+            <p className="hidden md:block text-xs text-muted-foreground mt-1">
+              Unique users in funnel
+            </p>
           </div>
         </div>
         {refreshing && (
@@ -213,7 +222,9 @@ export default function FunnelsPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-foreground">{item.users.toLocaleString()}</p>
+                      <p className="text-sm font-bold text-foreground">
+                        {item.users.toLocaleString()}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {width.toFixed(1)}% of initial
                       </p>
@@ -234,8 +245,8 @@ export default function FunnelsPage() {
                     <div className="flex items-center gap-2 px-4 py-2 bg-destructive/10 border border-destructive/20 rounded">
                       <ArrowDown className="w-4 h-4 text-destructive" />
                       <span className="text-sm text-destructive">
-                        <span className="font-bold">{item.dropoff.toLocaleString()}</span> users dropped off (
-                        {item.dropoffPercent.toFixed(1)}%)
+                        <span className="font-bold">{item.dropoff.toLocaleString()}</span> users
+                        dropped off ({item.dropoffPercent.toFixed(1)}%)
                       </span>
                     </div>
                   )}
@@ -262,9 +273,7 @@ export default function FunnelsPage() {
           <table className="w-full">
             <thead className="bg-secondary/50 border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Step
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Step</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                   Users Entered
                 </th>
@@ -283,15 +292,14 @@ export default function FunnelsPage() {
               {totalUsers > 0 ? (
                 steps.map((step: any, index: number) => {
                   const prevUsers = index === 0 ? totalUsers : steps[index - 1].users;
-                  const stepConversion = prevUsers > 0 ? ((step.users / prevUsers) * 100).toFixed(1) : 0;
+                  const stepConversion =
+                    prevUsers > 0 ? ((step.users / prevUsers) * 100).toFixed(1) : 0;
                   return (
                     <tr
                       key={step.step}
                       className="border-b border-border hover:bg-secondary/30 transition-colors"
                     >
-                      <td className="px-6 py-4 text-sm font-medium text-foreground">
-                        {step.name}
-                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-foreground">{step.name}</td>
                       <td className="px-6 py-4 text-sm text-foreground">
                         {prevUsers.toLocaleString()}
                       </td>

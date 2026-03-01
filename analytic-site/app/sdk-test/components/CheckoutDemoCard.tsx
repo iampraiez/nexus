@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNexus } from "../NexusProvider";
 import {
   Card,
@@ -23,12 +23,11 @@ export default function CheckoutDemoCard({ onEventTracked }: CheckoutDemoCardPro
   const { track, isInitialized } = useNexus();
   const [cartValue, setCartValue] = useState(149.97);
   const [itemCount, setItemCount] = useState(3);
+  // Reset completed state when SDK goes offline — derived from external prop
   const [checkoutStarted, setCheckoutStarted] = useState(false);
-
-  // Reset flow if SDK goes offline
-  useEffect(() => {
-    if (!isInitialized) setCheckoutStarted(false);
-  }, [isInitialized]);
+  if (!isInitialized && checkoutStarted) {
+    setCheckoutStarted(false);
+  }
 
   const handleCheckoutStarted = () => {
     track("checkout_started", { cartValue, itemCount });
@@ -44,7 +43,9 @@ export default function CheckoutDemoCard({ onEventTracked }: CheckoutDemoCardPro
   };
 
   return (
-    <Card className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}>
+    <Card
+      className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <CreditCard className="w-4 h-4 text-primary" />
@@ -87,7 +88,8 @@ export default function CheckoutDemoCard({ onEventTracked }: CheckoutDemoCardPro
         </div>
 
         {/* Flow state indicator */}
-        <div className="p-2.5 rounded-lg border space-y-1 transition-all"
+        <div
+          className="p-2.5 rounded-lg border space-y-1 transition-all"
           style={{
             background: checkoutStarted ? "rgba(16,185,129,0.05)" : "rgba(var(--secondary), 0.3)",
             borderColor: checkoutStarted ? "rgba(16,185,129,0.2)" : "rgba(var(--border), 0.5)",
@@ -101,7 +103,9 @@ export default function CheckoutDemoCard({ onEventTracked }: CheckoutDemoCardPro
             <span className="text-xs font-mono font-medium text-foreground/80">
               {checkoutStarted ? "Awaiting completion" : "Ready to start"}
             </span>
-            <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${checkoutStarted ? "bg-amber-500/20 text-amber-500" : "bg-emerald-500/20 text-emerald-500"}`}>
+            <span
+              className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${checkoutStarted ? "bg-amber-500/20 text-amber-500" : "bg-emerald-500/20 text-emerald-500"}`}
+            >
               {checkoutStarted ? "STARTED" : "IDLE"}
             </span>
           </div>

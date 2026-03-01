@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 interface DashboardContextType {
   company: any;
@@ -45,77 +45,82 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const fetchData = useCallback(async (force = false) => {
-    // Only fetch if forced or data is older than 5 minutes
-    const now = Date.now();
-    if (!force && lastFetched && now - lastFetched < 5 * 60 * 1000) {
-      return;
-    }
-
-    try {
-      // Parallel fetch for core data
-      const [sessionRes, projectsRes, analyticsRes] = await Promise.all([
-        fetch('/api/auth/session'),
-        fetch('/api/projects'),
-        fetch('/api/analytics/overview')
-      ]);
-
-      const sessionData = await sessionRes.json();
-      const projectsData = await projectsRes.json();
-      const analyticsData = await analyticsRes.json();
-
-      if (sessionRes.status === 401 || !sessionData.success) {
-        router.push('/auth/login');
+  const fetchData = useCallback(
+    async (force = false) => {
+      // Only fetch if forced or data is older than 5 minutes
+      const now = Date.now();
+      if (!force && lastFetched && now - lastFetched < 5 * 60 * 1000) {
         return;
       }
 
-      if (sessionData.success) {
-        setCompany(sessionData.data);
+      try {
+        // Parallel fetch for core data
+        const [sessionRes, projectsRes, analyticsRes] = await Promise.all([
+          fetch("/api/auth/session"),
+          fetch("/api/projects"),
+          fetch("/api/analytics/overview"),
+        ]);
+
+        const sessionData = await sessionRes.json();
+        const projectsData = await projectsRes.json();
+        const analyticsData = await analyticsRes.json();
+
+        if (sessionRes.status === 401 || !sessionData.success) {
+          router.push("/auth/login");
+          return;
+        }
+
+        if (sessionData.success) {
+          setCompany(sessionData.data);
+        }
+
+        let currentProjects = [];
+        if (projectsData.success) {
+          setProjects(projectsData.data);
+          currentProjects = projectsData.data;
+        }
+
+        if (analyticsData.success) {
+          setAnalyticsOverview(analyticsData.data);
+        }
+
+        // Calculate Usage & Limits
+        let eventsCount = 0;
+        if (analyticsData.success) {
+          // Find Total Events stat
+          const eventStat = analyticsData.data.stats.find((s: any) => s.label === "Total Events");
+          eventsCount = eventStat ? parseInt(eventStat.value.replace(/,/g, "")) || 0 : 0;
+        }
+
+        const isFreeTier = sessionData.data?.plan === "free" || !sessionData.data?.plan;
+        const FREE_EVENT_LIMIT = 10000;
+        const isFreeTierExceeded = isFreeTier && eventsCount > FREE_EVENT_LIMIT;
+
+        setUsage({
+          eventsCount,
+          projectsCount: currentProjects.length,
+          isFreeTier,
+          isFreeTierExceeded,
+        });
+
+        setLastFetched(now);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
       }
-
-      let currentProjects = [];
-      if (projectsData.success) {
-        setProjects(projectsData.data);
-        currentProjects = projectsData.data;
-      }
-
-      if (analyticsData.success) {
-        setAnalyticsOverview(analyticsData.data);
-      }
-
-      // Calculate Usage & Limits
-      let eventsCount = 0;
-      if (analyticsData.success) {
-        // Find Total Events stat
-        const eventStat = analyticsData.data.stats.find((s: any) => s.label === 'Total Events');
-        eventsCount = eventStat ? parseInt(eventStat.value.replace(/,/g, '')) || 0 : 0;
-      }
-
-      const isFreeTier = sessionData.data?.plan === 'free' || !sessionData.data?.plan;
-      const FREE_EVENT_LIMIT = 10000;
-      const isFreeTierExceeded = isFreeTier && eventsCount > FREE_EVENT_LIMIT;
-
-      setUsage({
-        eventsCount,
-        projectsCount: currentProjects.length,
-        isFreeTier,
-        isFreeTierExceeded,
-      });
-
-      setLastFetched(now);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [router, lastFetched]);
+    },
+    [router, lastFetched]
+  );
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   return (
-    <DashboardContext.Provider value={{ company, projects, analyticsOverview, usage, loading, refreshData: fetchData }}>
+    <DashboardContext.Provider
+      value={{ company, projects, analyticsOverview, usage, loading, refreshData: fetchData }}
+    >
       {children}
     </DashboardContext.Provider>
   );

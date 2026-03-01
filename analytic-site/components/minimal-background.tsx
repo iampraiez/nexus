@@ -15,21 +15,8 @@ export function MinimalBackground() {
         viewBox="0 0 100 100"
         patternUnits="userSpaceOnUse"
       >
-        <pattern
-          id="dots"
-          x="0"
-          y="0"
-          width="50"
-          height="50"
-          patternUnits="userSpaceOnUse"
-        >
-          <circle
-            cx="12.5"
-            cy="12.5"
-            r="1.5"
-            fill="currentColor"
-            className="text-primary/20"
-          />
+        <pattern id="dots" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+          <circle cx="12.5" cy="12.5" r="1.5" fill="currentColor" className="text-primary/20" />
         </pattern>
         <rect width="100%" height="100%" fill="url(#dots)" />
       </svg>

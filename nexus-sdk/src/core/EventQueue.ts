@@ -12,12 +12,13 @@ export class EventQueue {
   private flushTimer: NodeJS.Timeout | null = null;
   private onFlush: (events: SerializedEvent[]) => Promise<void>;
   private logger: ILogger;
+  private isStopped: boolean = false;
 
   constructor(
     onFlush: (events: SerializedEvent[]) => Promise<void>,
     logger: ILogger,
     batchSize: number = 10,
-    flushInterval: number = 2000
+    flushInterval: number = 30000
   ) {
     this.onFlush = onFlush;
     this.logger = logger;
@@ -29,6 +30,11 @@ export class EventQueue {
    * Add event to queue
    */
   enqueue(event: SerializedEvent): void {
+    if (this.isStopped) {
+      this.logger.warn("EventQueue is stopped. Event discarded.");
+      return;
+    }
+
     this.queue.push(event);
     this.logger.debug("Event queued", {
       type: event.type,
@@ -46,7 +52,7 @@ export class EventQueue {
    * Flush all events in queue
    */
   async flush(): Promise<void> {
-    if (this.queue.length === 0) {
+    if (this.isStopped || this.queue.length === 0) {
       return;
     }
 
@@ -60,10 +66,14 @@ export class EventQueue {
     try {
       await this.onFlush(events);
     } catch (error) {
-      // Re-queue events on failure
-      this.queue.unshift(...events);
-      this.logger.error("Failed to flush events", error);
-      this.startFlushTimer();
+      // Only re-queue and restart timer if we haven't been stopped
+      if (!this.isStopped) {
+        this.queue.unshift(...events);
+        this.logger.error("Failed to flush events", error);
+        this.startFlushTimer();
+      } else {
+        this.logger.warn("EventQueue stopped during flush — discarding events.");
+      }
     }
   }
 
@@ -82,7 +92,7 @@ export class EventQueue {
   }
 
   /**
-   * Clear all events
+   * Clear all events without stopping the queue
    */
   clear(): void {
     this.queue = [];
@@ -90,15 +100,18 @@ export class EventQueue {
   }
 
   /**
-   * Stop all operations permanently (until re-initialized)
+   * Permanently stop all operations. Cannot be restarted.
+   * Used by the auto-kill circuit breaker.
    */
   stop(): void {
-    this.clear();
-    this.logger.info("EventQueue stopped");
+    this.isStopped = true;
+    this.queue = [];
+    this.stopFlushTimer();
+    this.logger.info("EventQueue permanently stopped.");
   }
 
   private startFlushTimer(): void {
-    if (this.flushTimer) {
+    if (this.isStopped || this.flushTimer) {
       return;
     }
 

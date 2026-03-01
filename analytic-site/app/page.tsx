@@ -2,54 +2,64 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Github, Globe, Activity, TrendingUp, Users, Fuel as Funnel, AlertTriangle, ShieldCheck } from "lucide-react";
+import {
+  Github,
+  Globe,
+  Activity,
+  TrendingUp,
+  Users,
+  Fuel as Funnel,
+  AlertTriangle,
+  ShieldCheck,
+} from "lucide-react";
 import { MinimalBackground } from "@/components/minimal-background";
 import { SdkInstallCard } from "@/components/sdk-install-card";
+import { NavBar } from "@/components/nav-bar";
 import { Card } from "@/components/ui/card";
 
 const features = [
   {
-    title: 'Real-time Analytics',
-    description: 'Monitor user activity as it happens with millisecond precision.',
+    title: "Real-time Analytics",
+    description: "Monitor user activity as it happens with millisecond precision.",
     icon: Activity,
-    color: 'text-blue-500',
-    bg: 'bg-blue-500/10'
+    color: "text-blue-500",
+    bg: "bg-blue-500/10",
   },
   {
-    title: 'Retention Tracking',
-    description: 'Analyze cohort retention to improve product stickiness.',
+    title: "Retention Tracking",
+    description: "Analyze cohort retention to improve product stickiness.",
     icon: TrendingUp,
-    color: 'text-green-500',
-    bg: 'bg-green-500/10'
+    color: "text-green-500",
+    bg: "bg-green-500/10",
   },
   {
-    title: 'Funnel Analysis',
-    description: 'Visualize conversion paths and identify drop-off points.',
+    title: "Funnel Analysis",
+    description: "Visualize conversion paths and identify drop-off points.",
     icon: Funnel,
-    color: 'text-orange-500',
-    bg: 'bg-orange-500/10'
+    color: "text-orange-500",
+    bg: "bg-orange-500/10",
   },
   {
-    title: 'User Insights',
-    description: 'Deep dive into individual user profiles and session history.',
+    title: "User Insights",
+    description: "Deep dive into individual user profiles and session history.",
     icon: Users,
-    color: 'text-purple-500',
-    bg: 'bg-purple-500/10'
+    color: "text-purple-500",
+    bg: "bg-purple-500/10",
   },
   {
-    title: 'SDK Health',
-    description: 'Monitor the performance of your analytics integration.',
+    title: "SDK Health",
+    description: "Monitor the performance of your analytics integration.",
     icon: ShieldCheck,
-    color: 'text-red-500',
-    bg: 'bg-red-500/10'
+    color: "text-red-500",
+    bg: "bg-red-500/10",
   },
   {
-    title: 'Smart Alerts',
-    description: 'Get notified instantly when critical metrics spike or drop.',
+    title: "Smart Alerts",
+    description: "Get notified instantly when critical metrics spike or drop.",
     icon: AlertTriangle,
-    color: 'text-yellow-500',
-    bg: 'bg-yellow-500/10'
-  }
+    color: "text-yellow-500",
+    bg: "bg-yellow-500/10",
+  },
 ];
 
 export default function HomePage() {
@@ -61,34 +71,7 @@ export default function HomePage() {
       <div className="relative z-10 h-screen flex flex-col overflow-hidden">
         {/* Navigation Header - Floating */}
         <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-11/12 max-w-7xl">
-          <div className="bg-background/40 backdrop-blur-md border border-border/30 rounded-2xl px-6 py-3 flex justify-between items-center">
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-lg font-semibold text-foreground hover:text-primary transition"
-            >
-              <Activity className="w-5 h-5 text-primary" />
-              Nexus
-            </Link>
-            <div className="flex gap-6 items-center">
-              <Link
-                href="/docs"
-                className="text-sm text-muted-foreground hover:text-foreground transition"
-              >
-                Docs
-              </Link>
-              <Link
-                href="/sdk-test"
-                className="text-sm text-muted-foreground hover:text-primary transition"
-              >
-                SDK Demo
-              </Link>
-              <Link href="/auth/register">
-                <Button size="sm" className="text-sm">
-                  Get Started
-                </Button>
-              </Link>
-            </div>
-          </div>
+          <NavBar />
         </nav>
 
         {/* Main Content - Split Layout */}
@@ -99,14 +82,11 @@ export default function HomePage() {
               <div className="space-y-6">
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-light text-foreground leading-tight text-balance">
                   Track events with{" "}
-                  <span className="text-primary font-semibold block">
-                    perfect clarity
-                  </span>
+                  <span className="text-primary font-semibold block">perfect clarity</span>
                 </h1>
                 <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-                  Real-time analytics platform that makes sense of your user
-                  behavior. Understand patterns, optimize decisions, and scale
-                  with confidence.
+                  Real-time analytics platform that makes sense of your user behavior. Understand
+                  patterns, optimize decisions, and scale with confidence.
                 </p>
               </div>
 

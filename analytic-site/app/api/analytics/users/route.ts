@@ -1,47 +1,44 @@
-import { NextRequest } from 'next/server';
-import { getDatabase } from '@/lib/db';
-import { getSessionCompany } from '@/lib/auth';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
+import { NextRequest } from "next/server";
+import { getDatabase } from "@/lib/db";
+import { getSessionCompany } from "@/lib/auth";
+import { createSuccessResponse, createErrorResponse } from "@/lib/api-response";
 
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 
 export async function GET(request: NextRequest) {
   try {
     const company = await getSessionCompany();
     if (!company) {
-      return createErrorResponse('Not authenticated', 401);
+      return createErrorResponse("Not authenticated", 401);
     }
 
     const { searchParams } = new URL(request.url);
-    const range = searchParams.get('range') || '7d';
-    const projectId = searchParams.get('projectId');
-    const environment = searchParams.get('environment');
+    const range = searchParams.get("range") || "7d";
+    const projectId = searchParams.get("projectId");
+    const environment = searchParams.get("environment");
 
     const db = await getDatabase();
-    
+
     // Get all projects for the company to verify ownership
-    const projects = await db
-      .collection('projects')
-      .find({ companyId: company._id })
-      .toArray();
-    
-    const allProjectIds = projects.map(p => p._id);
+    const projects = await db.collection("projects").find({ companyId: company._id }).toArray();
+
+    const allProjectIds = projects.map((p) => p._id);
     let filterProjectIds = allProjectIds;
 
-    if (projectId && projectId !== 'all') {
+    if (projectId && projectId !== "all") {
       const selectedProjectId = new ObjectId(projectId);
-      if (allProjectIds.some(id => id.equals(selectedProjectId))) {
+      if (allProjectIds.some((id) => id.equals(selectedProjectId))) {
         filterProjectIds = [selectedProjectId];
       } else {
-        return createErrorResponse('Project not found or access denied', 404);
+        return createErrorResponse("Project not found or access denied", 404);
       }
     }
 
     const matchStage: any = {
-      projectId: { $in: filterProjectIds }
+      projectId: { $in: filterProjectIds },
     };
 
-    if (environment && environment !== 'all') {
+    if (environment && environment !== "all") {
       matchStage.environment = environment;
     }
 
@@ -49,13 +46,13 @@ export async function GET(request: NextRequest) {
     let startDate = new Date();
     let days = 7;
 
-    if (range === '24h') {
+    if (range === "24h") {
       startDate.setHours(now.getHours() - 24);
       days = 1;
-    } else if (range === '30d') {
+    } else if (range === "30d") {
       startDate.setDate(now.getDate() - 30);
       days = 30;
-    } else if (range === 'all') {
+    } else if (range === "all") {
       startDate = new Date(0);
       days = 365;
     } else {
@@ -64,55 +61,64 @@ export async function GET(request: NextRequest) {
     }
 
     // 1. Total Users (all time for the project/env)
-    const totalUsers = await db.collection('tracked_users').countDocuments(matchStage);
+    const totalUsers = await db.collection("tracked_users").countDocuments(matchStage);
 
     // 2. New Users in range
     const newUsersMatch = { ...matchStage };
-    if (range !== 'all') {
+    if (range !== "all") {
       newUsersMatch.firstSeen = { $gte: startDate };
     }
-    const newUsers = await db.collection('tracked_users').countDocuments(newUsersMatch);
+    const newUsers = await db.collection("tracked_users").countDocuments(newUsersMatch);
 
     // 3. Active Users in range
     const activeUsersMatch = { ...matchStage };
-    if (range !== 'all') {
+    if (range !== "all") {
       activeUsersMatch.lastSeen = { $gte: startDate };
     }
-    const activeUsers = await db.collection('tracked_users').countDocuments(activeUsersMatch);
+    const activeUsers = await db.collection("tracked_users").countDocuments(activeUsersMatch);
 
     // 4. Returning Users
     const returningUsers = activeUsers - newUsers;
 
     // 5. User Growth Over Time
-    const userGrowth = await db.collection('tracked_users').aggregate([
-      { $match: newUsersMatch },
-      {
-        $group: {
-          _id: {
-            $dateToString: { 
-              format: range === '24h' ? "%Y-%m-%d %H:00" : "%Y-%m-%d", 
-              date: "$firstSeen" 
-            }
+    const userGrowth = await db
+      .collection("tracked_users")
+      .aggregate([
+        { $match: newUsersMatch },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: range === "24h" ? "%Y-%m-%d %H:00" : "%Y-%m-%d",
+                date: "$firstSeen",
+              },
+            },
+            newUsers: { $sum: 1 },
           },
-          newUsers: { $sum: 1 }
-        }
-      },
-      { $sort: { "_id": 1 } }
-    ]).toArray();
+        },
+        { $sort: { _id: 1 } },
+      ])
+      .toArray();
 
     // 6. Device Breakdown (Still mocked as we don't have real device data yet)
-    const deviceData = totalUsers > 0 ? [
-      { device: 'Desktop', users: Math.round(totalUsers * 0.6), percentage: 60 },
-      { device: 'Mobile', users: Math.round(totalUsers * 0.35), percentage: 35 },
-      { device: 'Tablet', users: Math.round(totalUsers * 0.05), percentage: 5 },
-    ] : [];
+    const deviceData =
+      totalUsers > 0
+        ? [
+            { device: "Desktop", users: Math.round(totalUsers * 0.6), percentage: 60 },
+            { device: "Mobile", users: Math.round(totalUsers * 0.35), percentage: 35 },
+            { device: "Tablet", users: Math.round(totalUsers * 0.05), percentage: 5 },
+          ]
+        : [];
 
     // 7. User Segments (Dynamic based on event count)
-    const userActivity = await db.collection('events').aggregate([
-      { $match: matchStage },
-      { $group: { _id: "$userId", count: { $sum: 1 } } },
-      { $sort: { count: -1 } }
-    ]).toArray();
+    const userActivity = await db
+      .collection("events")
+      .aggregate([
+        { $match: matchStage },
+        { $group: { _id: "$userId", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ])
+      .toArray();
 
     const totalActive = userActivity.length;
     let powerUsers = 0;
@@ -123,37 +129,40 @@ export async function GET(request: NextRequest) {
       // Top 20% are power users
       const powerUserCount = Math.ceil(totalActive * 0.2);
       powerUsers = powerUserCount;
-      
+
       // Next 50% are regular users
       const regularUserCount = Math.ceil(totalActive * 0.5);
       regularUsers = regularUserCount;
-      
+
       // Rest are low activity/dormant (plus users with 0 events)
       dormantUsers = totalUsers - (powerUsers + regularUsers);
     } else {
       dormantUsers = totalUsers;
     }
 
-    const userSegments = totalUsers > 0 ? [
-      { 
-        segment: 'Power Users', 
-        count: powerUsers, 
-        percentage: (powerUsers / totalUsers) * 100, 
-        trend: '+5%' // Trend calculation would require historical comparison
-      },
-      { 
-        segment: 'Regular Users', 
-        count: regularUsers, 
-        percentage: (regularUsers / totalUsers) * 100, 
-        trend: '+2%' 
-      },
-      { 
-        segment: 'Dormant Users', 
-        count: Math.max(0, dormantUsers), 
-        percentage: (Math.max(0, dormantUsers) / totalUsers) * 100, 
-        trend: '-1%' 
-      },
-    ] : [];
+    const userSegments =
+      totalUsers > 0
+        ? [
+            {
+              segment: "Power Users",
+              count: powerUsers,
+              percentage: (powerUsers / totalUsers) * 100,
+              trend: "+5%", // Trend calculation would require historical comparison
+            },
+            {
+              segment: "Regular Users",
+              count: regularUsers,
+              percentage: (regularUsers / totalUsers) * 100,
+              trend: "+2%",
+            },
+            {
+              segment: "Dormant Users",
+              count: Math.max(0, dormantUsers),
+              percentage: (Math.max(0, dormantUsers) / totalUsers) * 100,
+              trend: "-1%",
+            },
+          ]
+        : [];
 
     return createSuccessResponse({
       metrics: {
@@ -161,19 +170,19 @@ export async function GET(request: NextRequest) {
         newUsers,
         activeUsers,
         returningUsers,
-        returningPercentage: activeUsers > 0 ? (returningUsers / activeUsers) * 100 : 0
+        returningPercentage: activeUsers > 0 ? (returningUsers / activeUsers) * 100 : 0,
       },
-      userGrowth: userGrowth.map(d => ({
+      userGrowth: userGrowth.map((d) => ({
         date: d._id,
         newUsers: d.newUsers,
         activeUsers: Math.round(d.newUsers * 1.5),
-        returning: Math.round(d.newUsers * 0.5)
+        returning: Math.round(d.newUsers * 0.5),
       })),
       deviceData,
-      userSegments
+      userSegments,
     });
   } catch (error) {
-    console.error('Error fetching users analytics:', error);
-    return createErrorResponse('Failed to fetch users analytics', 500);
+    console.error("Error fetching users analytics:", error);
+    return createErrorResponse("Failed to fetch users analytics", 500);
   }
 }

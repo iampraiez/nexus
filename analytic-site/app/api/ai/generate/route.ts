@@ -1,8 +1,8 @@
-import { NextRequest } from 'next/server';
-import { getDatabase } from '@/lib/db';
-import { getSessionCompany } from '@/lib/auth';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
-import { generateAnalyticsReport, AnalyticsReportData } from '@/lib/ai-service';
+import { NextRequest } from "next/server";
+import { getDatabase } from "@/lib/db";
+import { getSessionCompany } from "@/lib/auth";
+import { createSuccessResponse, createErrorResponse } from "@/lib/api-response";
+import { generateAnalyticsReport, AnalyticsReportData } from "@/lib/ai-service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (existingReportToday) {
       return createErrorResponse(
         "Daily AI credit limit reached. You can generate one comprehensive report per day.",
-        429,
+        429
       );
     }
 
@@ -43,40 +43,38 @@ export async function POST(request: NextRequest) {
       await db.collection("projects").find({ companyId: company._id }).toArray()
     ).map((p) => p._id);
 
-    const [totalEvents, activeUsers, topEvents, errorCount] = await Promise.all(
-      [
-        db.collection("events").countDocuments({
+    const [totalEvents, activeUsers, topEvents, errorCount] = await Promise.all([
+      db.collection("events").countDocuments({
+        projectId: { $in: projectIds },
+        timestamp: { $gte: startDate, $lte: endDate },
+      }),
+      db
+        .collection("events")
+        .distinct("userId", {
           projectId: { $in: projectIds },
           timestamp: { $gte: startDate, $lte: endDate },
-        }),
-        db
-          .collection("events")
-          .distinct("userId", {
-            projectId: { $in: projectIds },
-            timestamp: { $gte: startDate, $lte: endDate },
-          })
-          .then((ids) => ids.length),
-        db
-          .collection("events")
-          .aggregate([
-            {
-              $match: {
-                projectId: { $in: projectIds },
-                timestamp: { $gte: startDate, $lte: endDate },
-              },
+        })
+        .then((ids) => ids.length),
+      db
+        .collection("events")
+        .aggregate([
+          {
+            $match: {
+              projectId: { $in: projectIds },
+              timestamp: { $gte: startDate, $lte: endDate },
             },
-            { $group: { _id: "$eventName", count: { $sum: 1 } } },
-            { $sort: { count: -1 } },
-            { $limit: 5 },
-          ])
-          .toArray(),
-        db.collection("events").countDocuments({
-          projectId: { $in: projectIds },
-          name: "error",
-          timestamp: { $gte: startDate, $lte: endDate },
-        }),
-      ],
-    );
+          },
+          { $group: { _id: "$eventName", count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+          { $limit: 5 },
+        ])
+        .toArray(),
+      db.collection("events").countDocuments({
+        projectId: { $in: projectIds },
+        name: "error",
+        timestamp: { $gte: startDate, $lte: endDate },
+      }),
+    ]);
 
     // Check if there is enough data
     if (totalEvents === 0) {
@@ -115,11 +113,9 @@ export async function POST(request: NextRequest) {
     const reportId = result.insertedId;
 
     // Start background generation (don't await)
-    generateInBackground(reportId.toString(), reportData, company._id).catch(
-      (err) => {
-        console.error("Background generation failed:", err);
-      },
-    );
+    generateInBackground(reportId.toString(), reportData, company._id).catch((err) => {
+      console.error("Background generation failed:", err);
+    });
 
     // Return immediately with pending status
     return createSuccessResponse({
@@ -139,7 +135,7 @@ export async function POST(request: NextRequest) {
 async function generateInBackground(
   reportId: string,
   reportData: AnalyticsReportData,
-  companyId: any,
+  companyId: any
 ) {
   const db = await getDatabase();
   const { ObjectId } = await import("mongodb");
@@ -155,7 +151,7 @@ async function generateInBackground(
           status: "completed",
           completedAt: new Date(),
         },
-      },
+      }
     );
   } catch (aiError: any) {
     console.error("Background generation failed:", aiError);
@@ -168,7 +164,7 @@ async function generateInBackground(
           error: aiError.message || "Generation failed",
           failedAt: new Date(),
         },
-      },
+      }
     );
   }
 }
@@ -177,11 +173,12 @@ export async function GET(request: NextRequest) {
   try {
     const company = await getSessionCompany();
     if (!company) {
-      return createErrorResponse('Not authenticated', 401);
+      return createErrorResponse("Not authenticated", 401);
     }
 
     const db = await getDatabase();
-    const reports = await db.collection('ai_reports')
+    const reports = await db
+      .collection("ai_reports")
       .find({ companyId: company._id })
       .sort({ generatedAt: -1 })
       .limit(20)
@@ -189,7 +186,7 @@ export async function GET(request: NextRequest) {
 
     return createSuccessResponse(reports);
   } catch (error) {
-    console.error('Fetch reports error:', error);
-    return createErrorResponse('Failed to fetch reports', 500);
+    console.error("Fetch reports error:", error);
+    return createErrorResponse("Failed to fetch reports", 500);
   }
 }

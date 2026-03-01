@@ -1,8 +1,8 @@
-"use client"
-import { useState, useEffect, useCallback } from 'react';
-import { Loader2, Calendar, Filter, Database, Globe, AlertCircle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+"use client";
+import { useState, useEffect, useCallback } from "react";
+import { Loader2, Calendar, Filter, Database, Globe, AlertCircle } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   BarChart,
   Bar,
@@ -17,7 +17,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 import {
   Select,
   SelectContent,
@@ -34,47 +34,50 @@ export default function EventsPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Filters
-  const [range, setRange] = useState('7d');
-  const [projectId, setProjectId] = useState('all');
-  const [environment, setEnvironment] = useState('all');
+  const [range, setRange] = useState("7d");
+  const [projectId, setProjectId] = useState("all");
+  const [environment, setEnvironment] = useState("all");
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch("/api/projects");
       const result = await response.json();
       if (result.success) {
         setProjects(result.data);
       }
     } catch (err) {
-      console.error('Failed to fetch projects:', err);
+      console.error("Failed to fetch projects:", err);
     }
   };
 
-  const fetchData = useCallback(async (isInitial = false) => {
-    if (isInitial) setLoading(true);
-    else setRefreshing(true);
-    
-    try {
-      const params = new URLSearchParams({
-        range,
-        projectId,
-        environment
-      });
-      const response = await fetch(`/api/analytics/events?${params.toString()}`);
-      const result = await response.json();
-      if (result.success) {
-        setData(result.data);
-        setError(null);
-      } else {
-        setError(result.error || 'Failed to fetch data');
+  const fetchData = useCallback(
+    async (isInitial = false) => {
+      if (isInitial) setLoading(true);
+      else setRefreshing(true);
+
+      try {
+        const params = new URLSearchParams({
+          range,
+          projectId,
+          environment,
+        });
+        const response = await fetch(`/api/analytics/events?${params.toString()}`);
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+          setError(null);
+        } else {
+          setError(result.error || "Failed to fetch data");
+        }
+      } catch (err) {
+        setError("An error occurred while fetching data");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    } catch (err) {
-      setError('An error occurred while fetching data');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [range, projectId, environment]);
+    },
+    [range, projectId, environment]
+  );
 
   useEffect(() => {
     fetchProjects();
@@ -97,11 +100,7 @@ export default function EventsPage() {
       <div className="p-6 border border-destructive/50 bg-destructive/10 rounded-lg text-destructive">
         <p className="font-medium">Error</p>
         <p className="text-sm">{error}</p>
-        <Button 
-          variant="outline" 
-          className="mt-4" 
-          onClick={() => fetchData(true)}
-        >
+        <Button variant="outline" className="mt-4" onClick={() => fetchData(true)}>
           Try Again
         </Button>
       </div>
@@ -109,7 +108,7 @@ export default function EventsPage() {
   }
 
   const { metrics, eventsOverTime, topEvents, eventsByEnvironment } = data;
-  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+  const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
   const EmptyState = ({ message = "No data available for the selected filters" }) => (
     <div className="flex flex-col items-center justify-center h-full py-12 text-center">
@@ -128,7 +127,7 @@ export default function EventsPage() {
             Track and analyze user events across your application
           </p>
         </div>
-        
+
         <div className="flex flex-wrap gap-2 w-full lg:w-auto">
           {/* Project Filter */}
           <Select value={projectId} onValueChange={setProjectId} disabled={refreshing}>
@@ -141,7 +140,9 @@ export default function EventsPage() {
             <SelectContent>
               <SelectItem value="all">All Projects</SelectItem>
               {projects.map((p) => (
-                <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>
+                <SelectItem key={p._id} value={p._id}>
+                  {p.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -183,18 +184,36 @@ export default function EventsPage() {
       {/* Key Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
-          { label: 'Total Events', value: metrics.totalEvents.toLocaleString(), sub: 'In selected range' },
-          { label: 'Events/Day Avg', value: metrics.avgEventsPerDay.toLocaleString(), sub: 'Based on range' },
-          { label: 'Unique Events', value: metrics.uniqueEventTypes, sub: 'Event types tracked' },
-          { label: 'Errors', value: metrics.errorCount, sub: `${metrics.errorRate.toFixed(1)}% error rate`, subClass: 'text-red-600' }
+          {
+            label: "Total Events",
+            value: metrics.totalEvents.toLocaleString(),
+            sub: "In selected range",
+          },
+          {
+            label: "Events/Day Avg",
+            value: metrics.avgEventsPerDay.toLocaleString(),
+            sub: "Based on range",
+          },
+          { label: "Unique Events", value: metrics.uniqueEventTypes, sub: "Event types tracked" },
+          {
+            label: "Errors",
+            value: metrics.errorCount,
+            sub: `${metrics.errorRate.toFixed(1)}% error rate`,
+            subClass: "text-red-600",
+          },
         ].map((m, i) => (
-          <Card key={i} className="p-3 md:p-4 border border-border bg-card relative overflow-hidden">
+          <Card
+            key={i}
+            className="p-3 md:p-4 border border-border bg-card relative overflow-hidden"
+          >
             {refreshing && (
               <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] z-10" />
             )}
             <p className="text-muted-foreground text-xs md:text-sm mb-1">{m.label}</p>
             <p className="text-xl md:text-3xl font-bold text-foreground">{m.value}</p>
-            <p className={`hidden md:block text-xs mt-2 ${m.subClass || 'text-muted-foreground'}`}>{m.sub}</p>
+            <p className={`hidden md:block text-xs mt-2 ${m.subClass || "text-muted-foreground"}`}>
+              {m.sub}
+            </p>
             {refreshing && (
               <div className="absolute top-2 right-2">
                 <Loader2 className="w-3 h-3 animate-spin text-primary/40" />
@@ -211,24 +230,30 @@ export default function EventsPage() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         )}
-        <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">Events Over Time</h2>
+        <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">
+          Events Over Time
+        </h2>
         <div className="h-[300px] md:h-[400px] w-full">
           {eventsOverTime.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={eventsOverTime}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="var(--color-muted-foreground)" 
-                  fontSize={12} 
-                  tickFormatter={(val) => range === '24h' ? val.split(' ')[1] : val}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickFormatter={(val) => (range === "24h" ? val.split(" ")[1] : val)}
                 />
                 <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: 'var(--color-card)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '8px',
+                    backgroundColor: "var(--color-card)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "8px",
                   }}
                 />
                 <Legend />
@@ -238,7 +263,7 @@ export default function EventsPage() {
                   name="Total Events"
                   stroke="#3b82f6"
                   strokeWidth={3}
-                  dot={{ fill: '#3b82f6', r: 4 }}
+                  dot={{ fill: "#3b82f6", r: 4 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
                 <Line
@@ -247,7 +272,7 @@ export default function EventsPage() {
                   name="Page Views"
                   stroke="#10b981"
                   strokeWidth={3}
-                  dot={{ fill: '#10b981', r: 4 }}
+                  dot={{ fill: "#10b981", r: 4 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
               </LineChart>
@@ -266,22 +291,40 @@ export default function EventsPage() {
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
             </div>
           )}
-          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">Top Events</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-foreground mb-4 md:mb-6">
+            Top Events
+          </h2>
           <div className="h-[250px] md:h-[300px] w-full">
             {topEvents.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topEvents} layout="vertical" margin={{ left: 40 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="var(--color-border)"
+                    horizontal={false}
+                  />
                   <XAxis type="number" stroke="var(--color-muted-foreground)" fontSize={12} />
-                  <YAxis dataKey="name" type="category" stroke="var(--color-muted-foreground)" fontSize={12} width={80} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    stroke="var(--color-muted-foreground)"
+                    fontSize={12}
+                    width={80}
+                  />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'var(--color-card)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '8px',
+                      backgroundColor: "var(--color-card)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "8px",
                     }}
                   />
-                  <Bar dataKey="value" name="Count" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={20} />
+                  <Bar
+                    dataKey="value"
+                    name="Count"
+                    fill="#3b82f6"
+                    radius={[0, 4, 4, 0]}
+                    barSize={20}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -319,12 +362,12 @@ export default function EventsPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'var(--color-card)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '8px',
-                      color: 'var(--color-foreground)'
+                      backgroundColor: "var(--color-card)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: "8px",
+                      color: "var(--color-foreground)",
                     }}
-                    itemStyle={{ color: 'var(--color-foreground)' }}
+                    itemStyle={{ color: "var(--color-foreground)" }}
                   />
                   <Legend />
                 </PieChart>
@@ -353,15 +396,11 @@ export default function EventsPage() {
                 <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                   Event Name
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Count
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Count</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
                   % of Total
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                  Trend
-                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Trend</th>
               </tr>
             </thead>
             <tbody>
@@ -371,10 +410,10 @@ export default function EventsPage() {
                     key={event.name}
                     className="border-b border-border hover:bg-secondary/30 transition-colors"
                   >
-                    <td className="px-6 py-4 text-sm font-medium text-foreground">
-                      {event.name}
+                    <td className="px-6 py-4 text-sm font-medium text-foreground">{event.name}</td>
+                    <td className="px-6 py-4 text-sm text-foreground">
+                      {event.value.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 text-sm text-foreground">{event.value.toLocaleString()}</td>
                     <td className="px-6 py-4 text-sm text-foreground">
                       {((event.value / metrics.totalEvents) * 100).toFixed(1)}%
                     </td>

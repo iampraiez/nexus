@@ -1,11 +1,11 @@
-import { NextRequest } from 'next/server';
-import { getDatabase } from '@/lib/db';
-import { hashPassword, createSessionToken } from '@/lib/crypto';
-import { isValidEmail } from '@/lib/validation';
-import { createSuccessResponse, createErrorResponse } from '@/lib/api-response';
-import { createSession, setSessionCookie } from '@/lib/auth';
-import { ObjectId } from 'mongodb';
-import { logger } from '@/lib/logger';
+import { NextRequest } from "next/server";
+import { getDatabase } from "@/lib/db";
+import { hashPassword, createSessionToken } from "@/lib/crypto";
+import { isValidEmail } from "@/lib/validation";
+import { createSuccessResponse, createErrorResponse } from "@/lib/api-response";
+import { createSession, setSessionCookie } from "@/lib/auth";
+import { ObjectId } from "mongodb";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,19 +13,19 @@ export async function POST(request: NextRequest) {
     const { email, password } = body;
 
     if (!email || !isValidEmail(email)) {
-      return createErrorResponse('Invalid email address', 400);
+      return createErrorResponse("Invalid email address", 400);
     }
 
     if (!password) {
-      return createErrorResponse('Password required', 400);
+      return createErrorResponse("Password required", 400);
     }
 
     const db = await getDatabase();
 
-    const company = await db.collection('companies').findOne({ email });
+    const company = await db.collection("companies").findOne({ email });
 
     if (!company) {
-      return createErrorResponse('Invalid email or password', 401);
+      return createErrorResponse("Invalid email or password", 401);
     }
 
     // Check if email is verified
@@ -36,14 +36,14 @@ export async function POST(request: NextRequest) {
           requiresVerification: true,
         },
         200,
-        'Email not verified. Please verify your email.'
+        "Email not verified. Please verify your email."
       );
     }
 
     // Verify password
     const passwordHash = hashPassword(password);
     if (passwordHash !== company.passwordHash) {
-      return createErrorResponse('Invalid email or password', 401);
+      return createErrorResponse("Invalid email or password", 401);
     }
 
     // Create session token
@@ -60,10 +60,10 @@ export async function POST(request: NextRequest) {
         plan: company.plan,
       },
       200,
-      'Login successful'
+      "Login successful"
     );
   } catch (error) {
-    console.error('Login error:', error);
-    return createErrorResponse('Login failed', 500);
+    console.error("Login error:", error);
+    return createErrorResponse("Login failed", 500);
   }
 }

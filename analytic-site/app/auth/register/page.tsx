@@ -61,9 +61,7 @@ export default function RegisterPage() {
         </Link>
 
         <div className="mb-8 space-y-2">
-          <h1 className="text-3xl font-light text-foreground">
-            Create Account
-          </h1>
+          <h1 className="text-3xl font-light text-foreground">Create Account</h1>
           <p className="text-muted-foreground leading-relaxed">
             Get started with event tracking and analytics
           </p>
@@ -123,11 +121,7 @@ export default function RegisterPage() {
             </div>
 
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin mx-auto" />
-              ) : (
-                "Create Account"
-              )}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Create Account"}
             </Button>
           </form>
 

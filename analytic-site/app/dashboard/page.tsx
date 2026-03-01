@@ -47,7 +47,8 @@ export default function DashboardPage() {
           <div>
             <h3 className="font-semibold text-foreground">New: AI Analytics</h3>
             <p className="text-sm text-muted-foreground">
-              Get insanely comprehensive insights and strategic recommendations powered by Gemini 2.0.
+              Get insanely comprehensive insights and strategic recommendations powered by Gemini
+              2.0.
             </p>
           </div>
         </div>
@@ -57,60 +58,61 @@ export default function DashboardPage() {
           </Button>
         </Link>
       </div>
- 
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {stats.map((stat: any) => {
-          const Icon = stat.label === "Total Events" ? Activity : 
-                       stat.label === "Active Users" ? Users :
-                       stat.label === "Conversion Rate" ? TrendingUp : BarChart3;
+          const Icon =
+            stat.label === "Total Events"
+              ? Activity
+              : stat.label === "Active Users"
+                ? Users
+                : stat.label === "Conversion Rate"
+                  ? TrendingUp
+                  : BarChart3;
           const ChangeIcon = stat.positive ? ArrowUpRight : ArrowDownRight;
           const changeColor = stat.positive ? "text-green-600" : "text-red-600";
- 
+
           return (
-            <Link key={stat.label} href={
-              stat.label === "Total Events" ? "/dashboard/analytics/events" :
-              stat.label === "Active Users" ? "/dashboard/analytics/users" :
-              stat.label === "Conversion Rate" ? "/dashboard/analytics/funnels" :
-              "/dashboard/projects"
-            }>
+            <Link
+              key={stat.label}
+              href={
+                stat.label === "Total Events"
+                  ? "/dashboard/analytics/events"
+                  : stat.label === "Active Users"
+                    ? "/dashboard/analytics/users"
+                    : stat.label === "Conversion Rate"
+                      ? "/dashboard/analytics/funnels"
+                      : "/dashboard/projects"
+              }
+            >
               <Card className="p-5 md:p-6 hover:bg-secondary/50 transition-colors cursor-pointer border border-border bg-card">
                 <div className="flex items-start justify-between mb-4">
                   <div className="p-2 rounded-lg bg-primary/10">
                     <Icon className="w-5 h-5 text-primary" />
                   </div>
-                  <div
-                    className={`flex items-center gap-1 text-sm font-medium ${changeColor}`}
-                  >
+                  <div className={`flex items-center gap-1 text-sm font-medium ${changeColor}`}>
                     <ChangeIcon className="w-4 h-4" />
                     {stat.change}
                   </div>
                 </div>
-                <p className="text-muted-foreground text-xs md:text-sm mb-1">
-                  {stat.label}
-                </p>
-                <p className="text-2xl md:text-3xl font-bold text-foreground">
-                  {stat.value}
-                </p>
+                <p className="text-muted-foreground text-xs md:text-sm mb-1">{stat.label}</p>
+                <p className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</p>
               </Card>
             </Link>
           );
         })}
       </div>
- 
+
       {/* SDK Install Card */}
       <Card className="p-6 border border-border bg-card">
-        <h2 className="text-lg font-semibold text-foreground mb-4">
-          Quick Install
-        </h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">Quick Install</h2>
         <SdkInstallCard />
       </Card>
 
       {/* Quick Links */}
       <Card className="p-6 border border-border bg-card">
-        <h2 className="text-xl font-semibold text-foreground mb-6">
-          Quick Links
-        </h2>
+        <h2 className="text-xl font-semibold text-foreground mb-6">Quick Links</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link href="/dashboard/projects">
             <Button
@@ -132,9 +134,7 @@ export default function DashboardPage() {
             >
               <div className="text-left">
                 <div className="font-medium">Billing & Plans</div>
-                <div className="text-xs text-muted-foreground">
-                  Upgrade or manage your plan
-                </div>
+                <div className="text-xs text-muted-foreground">Upgrade or manage your plan</div>
               </div>
             </Button>
           </Link>

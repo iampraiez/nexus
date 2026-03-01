@@ -38,8 +38,8 @@ export class EventTracker {
     transport?: ITransport
   ) {
     this.config = {
-      batchSize: 10,
-      flushInterval: 2000,
+      batchSize: 20,
+      flushInterval: 30000,
       maxRetries: 3,
       ...config,
     };
