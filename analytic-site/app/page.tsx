@@ -173,7 +173,7 @@ export default function HomePage() {
                   target="_blank"
                   className="hover:text-primary transition"
                 >
-                  Praise Olaoye
+                  iampraiez
                 </a>
               </p>
             </div>

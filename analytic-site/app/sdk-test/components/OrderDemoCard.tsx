@@ -2,30 +2,48 @@
 
 import { useState, useEffect } from "react";
 import { useNexus } from "../NexusProvider";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Box, XCircle, AlertTriangle, CheckCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Package, XCircle, AlertTriangle, CheckCircle, RefreshCw } from "lucide-react";
 
 interface OrderDemoCardProps {
-  onEventTracked: () => void;
+  onEventTracked: (type: string) => void;
+}
+
+function generateOrderId() {
+  return `order-${Date.now().toString().slice(-6)}`;
 }
 
 export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
-  const { track } = useNexus();
-  const [mounted, setMounted] = useState(false);
+  const { track, isInitialized } = useNexus();
   const [orderId, setOrderId] = useState("order-......");
   const [userId, setUserId] = useState("user-123456");
   const [amount, setAmount] = useState(299.97);
   const [currency, setCurrency] = useState("USD");
-  const [errorMsg, setErrorMsg] = useState("Card declined");
+  const [failureReason, setFailureReason] = useState("Card declined");
 
+  // Generate order ID only on client
   useEffect(() => {
-    setMounted(true);
-    setOrderId(`order-${Date.now().toString().slice(-6)}`);
+    setOrderId(generateOrderId());
   }, []);
+
+  const refreshOrderId = () => setOrderId(generateOrderId());
 
   const handleOrderCreated = () => {
     track("order_created", {
@@ -38,74 +56,67 @@ export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
         { productId: "prod-002", qty: 1 },
       ],
     });
-    onEventTracked();
+    onEventTracked("order_created");
   };
 
   const handleOrderCancelled = () => {
-    track("order_cancelled", {
-      orderId,
-      reason: "Customer request",
-    });
-    onEventTracked();
+    track("order_cancelled", { orderId, reason: "Customer request" });
+    onEventTracked("order_cancelled");
   };
 
   const handlePaymentFailed = () => {
-    track("payment_failed", {
-      orderId,
-      error: errorMsg,
-    });
-    onEventTracked();
+    track("payment_failed", { orderId, error: failureReason });
+    onEventTracked("payment_failed");
   };
 
   return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:border-primary/50">
+    <Card className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Box className="w-5 h-5 text-primary" />
-          Order Management
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Package className="w-4 h-4 text-primary" />
+          Order Events
         </CardTitle>
-        <CardDescription>
-          Simulate order lifecycle events and failure states.
+        <CardDescription className="text-xs">
+          Simulate order lifecycle and failure states.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="orderId" className="text-muted-foreground">Order ID</Label>
-            <Input
-              id="orderId"
-              value={orderId}
-              onChange={(e) => setOrderId(e.target.value)}
-              className="bg-background/50 font-mono text-xs"
-            />
+      <CardContent className="space-y-3 flex-1">
+        {/* Order ID row */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="ode-order" className="text-xs text-muted-foreground">Order ID</Label>
+            <button
+              onClick={refreshOrderId}
+              className="text-[9px] text-muted-foreground/50 hover:text-primary flex items-center gap-1 transition-colors"
+            >
+              <RefreshCw className="w-2.5 h-2.5" />
+              Regenerate
+            </button>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="userId" className="text-muted-foreground">User ID</Label>
-            <Input
-              id="userId"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              className="bg-background/50 font-mono text-xs"
-            />
-          </div>
+          <Input
+            id="ode-order"
+            value={orderId}
+            onChange={(e) => setOrderId(e.target.value)}
+            className="bg-background/50 h-8 text-xs font-mono"
+          />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="amount" className="text-muted-foreground">Amount</Label>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="ode-amount" className="text-xs text-muted-foreground">Amount</Label>
             <Input
-              id="amount"
+              id="ode-amount"
               type="number"
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-              className="bg-background/50"
+              className="bg-background/50 h-8 text-xs"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="currency" className="text-muted-foreground">Currency</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="ode-currency" className="text-xs text-muted-foreground">Currency</Label>
             <Select value={currency} onValueChange={setCurrency}>
-              <SelectTrigger id="currency" className="bg-background/50">
+              <SelectTrigger id="ode-currency" className="bg-background/50 h-8 text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -118,39 +129,43 @@ export default function OrderDemoCard({ onEventTracked }: OrderDemoCardProps) {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="errorMsg" className="text-muted-foreground">Failure Reason</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="ode-failure" className="text-xs text-muted-foreground">Failure Reason</Label>
           <Input
-            id="errorMsg"
-            value={errorMsg}
-            onChange={(e) => setErrorMsg(e.target.value)}
-            className="bg-background/50 border-destructive/20 focus-visible:ring-destructive"
+            id="ode-failure"
+            value={failureReason}
+            onChange={(e) => setFailureReason(e.target.value)}
+            className="bg-background/50 h-8 text-xs border-destructive/20 focus-visible:ring-destructive"
           />
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col gap-2">
-        <Button 
+      <CardFooter className="flex flex-col gap-2 pt-2">
+        <Button
+          size="sm"
           onClick={handleOrderCreated}
-          className="w-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/10"
+          className="w-full text-xs bg-primary hover:bg-primary/90"
         >
-          <CheckCircle className="mr-2 h-4 w-4" />
-          Track Order Success
+          <CheckCircle className="mr-1.5 h-3.5 w-3.5" />
+          Order Created
         </Button>
-        <div className="grid grid-cols-2 gap-3 w-full">
-          <Button 
+        <div className="grid grid-cols-2 gap-2 w-full">
+          <Button
+            size="sm"
             variant="secondary"
             onClick={handleOrderCancelled}
-            className="hover:bg-secondary/80"
+            className="text-xs hover:bg-secondary/80"
           >
-            <XCircle className="mr-2 h-4 w-4" />
+            <XCircle className="mr-1.5 h-3.5 w-3.5" />
             Cancel
           </Button>
-          <Button 
+          <Button
+            size="sm"
             variant="destructive"
             onClick={handlePaymentFailed}
+            className="text-xs"
           >
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            Fail Payout
+            <AlertTriangle className="mr-1.5 h-3.5 w-3.5" />
+            Pay Failed
           </Button>
         </div>
       </CardFooter>

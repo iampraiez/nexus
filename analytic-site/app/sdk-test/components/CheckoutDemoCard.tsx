@@ -1,116 +1,131 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNexus } from "../NexusProvider";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CreditCard, ArrowRight, CheckCircle2 } from "lucide-react";
 
 interface CheckoutDemoCardProps {
-  onEventTracked: () => void;
+  onEventTracked: (type: string) => void;
 }
 
-export default function CheckoutDemoCard({
-  onEventTracked,
-}: CheckoutDemoCardProps) {
-  const { track } = useNexus();
-  const [mounted, setMounted] = useState(false);
+export default function CheckoutDemoCard({ onEventTracked }: CheckoutDemoCardProps) {
+  const { track, isInitialized } = useNexus();
   const [cartValue, setCartValue] = useState(149.97);
   const [itemCount, setItemCount] = useState(3);
+  const [checkoutStarted, setCheckoutStarted] = useState(false);
 
+  // Reset flow if SDK goes offline
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const orderIdPreview = useMemo(() => {
-    if (!mounted) return "order-......";
-    return `order-${Date.now().toString().slice(-6)}`;
-  }, [mounted]);
+    if (!isInitialized) setCheckoutStarted(false);
+  }, [isInitialized]);
 
   const handleCheckoutStarted = () => {
-    track("checkout_started", {
-      cartValue,
-      itemCount,
-    });
-    onEventTracked();
+    track("checkout_started", { cartValue, itemCount });
+    onEventTracked("checkout_started");
+    setCheckoutStarted(true);
   };
 
   const handleCheckoutCompleted = () => {
-    const orderId = `order-${Date.now()}`;
-    track("checkout_completed", {
-      orderId,
-      cartValue,
-    });
-    onEventTracked();
+    const orderId = `order-${Date.now().toString().slice(-6)}`;
+    track("checkout_completed", { orderId, cartValue });
+    onEventTracked("checkout_completed");
+    setCheckoutStarted(false);
   };
 
   return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:border-primary/50">
+    <Card className={`border-border/50 bg-card/50 backdrop-blur-sm flex flex-col transition-all ${!isInitialized ? "opacity-50 pointer-events-none" : "hover:border-primary/50"}`}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CreditCard className="w-5 h-5 text-primary" />
+        <CardTitle className="flex items-center gap-2 text-base">
+          <CreditCard className="w-4 h-4 text-primary" />
           Checkout Flow
         </CardTitle>
-        <CardDescription>
-          Track the transition from cart to successful purchase.
+        <CardDescription className="text-xs">
+          Simulate cart-to-purchase events in sequence.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="cartValue" className="text-muted-foreground">Cart Total ($)</Label>
+      <CardContent className="space-y-3 flex-1">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="cde-cart" className="text-xs text-muted-foreground">
+              Cart Total ($)
+            </Label>
             <Input
-              id="cartValue"
+              id="cde-cart"
               type="number"
               step="0.01"
               min="0"
               value={cartValue}
               onChange={(e) => setCartValue(parseFloat(e.target.value) || 0)}
-              className="bg-background/50"
+              className="bg-background/50 h-8 text-xs"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="itemCount" className="text-muted-foreground">Qty</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="cde-qty" className="text-xs text-muted-foreground">
+              Items
+            </Label>
             <Input
-              id="itemCount"
+              id="cde-qty"
               type="number"
               min="1"
               max="100"
               value={itemCount}
               onChange={(e) => setItemCount(Math.max(1, parseInt(e.target.value) || 1))}
-              className="bg-background/50"
+              className="bg-background/50 h-8 text-xs"
             />
           </div>
         </div>
 
-        <div className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10 space-y-1">
-          <div className="flex justify-between text-[10px] text-muted-foreground uppercase tracking-widest">
-            <span>Next Order ID</span>
+        {/* Flow state indicator */}
+        <div className="p-2.5 rounded-lg border space-y-1 transition-all"
+          style={{
+            background: checkoutStarted ? "rgba(16,185,129,0.05)" : "rgba(var(--secondary), 0.3)",
+            borderColor: checkoutStarted ? "rgba(16,185,129,0.2)" : "rgba(var(--border), 0.5)",
+          }}
+        >
+          <div className="flex justify-between text-[9px] uppercase tracking-widest text-muted-foreground/50">
+            <span>Step</span>
             <span>Status</span>
           </div>
           <div className="flex justify-between items-center">
-            <code className="text-xs font-mono text-emerald-500">{orderIdPreview}</code>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-bold">READY</span>
+            <span className="text-xs font-mono font-medium text-foreground/80">
+              {checkoutStarted ? "Awaiting completion" : "Ready to start"}
+            </span>
+            <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${checkoutStarted ? "bg-amber-500/20 text-amber-500" : "bg-emerald-500/20 text-emerald-500"}`}>
+              {checkoutStarted ? "STARTED" : "IDLE"}
+            </span>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col gap-3">
-        <Button 
-          variant="outline" 
+      <CardFooter className="flex flex-col gap-2 pt-2">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={handleCheckoutStarted}
-          className="w-full border-primary/20 hover:bg-primary/5 group"
+          disabled={checkoutStarted}
+          className="w-full text-xs border-primary/20 hover:bg-primary/5 group disabled:opacity-40"
         >
-          <span>Start Checkout</span>
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <span>1. Start Checkout</span>
+          <ArrowRight className="ml-auto h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
         </Button>
-        <Button 
+        <Button
+          size="sm"
           onClick={handleCheckoutCompleted}
-          className="w-full bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-500/10"
+          disabled={!checkoutStarted}
+          className="w-full text-xs bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-500/10 disabled:opacity-40"
         >
-          <CheckCircle2 className="mr-2 h-4 w-4" />
-          Complete Purchase
+          <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+          2. Complete Purchase
         </Button>
       </CardFooter>
     </Card>
