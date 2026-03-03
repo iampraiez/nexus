@@ -39,7 +39,7 @@ export default function DashboardPage() {
       </div>
 
       {/* New Feature Announcement */}
-      <div className="bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-linear-to-r from-primary/10 to-purple-500/10 border border-primary/20 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary/20 rounded-full text-primary">
             <Sparkles className="w-5 h-5" />

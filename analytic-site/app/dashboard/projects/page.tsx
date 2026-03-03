@@ -87,6 +87,8 @@ export default function ProjectsPage() {
   // API Key State
   const [newlyGeneratedKey, setNewlyGeneratedKey] = useState<string | null>(null);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
+  const [generatingKey, setGeneratingKey] = useState(false);
+  const [revokingKeyId, setRevokingKeyId] = useState<string | null>(null);
 
   const { toast } = useToast();
 
@@ -264,6 +266,7 @@ export default function ProjectsPage() {
     if (!selectedProject) return;
 
     try {
+      setGeneratingKey(true);
       const response = await fetch(`/api/projects/${selectedProject._id}/api-keys`, {
         method: "POST",
       });
@@ -283,6 +286,8 @@ export default function ProjectsPage() {
         description: "Failed to generate API key",
         variant: "destructive",
       });
+    } finally {
+      setGeneratingKey(false);
     }
   }
 
@@ -290,6 +295,7 @@ export default function ProjectsPage() {
     if (!selectedProject) return;
 
     try {
+      setRevokingKeyId(keyId);
       const response = await fetch(`/api/projects/${selectedProject._id}/api-keys/${keyId}`, {
         method: "DELETE",
       });
@@ -307,6 +313,8 @@ export default function ProjectsPage() {
         description: "Failed to revoke API key",
         variant: "destructive",
       });
+    } finally {
+      setRevokingKeyId(null);
     }
   }
 
@@ -548,9 +556,13 @@ export default function ProjectsPage() {
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
                                   onClick={handleDeleteProject}
+                                  disabled={loading}
                                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                 >
-                                  Delete Project
+                                  {loading ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                  ) : null}
+                                  {loading ? "Deleting..." : "Delete Project"}
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -574,8 +586,13 @@ export default function ProjectsPage() {
                       Use these keys to authenticate your SDK requests
                     </p>
                   </div>
-                  <Button onClick={handleGenerateApiKey} size="sm" className="gap-2">
-                    Generate Key
+                  <Button onClick={handleGenerateApiKey} size="sm" className="gap-2" disabled={generatingKey}>
+                    {generatingKey ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4" /> // Using Plus instead of just text for better UI
+                    )}
+                    {generatingKey ? "Generating..." : "Generate Key"}
                   </Button>
                 </div>
 
@@ -655,10 +672,17 @@ export default function ProjectsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
+                                disabled={revokingKeyId === key._id}
                                 className="gap-2 h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                               >
-                                <Trash2 className="w-3 h-3" />
-                                <span className="hidden sm:inline">Revoke</span>
+                                {revokingKeyId === key._id ? (
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-3 h-3" />
+                                )}
+                                <span className="hidden sm:inline">
+                                  {revokingKeyId === key._id ? "Revoking..." : "Revoke"}
+                                </span>
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>

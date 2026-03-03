@@ -76,14 +76,17 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { loading, usage } = useDashboard();
 
   async function handleLogout() {
+    setIsLoggingOut(true);
     try {
       await fetch("/api/auth/logout", { method: "POST" });
       router.push("/auth/login");
     } catch (error) {
       console.error("Logout error:", error);
+      setIsLoggingOut(false);
     }
   }
 
@@ -198,9 +201,14 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             variant="ghost"
             className="w-full justify-start gap-2 text-muted-foreground"
             onClick={handleLogout}
+            disabled={isLoggingOut}
           >
-            <LogOut className="w-4 h-4" />
-            Sign Out
+            {isLoggingOut ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <LogOut className="w-4 h-4" />
+            )}
+            {isLoggingOut ? "Signing out..." : "Sign Out"}
           </Button>
         </div>
       </aside>

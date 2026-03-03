@@ -50,6 +50,7 @@ export default function SettingsPage() {
   const [exporting, setExporting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [revokingSessionId, setRevokingSessionId] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Form states
@@ -191,6 +192,7 @@ export default function SettingsPage() {
 
   const handleRevokeSession = async (sessionId: string) => {
     try {
+      setRevokingSessionId(sessionId);
       const response = await fetch(`/api/auth/sessions?id=${sessionId}`, { method: "DELETE" });
       if (response.ok) {
         setSessions(sessions.filter((s) => s._id !== sessionId));
@@ -207,6 +209,8 @@ export default function SettingsPage() {
         description: "Failed to revoke session.",
         variant: "destructive",
       });
+    } finally {
+      setRevokingSessionId(null);
     }
   };
 
@@ -398,10 +402,15 @@ export default function SettingsPage() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    disabled={revokingSessionId === session._id}
                     className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     onClick={() => handleRevokeSession(session._id)}
                   >
-                    Revoke
+                    {revokingSessionId === session._id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      "Revoke"
+                    )}
                   </Button>
                 </div>
               ))}
