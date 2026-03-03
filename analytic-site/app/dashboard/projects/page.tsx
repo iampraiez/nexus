@@ -696,7 +696,7 @@ export default function ProjectsPage() {
                   <h4 className="text-sm font-semibold text-foreground">Integration Guide</h4>
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                     Ready to start tracking? Check out our{" "}
-                    <Link href="/docs" className="text-primary hover:underline font-medium">
+                    <Link href="/docs" target="_blank" className="text-primary hover:underline font-medium">
                       SDK Documentation
                     </Link>{" "}
                     to learn how to initialize the Nexus SDK with your project credentials.
