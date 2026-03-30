@@ -147,6 +147,7 @@ export async function checkAllAlerts(): Promise<{
 
             // Prepare notification payload
             const payload: NotificationPayload = {
+              companyId: alert.companyId,
               alertName: alert.name,
               trigger,
               triggerDetails: result.triggerDetails,

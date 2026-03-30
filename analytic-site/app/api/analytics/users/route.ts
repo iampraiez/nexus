@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     const range = searchParams.get("range") || "7d";
     const projectId = searchParams.get("projectId");
     const environment = searchParams.get("environment");
+    const filterParam = searchParams.get("filter");
 
     const db = await getDatabase();
 
@@ -34,7 +35,17 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    let customFilter = {};
+    if (filterParam) {
+      try {
+        customFilter = JSON.parse(filterParam);
+      } catch (e) {
+        return createErrorResponse("Invalid filter format", 400);
+      }
+    }
+
     const matchStage: any = {
+      ...customFilter,
       projectId: { $in: filterProjectIds },
     };
 

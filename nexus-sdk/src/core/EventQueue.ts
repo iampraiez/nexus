@@ -85,6 +85,13 @@ export class EventQueue {
   }
 
   /**
+   * Get all pending events
+   */
+  getEvents(): SerializedEvent[] {
+    return [...this.queue];
+  }
+
+  /**
    * Check if queue has events
    */
   hasEvents(): boolean {

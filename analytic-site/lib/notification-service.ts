@@ -1,6 +1,9 @@
+import { ObjectId } from 'mongodb';
+import { getDatabase } from './db';
 import { EmailService } from './email-service';
 
 export interface NotificationPayload {
+  companyId?: string | ObjectId;
   alertName: string;
   trigger: string;
   triggerDetails: string;
@@ -97,16 +100,46 @@ export async function sendWebhookNotification(
 }
 
 /**
+ * Send alert notification via In-App (Database)
+ */
+export async function sendInAppNotification(
+  payload: NotificationPayload
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (!payload.companyId) {
+      throw new Error('Company ID is required for in-app notifications');
+    }
+    const db = await getDatabase();
+    await db.collection("in_app_notifications").insertOne({
+      companyId: new ObjectId(payload.companyId),
+      alertName: payload.alertName,
+      trigger: payload.trigger,
+      triggerDetails: payload.triggerDetails,
+      value: payload.value,
+      threshold: payload.threshold,
+      isRead: false,
+      timestamp: new Date(),
+    });
+    return { success: true };
+  } catch (error: any) {
+    console.error('In-App notification error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Main notification dispatcher
  */
 export async function sendNotification(
-  type: 'email' | 'webhook',
+  type: 'email' | 'webhook' | 'in-app',
   target: string,
   payload: NotificationPayload
 ): Promise<{ success: boolean; error?: string }> {
   if (type === 'email') {
     return sendEmailNotification(target, payload);
-  } else {
+  } else if (type === 'webhook') {
     return sendWebhookNotification(target, payload);
+  } else {
+    return sendInAppNotification(payload);
   }
 }

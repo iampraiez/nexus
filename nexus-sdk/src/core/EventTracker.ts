@@ -62,7 +62,18 @@ export class EventTracker {
         this.config.maxRetries
       );
 
-    this.sessionId = this.generateSessionId();
+    const existingSession = this.getCookie("nx_session_id");
+    if (existingSession) {
+      this.sessionId = existingSession;
+    } else {
+      this.sessionId = this.generateSessionId();
+      this.setCookie("nx_session_id", this.sessionId, 1); // 1 day limit
+    }
+
+    const existingUserId = this.getCookie("nx_user_id");
+    if (existingUserId) {
+      this.userId = existingUserId;
+    }
 
     this.queue = new EventQueue(
       this.flushEvents.bind(this),
@@ -81,6 +92,7 @@ export class EventTracker {
    */
   setUserId(userId: string): void {
     this.userId = userId;
+    this.setCookie("nx_user_id", userId, 365); // 1 year persistence
     this.logger.info(`User identified: ${userId}`);
   }
 
@@ -259,6 +271,38 @@ export class EventTracker {
       this.isOnline = false;
       this.logger.info("Gone offline, events will be saved locally");
     });
+
+    window.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        const pendingEvents = this.queue.getEvents();
+        if (pendingEvents.length > 0) {
+          // Save pending events to offline storage when page is hidden/closed
+          void this.saveOfflineEvents(pendingEvents);
+        }
+      }
+    });
+  }
+
+  // ==== Cookie Helpers for Subdomain Tracking ====
+  private getRootDomain(): string {
+    if (typeof window === "undefined") return "";
+    const parts = window.location.hostname.split(".");
+    if (parts.length <= 2) return `.${window.location.hostname}`;
+    return `.${parts.slice(-2).join(".")}`;
+  }
+
+  private setCookie(name: string, value: string, days: number): void {
+    if (typeof document === "undefined") return;
+    const d = new Date();
+    d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * days);
+    document.cookie = `${name}=${value};path=/;domain=${this.getRootDomain()};expires=${d.toUTCString()}`;
+  }
+
+  private getCookie(name: string): string | null {
+    if (typeof document === "undefined") return null;
+    const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+    if (match) return match[2];
+    return null;
   }
 
   /**

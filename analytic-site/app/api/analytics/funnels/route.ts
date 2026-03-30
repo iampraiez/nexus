@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     const range = searchParams.get("range") || "30d";
     const projectId = searchParams.get("projectId");
     const environment = searchParams.get("environment");
+    const funnelId = searchParams.get("funnelId");
 
     const db = await getDatabase();
 
@@ -62,11 +63,23 @@ export async function GET(request: NextRequest) {
     }
 
     // Define funnel steps
-    const steps = [
+    let steps = [
       { name: "Page Visit", event: "page_view" },
       { name: "Product Viewed", event: "product_viewed" },
       { name: "Order Created", event: "order_created" },
     ];
+    let funnelName = "Default Conversion Funnel";
+
+    if (funnelId && funnelId !== "default") {
+      const customFunnel = await db.collection("funnels").findOne({
+        _id: new ObjectId(funnelId),
+        companyId: company._id
+      });
+      if (customFunnel && customFunnel.steps) {
+        steps = customFunnel.steps;
+        funnelName = customFunnel.name;
+      }
+    }
 
     const funnelData: any[] = [];
     let initialUsers = 0;
@@ -99,7 +112,7 @@ export async function GET(request: NextRequest) {
     }
 
     return createSuccessResponse({
-      funnelName: "Default Conversion Funnel",
+      funnelName,
       totalUsers: initialUsers,
       overallConversion:
         initialUsers > 0 ? (funnelData[funnelData.length - 1].users / initialUsers) * 100 : 0,
