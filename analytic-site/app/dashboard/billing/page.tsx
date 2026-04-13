@@ -55,6 +55,26 @@ export default function BillingPage() {
     }
   }, [company, searchParams, refreshData]);
 
+  async function handleManageSubscription() {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/billing/portal", {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (response.ok && data.data?.url) {
+        window.location.href = data.data.url;
+      } else {
+        setMessage(data.error || "Failed to load portal");
+      }
+    } catch (error) {
+      setMessage("An error occurred loading the portal.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleUpgrade(plan: string) {
     if (plan === currentPlan) return;
 
@@ -190,19 +210,15 @@ export default function BillingPage() {
                 <Button
                   className="w-full mb-6"
                   variant={isCurrent || !usage.isFreeTier ? "outline" : "default"}
-                  onClick={() => handleUpgrade(plan.id)}
-                  disabled={loading || isCurrent || !usage.isFreeTier}
+                  onClick={() => (isCurrent && plan.id !== "free") ? handleManageSubscription() : handleUpgrade(plan.id)}
+                  disabled={loading || (isCurrent && plan.id === "free") || (!isCurrent && !usage.isFreeTier)}
                 >
                   {loading ? (
                     <Loader2 className="w-4 h-4 animate-spin mx-auto" />
                   ) : isCurrent ? (
-                    "Active"
+                    plan.id === "free" ? "Active" : "Manage Subscription"
                   ) : !usage.isFreeTier ? (
-                    plan.id === "pro" ? (
-                      "Subscribed"
-                    ) : (
-                      "Included"
-                    )
+                    plan.id === "pro" ? "Subscribed" : "Included"
                   ) : (
                     `Upgrade to ${plan.name}`
                   )}

@@ -34,23 +34,25 @@ async function handleCheckoutSessionCompleted(event: any) {
     }
   );
 
-  // Create subscription record
-  const subscription = await stripe.subscriptions.retrieve(session.subscription);
+  // Create subscription record if it exists
+  if (session.subscription) {
+    const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
 
-  await db.collection("subscriptions").updateOne(
-    { companyId: new ObjectId(companyId) },
-    {
-      $set: {
-        stripeSubscriptionId: session.subscription,
-        stripePriceId: session.metadata?.plan || "pro",
-        status: subscription.status,
-        currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
-        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
-        updatedAt: new Date(),
+    await db.collection("subscriptions").updateOne(
+      { companyId: new ObjectId(companyId) },
+      {
+        $set: {
+          stripeSubscriptionId: session.subscription,
+          stripePriceId: session.metadata?.plan || "pro",
+          status: subscription.status,
+          currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+          currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+          updatedAt: new Date(),
+        },
       },
-    },
-    { upsert: true }
-  );
+      { upsert: true }
+    );
+  }
 
   // Update company plan
   await db.collection("companies").updateOne(
@@ -118,6 +120,51 @@ async function handleSubscriptionDeleted(event: any) {
       },
     }
   );
+
+  // Downgrade company plan to free
+  if (subscription.customer) {
+    await db.collection("companies").updateOne(
+      { stripeCustomerId: subscription.customer },
+      {
+        $set: {
+          plan: "free",
+          updatedAt: new Date(),
+        },
+      }
+    );
+  }
+}
+
+async function handleSubscriptionUpdated(event: any) {
+  const subscription = event.data.object;
+
+  const db = await getDatabase();
+
+  await db.collection("subscriptions").updateOne(
+    { stripeSubscriptionId: subscription.id },
+    {
+      $set: {
+        status: subscription.status,
+        currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
+        currentPeriodEnd: new Date((subscription as any).current_period_end * 1000),
+        updatedAt: new Date(),
+      },
+    }
+  );
+
+  // Sync company plan based on the subscription status
+  if (subscription.customer) {
+    const isPro = ["active", "trialing", "past_due"].includes(subscription.status);
+    await db.collection("companies").updateOne(
+      { stripeCustomerId: subscription.customer },
+      {
+        $set: {
+          plan: isPro ? "pro" : "free",
+          updatedAt: new Date(),
+        },
+      }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -150,6 +197,9 @@ export async function POST(request: NextRequest) {
         break;
       case "customer.subscription.deleted":
         await handleSubscriptionDeleted(event);
+        break;
+      case "customer.subscription.updated":
+        await handleSubscriptionUpdated(event);
         break;
       default:
         console.log("Unhandled webhook event:", event.type);
